@@ -10,7 +10,6 @@ public class Order : IHasDomainEvents
     public Guid TenantId { get; private set; }
     public Guid CustomerId { get; private set; }
     public OrderStatus OrderStatus { get; private set; }
-    public PaymentMethod PaymentMethod { get; private set; }
     public DateTime CreatedAt { get; private set; }
     public DateTime LastUpdatedAt { get; private set; }
     public DateTime? PayedAt { get; private set; }
@@ -27,7 +26,7 @@ public class Order : IHasDomainEvents
 
     private Order() { }
 
-    public Order(Guid OrderId, Guid tenantId, Guid customerId, Address address, IEnumerable<OrderItem> items, PaymentMethod paymentMethod)
+    public Order(Guid OrderId, Guid tenantId, Guid customerId, Address address, IEnumerable<OrderItem> items)
     {
         Id = OrderId;
         TenantId = tenantId;
@@ -37,7 +36,6 @@ public class Order : IHasDomainEvents
         LastUpdatedAt = DateTime.UtcNow;
         Address = address;
         _items.AddRange(items);
-        PaymentMethod = paymentMethod;
     }
 
     #region CHANGE ORDER STATUS
@@ -50,7 +48,6 @@ public class Order : IHasDomainEvents
 
         TriggerDomainEvents(newStatus);
     }
-    #endregion
 
     private void TriggerDomainEvents(OrderStatus newStatus)
     {
@@ -74,5 +71,5 @@ public class Order : IHasDomainEvents
         }
     }
 
-
+    #endregion
 }
