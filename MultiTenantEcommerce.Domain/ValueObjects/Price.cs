@@ -5,10 +5,23 @@ public class Price
 {
     public decimal Value { get; private set; }
 
-    public Price(decimal value)
+    public Price(decimal price)
     {
-        GuardCommon.AgainstNegativeOrZero(value, nameof(value));
+        ValidatePrice(price);
 
-        Value = value;
+        Value = price;
+    }
+
+    public void UpdatePrice(decimal price)
+    {
+        ValidatePrice(price);
+        if (Value == price) throw new Exception("New price can't be equal to previous price.");
+
+        Value = price;
+    }
+
+    public void ValidatePrice(decimal price)
+    {
+        GuardCommon.AgainstNegativeOrZero(price, nameof(price));
     }
 }
