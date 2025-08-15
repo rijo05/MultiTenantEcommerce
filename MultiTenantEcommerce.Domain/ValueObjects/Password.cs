@@ -4,7 +4,7 @@ namespace MultiTenantEcommerce.Domain.ValueObjects;
 public class Password
 {
     public string Value { get; private set; }
-    private const string Pattern = @"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$";
+    const string Pattern = @"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$";
 
     private Password() { }
     public Password(string password)
