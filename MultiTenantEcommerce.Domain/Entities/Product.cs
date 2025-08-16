@@ -15,9 +15,11 @@ public class Product
     public Price Price { get; private set; }
     public bool IsActive { get; private set; }
     public Guid CategoryId { get; private set; }
+    public Stock stock {  get; private set; }
     public DateTime CreatedAt { get; private set; }
 
     private Product() { }
+
     public Product(Guid tenantId, string name, Price price, Guid categoryId, string? sku, string? description, bool isActive = true)
     {
         GuardCommon.AgainstNullOrEmpty(name, nameof(name));

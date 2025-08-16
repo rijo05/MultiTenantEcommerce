@@ -7,7 +7,6 @@ public class Tenant
     public string CompanyName { get; private set; }
     public DateTime CreatedAt { get; private set; }
 
-    private Tenant() { }
     public Tenant(string companyName)
     {
         GuardCommon.AgainstNullOrEmpty(companyName, nameof(companyName));

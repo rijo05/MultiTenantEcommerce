@@ -3,11 +3,12 @@
 namespace MultiTenantEcommerce.Domain.Entities;
 public class Customer : UserBase
 {
+    public Guid Id { get; private set; }
     public Address Address { get; private set; }
     public Password Password { get; private set; }
     public PhoneNumber PhoneNumber { get; private set; }
 
-    private Customer() { }
+
     public Customer(Guid tenantId, string name, Email email, Password password, Address address, PhoneNumber phoneNumber) : base(tenantId, name, email)
     {
         Id = Guid.NewGuid();
@@ -20,10 +21,5 @@ public class Customer : UserBase
     {
         Password.UpdatePassword(newPassword);
         UpdatedAt = DateTime.UtcNow;
-    }
-
-    public void UpdateAddress(string address)
-    {
-        //TODO()
     }
 }

@@ -8,10 +8,9 @@ public class Category
     public string Name { get; private set; }
     public string? Description { get; private set; }
     public bool IsActive { get; private set; }
-    public DateTime CreatedAt { get; private set; }
-    public DateTime UpdatedAt { get; private set; }
-
     private Category() { }
+
+
     public Category(Guid tenantId, string name, string? description)
     {
         GuardCommon.AgainstNullOrEmpty(name, nameof(name));
@@ -22,7 +21,6 @@ public class Category
         Name = name;
         Description = description;
         IsActive = true;
-        CreatedAt = DateTime.UtcNow;
     }
 
     #region UPDATE DATA
@@ -32,26 +30,22 @@ public class Category
         GuardCommon.AgainstNullOrEmpty(newName, nameof(newName));
         GuardCommon.AgainstMaxLength(newName, 100, nameof(newName));
         Name = newName;
-        UpdatedAt = DateTime.UtcNow;
     }
 
     public void UpdateDescription(string description)
     {
         GuardCommon.AgainstMaxLength(description, 255, nameof(description));
         Description = description;
-        UpdatedAt = DateTime.UtcNow;
     }
 
     public void ClearDescription()
     {
         Description = null;
-        UpdatedAt = DateTime.UtcNow;
     }
 
     public void SetActive(bool isActive)
     {
         IsActive = isActive;
-        UpdatedAt = DateTime.UtcNow;
     }
     #endregion
 }

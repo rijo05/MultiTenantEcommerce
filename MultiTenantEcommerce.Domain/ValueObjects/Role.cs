@@ -6,6 +6,7 @@ public class Role
     public RoleType roleName { get; private set; }
 
     private Role() { }
+
     public Role(string name)
     {
         if (!Enum.TryParse<RoleType>(name, true, out var parsedRole))

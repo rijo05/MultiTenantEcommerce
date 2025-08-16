@@ -1,5 +1,4 @@
 ﻿using MultiTenantEcommerce.Domain.Entities;
-using MultiTenantEcommerce.Domain.Enums;
 
 namespace MultiTenantEcommerce.Domain.Interfaces;
 
@@ -14,7 +13,5 @@ public interface IProductRepository : IRepository<Product>
         bool? isActive = null,
         int page = 1,
         int pageSize = 20,
-        SortOptions? sort = null);
-
-    public Task AddBulkAsync(List<Product> products);
+        string? sort = null);
 }

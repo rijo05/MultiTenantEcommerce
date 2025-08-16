@@ -6,14 +6,12 @@ public class StockMovement
 {
     public Guid Id { get; private set; }
     public Guid ProductId { get; private set; }
-    public Guid TenantId { get; private set; }
     public int Quantity { get; private set; }
-    public DateTime CreatedAt { get; private set; }
+    public DateTime Date { get; private set; }
     public StockMovementReason Reason {  get; private set; }
     public string? OtherReason { get; private set; }
 
-    private StockMovement() { }
-    public StockMovement(Guid productId, Guid tenantId, int quantity, DateTime date, StockMovementReason reason, string? otherReason = null)
+    public StockMovement(Guid productId, int quantity, DateTime date, StockMovementReason reason, string? otherReason = null)
     {
         GuardCommon.AgainstNegativeOrZero(quantity, nameof(quantity));
         GuardCommon.AgainstEmptyGuid(productId, nameof(productId));
@@ -26,9 +24,8 @@ public class StockMovement
 
         Id = Guid.NewGuid();
         ProductId = productId;
-        TenantId = tenantId;
         Quantity = quantity;
-        CreatedAt = DateTime.UtcNow;
+        Date = DateTime.UtcNow;
         Reason = reason;
         OtherReason = otherReason;
     }

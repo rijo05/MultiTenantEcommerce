@@ -1,32 +1,32 @@
-﻿namespace MultiTenantEcommerce.Domain.ValueObjects;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace MultiTenantEcommerce.Domain.ValueObjects;
 public class PhoneNumber
 {
     public string CountryCode { get; private set; }
-    public string Number {  get; private set; }
+    public string PhoneNumner {  get; private set; }
 
-    private PhoneNumber() { }
-    public PhoneNumber(string countryCode, string Number)
+    public PhoneNumber(string countryCode, string phoneNumner)
     {
         ValidateCountryCode(countryCode);
-        ValidatePhoneNumber(Number);
+        ValidatePhoneNumber(phoneNumner);
 
-        CountryCode = countryCode.Replace(" ", "");
-        Number = Number.Replace(" ", "");
+        CountryCode = countryCode;
+        PhoneNumner = phoneNumner;
     }
 
-    private void ValidatePhoneNumber(string Number)
+    private void ValidatePhoneNumber(string phoneNumber)
     {
-        if (string.IsNullOrEmpty(Number)) throw new Exception("Phone number cannot be null or empty.");
+        if (string.IsNullOrEmpty(phoneNumber)) throw new Exception("Phone number cannot be null or empty.");
     }
 
     public void ValidateCountryCode(string countryCode)
     {
         if (string.IsNullOrEmpty(countryCode)) throw new Exception("Country Code cannot be null or empty.");
-    }
-
-    public override string ToString()
-    {
-        return $"+{CountryCode} {Number}";
     }
 
 }

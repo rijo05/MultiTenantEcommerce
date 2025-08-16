@@ -5,7 +5,6 @@ public class Price
 {
     public decimal Value { get; private set; }
 
-    private Price() { }
     public Price(decimal price)
     {
         ValidatePrice(price);
