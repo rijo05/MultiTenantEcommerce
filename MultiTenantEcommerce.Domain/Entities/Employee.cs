@@ -26,7 +26,5 @@ public class Employee : UserBase
     {
         //TODO()
     }
-
-
     #endregion
 }
