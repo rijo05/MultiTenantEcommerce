@@ -7,10 +7,7 @@ public class Address
     public string Country { get; private set; }
     public string HouseNumber { get; private set; }
 
-    private Address()
-    {
-
-    }
+    private Address() { }
 
     public Address(string street, string city, string postalCode, string country, string houseNumber)
     {

@@ -7,29 +7,34 @@ public class Stock : IHasDomainEvents
 {
     public Guid Id { get; private set; }
     public Guid ProductId { get; private set; }
-    public Product Product { get; private set; }
+    public Guid TenantId { get; private set; }
     public int Quantity { get; private set; }
     public int MinimumQuantity { get; private set; }
     public int Reserved {  get; private set; }
     public int StockAvailableAtMoment => Quantity - Reserved;
 
-
+    #region domain events
     private readonly List<IDomainEvent> _domainEvents = new();
     public List<IDomainEvent> DomainEvents => _domainEvents;
     public void ClearDomainEvents() => _domainEvents.Clear();
+    #endregion
 
-    public Stock(Product product, int quantity = 0, int minimumQuantity = 10)
+    private Stock() { }
+    public Stock(Product product, Guid tenantId, int quantity = 0, int minimumQuantity = 10)
     {
         GuardCommon.AgainstNegative(quantity, nameof(quantity));
         GuardCommon.AgainstNegative(minimumQuantity, nameof(minimumQuantity));
 
         Id = Guid.NewGuid();
         ProductId = product.Id;
+        TenantId = tenantId;
         Quantity = quantity;
         MinimumQuantity = minimumQuantity;
         Reserved = 0;
     }
 
+
+    #region STOCK CHANGES
     public void ChangeStock(int quantity)
     {
         if (quantity < 0)
@@ -58,6 +63,8 @@ public class Stock : IHasDomainEvents
 
         MinimumQuantity = quantity;
     }
+
+    #endregion
 
     #region STOCK CONFLICTS
     public void ReleaseStock(int quantity)

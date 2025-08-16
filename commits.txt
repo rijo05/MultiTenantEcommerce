@@ -1,0 +1,23 @@
+"Add": Para quando você adicionar algo novo, mas sem necessariamente implementar uma lógica complexa.
+
+Exemplo: feat: add login validation
+
+"Implement": Para desenvolver a lógica de uma funcionalidade, criar uma nova estrutura ou algo que envolva codificação mais profunda.
+
+Exemplo: feat: implement JWT authentication
+
+"Fix": Para corrigir bugs ou erros no sistema.
+
+Exemplo: fix: resolve login issue when password is incorrect
+
+"Update": Para quando você alterar algo que já existia (sem criar do zero, mas melhorando ou modificando).
+
+Exemplo: update: change user model to include email validation
+
+"Refactor": Para quando você refatorar código sem mudar a funcionalidade, apenas melhorando a estrutura ou legibilidade.
+
+Exemplo: refactor: simplify authentication middleware
+
+"Remove": Para quando você remover algo que não é mais necessário.
+
+Exemplo: remove: delete unused validation function

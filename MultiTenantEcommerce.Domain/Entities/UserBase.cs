@@ -10,6 +10,7 @@ public abstract class UserBase
     public Email Email { get; protected set; }
     public DateTime CreatedAt { get; protected set; }
     public DateTime? UpdatedAt { get; protected set; }
+    public bool IsActive { get; protected set; }
 
     protected UserBase() { }
 
@@ -24,6 +25,7 @@ public abstract class UserBase
         Email = email;
         CreatedAt = DateTime.UtcNow;
         UpdatedAt = CreatedAt;
+        IsActive = true;
     }
 
     public void UpdateName(string? newName)
@@ -37,5 +39,11 @@ public abstract class UserBase
     {
         Email.UpdateEmail(newEmail);
         UpdatedAt = DateTime.UtcNow;
+    }
+
+    public void SetActive(bool isActive)
+    {
+        IsActive = isActive;
+        UpdatedAt = DateTime.UtcNow; ;
     }
 }
