@@ -7,9 +7,8 @@ public interface IOrderRepository : IRepository<Order>
 {
     public Task<List<OrderItem>> GetItemsByOrderIdAsync(Guid id);
     public Task<List<Order>> GetFilteredAsync(
-        Guid? tenantId = null,
         Guid? customerId = null,
-        OrderStatus? status = null,
+        string? status = null,
         DateTime? minDate = null,
         DateTime? maxDate = null,
         bool? isPaid = null,
@@ -17,6 +16,6 @@ public interface IOrderRepository : IRepository<Order>
         decimal? maxPrice = null,
         int page = 1,
         int pageSize = 20,
-        string? sort = null);
+        SortOptions? sort = null);
 }
 
