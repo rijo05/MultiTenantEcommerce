@@ -3,11 +3,10 @@ using MultiTenantEcommerce.Domain.Common.Guard;
 using MultiTenantEcommerce.Domain.Events.Products;
 
 namespace MultiTenantEcommerce.Domain.Entities;
-public class Stock : IHasDomainEvents
+public class Stock : TenantBase, IHasDomainEvents
 {
     public Guid Id { get; private set; }
     public Guid ProductId { get; private set; }
-    public Guid TenantId { get; private set; }
     public int Quantity { get; private set; }
     public int MinimumQuantity { get; private set; }
     public int Reserved {  get; private set; }
@@ -20,14 +19,13 @@ public class Stock : IHasDomainEvents
     #endregion
 
     private Stock() { }
-    public Stock(Product product, Guid tenantId, int quantity = 0, int minimumQuantity = 10)
+    public Stock(Product product, Guid tenantId, int quantity = 0, int minimumQuantity = 10) : base(tenantId)
     {
         GuardCommon.AgainstNegative(quantity, nameof(quantity));
         GuardCommon.AgainstNegative(minimumQuantity, nameof(minimumQuantity));
 
         Id = Guid.NewGuid();
         ProductId = product.Id;
-        TenantId = tenantId;
         Quantity = quantity;
         MinimumQuantity = minimumQuantity;
         Reserved = 0;
@@ -45,23 +43,23 @@ public class Stock : IHasDomainEvents
         }
 
         Quantity += quantity;
-
         TriggerDomainEvents(Quantity);
+        SetUpdatedAt();
     }
 
     public void SetStock(int quantity)
     {
         GuardCommon.AgainstNegative(quantity, nameof(quantity));
         Quantity = quantity;
-
         TriggerDomainEvents(Quantity);
+        SetUpdatedAt();
     }
 
     public void SetMinimumStockLevel(int quantity)
     {
         GuardCommon.AgainstNegativeOrZero(quantity, nameof(quantity));
-
         MinimumQuantity = quantity;
+        SetUpdatedAt();
     }
 
     #endregion
@@ -73,6 +71,7 @@ public class Stock : IHasDomainEvents
             throw new Exception("Quantity not valid");
 
         Reserved -= quantity;
+        SetUpdatedAt();
     }
     public void ReserveStock(int quantity)
     {
@@ -80,6 +79,7 @@ public class Stock : IHasDomainEvents
             throw new Exception("Quantity not valid");
 
         Reserved += quantity;
+        SetUpdatedAt();
     }
 
     public void CommitStock(int quantity)
@@ -89,6 +89,7 @@ public class Stock : IHasDomainEvents
 
         Quantity -= quantity;
         Reserved -= quantity;
+        SetUpdatedAt();
     }
     #endregion
 

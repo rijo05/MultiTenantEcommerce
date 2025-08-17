@@ -4,15 +4,12 @@ using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Domain.Entities;
-public class Order : IHasDomainEvents
+public class Order : TenantBase, IHasDomainEvents
 {
     public Guid Id { get; private set; }
-    public Guid TenantId { get; private set; }
     public Guid CustomerId { get; private set; }
     public OrderStatus OrderStatus { get; private set; }
     public PaymentMethod PaymentMethod { get; private set; }
-    public DateTime CreatedAt { get; private set; }
-    public DateTime UpdatedAt { get; private set; }
     public DateTime? PayedAt { get; private set; }
     public Address Address { get; private set; }
     public decimal Price => _items.Sum(x => x.Total);
@@ -26,14 +23,11 @@ public class Order : IHasDomainEvents
     #endregion
 
     private Order() { }
-    public Order(Guid tenantId, Guid customerId, Address address, IEnumerable<OrderItem> items, PaymentMethod paymentMethod)
+    public Order(Guid tenantId, Guid customerId, Address address, IEnumerable<OrderItem> items, PaymentMethod paymentMethod) : base(tenantId)
     {
         Id = Guid.NewGuid();
-        TenantId = tenantId;
         CustomerId = customerId;
         OrderStatus = OrderStatus.PendingPayment;
-        CreatedAt = DateTime.UtcNow;
-        UpdatedAt = DateTime.UtcNow;
         Address = address;
         _items.AddRange(items);
         PaymentMethod = paymentMethod;
@@ -45,7 +39,7 @@ public class Order : IHasDomainEvents
     {
         OrderStatusTransitionValidator.ValidateTransition(this.OrderStatus, newStatus);
         OrderStatus = newStatus;
-        UpdatedAt = DateTime.UtcNow;
+        SetUpdatedAt();
 
         TriggerDomainEvents(newStatus);
     }
