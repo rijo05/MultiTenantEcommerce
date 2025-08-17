@@ -1,12 +1,12 @@
 ﻿using MultiTenantEcommerce.Domain.Common.Guard;
 
 namespace MultiTenantEcommerce.Domain.ValueObjects;
-public class Price
+public class Money
 {
     public decimal Value { get; private set; }
 
-    private Price() { }
-    public Price(decimal price)
+    private Money() { }
+    public Money(decimal price)
     {
         ValidatePrice(price);
 
