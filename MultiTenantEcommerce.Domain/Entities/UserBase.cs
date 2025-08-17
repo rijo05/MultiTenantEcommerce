@@ -2,29 +2,23 @@
 using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Domain.Entities;
-public abstract class UserBase
+public abstract class UserBase : TenantBase
 {
     public Guid Id { get; protected set; }
-    public Guid TenantId { get; protected set; }
     public string Name { get; protected set; }
     public Email Email { get; protected set; }
-    public DateTime CreatedAt { get; protected set; }
-    public DateTime? UpdatedAt { get; protected set; }
     public bool IsActive { get; protected set; }
 
     protected UserBase() { }
 
-    protected UserBase(Guid tenantId, string name, Email email)
+    protected UserBase(Guid tenantId, string name, Email email) : base(tenantId)
     {
         UserBaseGuard.AgainstNullOrEmptyName(name);
         UserBaseGuard.AgainstInvalidEmail(email.Value);
 
-
         Id = Guid.NewGuid();
         Name = name;
         Email = email;
-        CreatedAt = DateTime.UtcNow;
-        UpdatedAt = CreatedAt;
         IsActive = true;
     }
 
@@ -32,18 +26,19 @@ public abstract class UserBase
     {
         UserBaseGuard.AgainstNullOrEmptyName(newName);
         Name = newName;
-        UpdatedAt = DateTime.UtcNow; ;
+        SetUpdatedAt();
     }
 
     public void UpdateEmail(string? newEmail)
     {
         Email.UpdateEmail(newEmail);
-        UpdatedAt = DateTime.UtcNow;
+        SetUpdatedAt();
     }
 
     public void SetActive(bool isActive)
     {
         IsActive = isActive;
-        UpdatedAt = DateTime.UtcNow; ;
+        SetUpdatedAt();
     }
+
 }

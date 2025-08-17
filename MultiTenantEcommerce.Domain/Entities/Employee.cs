@@ -19,12 +19,13 @@ public class Employee : UserBase
     public void UpdatePassword(string newPassword)
     {
         Password.UpdatePassword(newPassword);
-        UpdatedAt = DateTime.UtcNow;
+        SetUpdatedAt();
     }
 
     public void UpdateRole(Role role)
     {
         //TODO()
+        SetUpdatedAt();
     }
     #endregion
 }

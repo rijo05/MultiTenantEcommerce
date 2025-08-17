@@ -19,11 +19,12 @@ public class Customer : UserBase
     public void UpdatePassword(string newPassword)
     {
         Password.UpdatePassword(newPassword);
-        UpdatedAt = DateTime.UtcNow;
+        SetUpdatedAt();
     }
 
     public void UpdateAddress(string address)
     {
         //TODO()
+        SetUpdatedAt();
     }
 }
