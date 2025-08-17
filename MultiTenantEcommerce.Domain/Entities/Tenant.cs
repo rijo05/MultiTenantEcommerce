@@ -6,6 +6,7 @@ public class Tenant
     public Guid Id { get; private set; }
     public string CompanyName { get; private set; }
     public DateTime CreatedAt { get; private set; }
+    public DateTime UpdateAt { get; private set; }
 
     private Tenant() { }
     public Tenant(string companyName)
@@ -16,5 +17,6 @@ public class Tenant
         Id = Guid.NewGuid();
         CompanyName = companyName;
         CreatedAt = DateTime.UtcNow;
+        UpdateAt = DateTime.UtcNow;
     }
 }
