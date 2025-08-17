@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Interfaces;
+using MultiTenantEcommerce.Infrastructure.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Repositories;
 

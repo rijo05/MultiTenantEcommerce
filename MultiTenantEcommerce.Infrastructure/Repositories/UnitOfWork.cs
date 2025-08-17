@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using MultiTenantEcommerce.Domain.Interfaces;
+using MultiTenantEcommerce.Infrastructure.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Repositories;
 

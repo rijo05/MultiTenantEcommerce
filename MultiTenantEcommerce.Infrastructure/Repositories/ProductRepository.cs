@@ -2,7 +2,7 @@
 using MultiTenantEcommerce.Domain.Entities;
 using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Interfaces;
-using MultiTenantEcommerce.Infrastructure;
+using MultiTenantEcommerce.Infrastructure.Context;
 using MultiTenantEcommerce.Infrastructure.Repositories;
 
 namespace ERP.Infrastructure.Repository;
