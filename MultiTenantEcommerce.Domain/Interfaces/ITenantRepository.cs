@@ -3,5 +3,5 @@
 namespace MultiTenantEcommerce.Domain.Interfaces;
 public interface ITenantRepository : IRepository<Tenant>
 {
-
+    public Task<Tenant?> GetByCompanyName(string companyName);
 }
