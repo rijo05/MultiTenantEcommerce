@@ -12,16 +12,7 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
             
     public async Task<Employee?> GetByEmailAsync(Email email)
     {
-        return await _appDbContext
-                        .Employees
-                        .FirstOrDefaultAsync(u => u.Email.Value == email.Value);
-    }
-
-    public async Task<List<Employee>> GetByNameAsync(string name)
-    {
-        return await _appDbContext.Employees
-            .Where(u => EF.Functions.Like(u.Name, $"%{name}%"))
-            .ToListAsync();
+        return await _appDbContext.Employees.FirstOrDefaultAsync(u => u.Email.Value == email.Value);
     }
 
     public async Task<List<Employee>> GetFilteredAsync(
