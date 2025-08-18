@@ -11,8 +11,8 @@ public abstract class TenantBase
     protected TenantBase(Guid tenantId) 
     {
         TenantId = tenantId;
-        CreatedAt = DateTime.Now;
-        UpdatedAt = DateTime.Now;   
+        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = DateTime.UtcNow;   
     }
 
     public void SetCreatedAt()
