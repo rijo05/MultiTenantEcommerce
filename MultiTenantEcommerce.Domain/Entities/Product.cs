@@ -63,6 +63,12 @@ public class Product : TenantBase
         IsActive = isActive;
         SetUpdatedAt();
     }
+    public void ChangeSKU(string sku)
+    {
+        GuardCommon.AgainstNullOrEmpty(sku, nameof(sku));
+        SKU = sku;
+        SetUpdatedAt();
+    }
 
     public void ClearDescription()
     {
