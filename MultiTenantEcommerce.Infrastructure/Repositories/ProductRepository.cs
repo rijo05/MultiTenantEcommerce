@@ -3,9 +3,8 @@ using MultiTenantEcommerce.Domain.Entities;
 using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Interfaces;
 using MultiTenantEcommerce.Infrastructure.Context;
-using MultiTenantEcommerce.Infrastructure.Repositories;
 
-namespace ERP.Infrastructure.Repository;
+namespace MultiTenantEcommerce.Infrastructure.Repositories;
 
 public class ProductRepository : Repository<Product>, IProductRepository
 {
@@ -18,12 +17,6 @@ public class ProductRepository : Repository<Product>, IProductRepository
                         .ToListAsync();
     }
 
-    public async Task<List<Product>> GetByNameAsync(string name)
-    {
-        return await _appDbContext.Products
-                        .Where(u => EF.Functions.Like(u.Name, $"%{name}%"))
-                        .ToListAsync();
-    }
     public async Task<List<Product>> GetFilteredAsync(
     Guid? categoryId = null,
     string? name = null,
@@ -58,5 +51,10 @@ public class ProductRepository : Repository<Product>, IProductRepository
     public async Task AddBulkAsync(List<Product> products)
     {
         await _appDbContext.Products.AddRangeAsync(products);
+    }
+
+    public async Task<Product?> GetBySKUAsync(string sku)
+    {
+        return await _appDbContext.Products.FirstOrDefaultAsync(x => x.SKU == sku);
     }
 }

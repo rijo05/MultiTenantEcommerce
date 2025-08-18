@@ -6,6 +6,9 @@ namespace MultiTenantEcommerce.Domain.Interfaces;
 public interface IProductRepository : IRepository<Product>
 {
     public Task<List<Product>> GetByCategoryIdAsync(Guid categoryId);
+
+    public Task<Product?> GetBySKUAsync(string sku);
+
     public Task<List<Product>> GetFilteredAsync(
         Guid? categoryId = null,
         string? name = null,
