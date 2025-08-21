@@ -9,7 +9,7 @@ using System.Data;
 namespace MultiTenantEcommerce.Infrastructure.Repositories;
 public class CustomerRepository : Repository<Customer>, ICustomerRepository
 {
-    public CustomerRepository(AppDbContext appDbContext) : base(appDbContext) { }
+    public CustomerRepository(AppDbContext appDbContext, TenantContext tenantContext) : base(appDbContext, tenantContext) { }
 
     public async Task<Customer?> GetByEmailAsync(Email email)
     {

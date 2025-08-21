@@ -8,7 +8,8 @@ namespace MultiTenantEcommerce.Infrastructure.Repositories;
 
 public class ProductRepository : Repository<Product>, IProductRepository
 {
-    public ProductRepository(AppDbContext appDbContext) : base(appDbContext) {}
+    public ProductRepository(AppDbContext appDbContext, TenantContext tenantContext)
+    : base(appDbContext, tenantContext) { }
 
     public async Task<List<Product>> GetByCategoryIdAsync(Guid categoryId)
     {

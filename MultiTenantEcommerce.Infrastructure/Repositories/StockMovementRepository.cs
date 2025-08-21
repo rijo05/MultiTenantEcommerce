@@ -8,7 +8,7 @@ using System.Data;
 namespace MultiTenantEcommerce.Infrastructure.Repositories;
 public class StockMovementRepository : Repository<StockMovement>, IStockMovementRepository
 {
-    public StockMovementRepository(AppDbContext appDbContext) : base(appDbContext) { }
+    public StockMovementRepository(AppDbContext appDbContext, TenantContext tenantContext) : base(appDbContext, tenantContext) { }
 
     public async Task<List<StockMovement>> GetFilteredAsync(
     Guid? productId = null, 

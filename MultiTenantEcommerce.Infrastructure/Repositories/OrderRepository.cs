@@ -8,7 +8,7 @@ namespace MultiTenantEcommerce.Infrastructure.Repositories;
 
 public class OrderRepository : Repository<Order>, IOrderRepository
 {
-    public OrderRepository(AppDbContext appDbContext) : base(appDbContext) { }
+    public OrderRepository(AppDbContext appDbContext, TenantContext tenantContext) : base(appDbContext, tenantContext) { }
 
     public async Task<List<Order>> GetFilteredAsync(
         Guid? customerId = null,
@@ -40,10 +40,10 @@ public class OrderRepository : Repository<Order>, IOrderRepository
             query = query.Where(p => p.PayedAt.HasValue != isPaid);
 
         if (minPrice.HasValue)
-            query = query.Where(p => p.Price >= minPrice);
+            query = query.Where(p => p.Price.Value >= minPrice);
 
         if (maxPrice.HasValue)
-            query = query.Where(p => p.Price <= maxPrice);
+            query = query.Where(p => p.Price.Value <= maxPrice);
 
         return await SortAndPageAsync(query, sort, page, pageSize);
     }

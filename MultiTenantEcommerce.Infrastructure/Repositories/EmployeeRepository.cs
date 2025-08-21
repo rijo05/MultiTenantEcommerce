@@ -8,7 +8,7 @@ using MultiTenantEcommerce.Infrastructure.Context;
 namespace MultiTenantEcommerce.Infrastructure.Repositories;
 public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
 {
-    public EmployeeRepository(AppDbContext appDbContext) : base(appDbContext) { }
+    public EmployeeRepository(AppDbContext appDbContext, TenantContext tenantContext) : base(appDbContext, tenantContext) { }
             
     public async Task<Employee?> GetByEmailAsync(Email email)
     {

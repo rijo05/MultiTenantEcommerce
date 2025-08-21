@@ -9,7 +9,7 @@ namespace MultiTenantEcommerce.Infrastructure.Repositories;
 
 public class CategoryRepository : Repository<Category>, ICategoryRepository
 {
-    public CategoryRepository(AppDbContext appDbContext) : base(appDbContext) { }
+    public CategoryRepository(AppDbContext appDbContext, TenantContext tenantContext) : base(appDbContext, tenantContext) { }
 
     public async Task<Category?> GetByExactNameAsync(string name)
     {
