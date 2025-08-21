@@ -8,8 +8,6 @@ using MultiTenantEcommerce.Application.DTOs.Product;
 using MultiTenantEcommerce.Application.Interfaces;
 using MultiTenantEcommerce.Application.Validators.CategoryValidator;
 using MultiTenantEcommerce.Application.Validators.ProductValidator;
-using MultiTenantEcommerce.Application.Validators.OrderItemValidator;
-using MultiTenantEcommerce.Application.Validators.Common;
 using MultiTenantEcommerce.Application.Mappers;
 using MultiTenantEcommerce.Application.Services;
 using MultiTenantEcommerce.Domain.Events.Products;
@@ -20,6 +18,8 @@ using MultiTenantEcommerce.Infrastructure.Repositories;
 using MultiTenantEcommerce.Application.DTOs.Order;
 using MultiTenantEcommerce.Application.Validators.OrderValidator;
 using MultiTenantEcommerce.Application.Validators.EmployeeValidator;
+using MultiTenantEcommerce.Application.DTOs.Tenant;
+using MultiTenantEcommerce.Application.Validators.TenantValidator;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -81,6 +81,14 @@ builder.Services.AddScoped<OrderMapper>();
 builder.Services.AddScoped<AddressMapper>();
 builder.Services.AddScoped<OrderItemMapper>();
 builder.Services.AddScoped<IValidator<CreateOrderDTO>, CreateOrderDTOValidator>();
+
+//Tenant Service
+builder.Services.AddScoped<ITenantService, TenantService>();
+builder.Services.AddScoped<TenantMapper>();
+builder.Services.AddScoped<IValidator<CreateTenantDTO>, CreateTenantDTOValidator>();
+builder.Services.AddScoped<IValidator<UpdateTenantDTO>, UpdateTenantDTOValidator>();
+
+
 
 
 
