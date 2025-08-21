@@ -1,6 +1,7 @@
 ﻿using MultiTenantEcommerce.Domain.Common;
 using MultiTenantEcommerce.Domain.Common.Guard;
 using MultiTenantEcommerce.Domain.Events.Products;
+using System.ComponentModel.DataAnnotations;
 
 namespace MultiTenantEcommerce.Domain.Entities;
 public class Stock : TenantBase, IHasDomainEvents
@@ -11,6 +12,9 @@ public class Stock : TenantBase, IHasDomainEvents
     public int MinimumQuantity { get; private set; }
     public int Reserved {  get; private set; }
     public int StockAvailableAtMoment => Quantity - Reserved;
+
+    [Timestamp]
+    public byte[] RowVersion { get; set; }
 
     #region domain events
     private readonly List<IDomainEvent> _domainEvents = new();
