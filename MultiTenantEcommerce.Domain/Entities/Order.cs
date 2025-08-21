@@ -12,7 +12,7 @@ public class Order : TenantBase, IHasDomainEvents
     public PaymentMethod PaymentMethod { get; private set; }
     public DateTime? PayedAt { get; private set; }
     public Address Address { get; private set; }
-    public decimal Price => _items.Sum(x => x.Total);
+    public Money Price {  get; private set; }
     public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
     private readonly List<OrderItem> _items = new();
 
@@ -23,14 +23,15 @@ public class Order : TenantBase, IHasDomainEvents
     #endregion
 
     private Order() { }
-    public Order(Guid tenantId, Guid customerId, Address address, IEnumerable<OrderItem> items, PaymentMethod paymentMethod) : base(tenantId)
+    public Order(Guid orderId, Guid tenantId, Guid customerId, Address address, IEnumerable<OrderItem> items, PaymentMethod paymentMethod) : base(tenantId)
     {
-        Id = Guid.NewGuid();
+        Id = orderId;
         CustomerId = customerId;
         OrderStatus = OrderStatus.PendingPayment;
         Address = address;
         _items.AddRange(items);
         PaymentMethod = paymentMethod;
+        Price = new Money(_items.Sum(x => x.Total));
     }
 
     #region CHANGE ORDER STATUS

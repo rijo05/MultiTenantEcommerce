@@ -46,9 +46,15 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasConversion<string>()
             .IsRequired();
 
+        builder.OwnsOne(u => u.Price, price =>
+        {
+            price.Property(e => e.Value)
+                .HasColumnName("Price")
+                .IsRequired();
+        });
+
         builder.HasIndex(o => o.TenantId)
                 .HasDatabaseName("IX_Order_TenantId");
-
 
         builder.HasIndex(o => new { o.TenantId, o.CustomerId })
                 .HasDatabaseName("IX_Order_TenantId_CustomerId");
