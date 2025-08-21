@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MultiTenantEcommerce.Domain.Entities;
 using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Interfaces;
 using MultiTenantEcommerce.Infrastructure.Context;
@@ -8,10 +9,12 @@ namespace MultiTenantEcommerce.Infrastructure.Repositories;
 public class Repository<T> : IRepository<T> where T : class
 {
     protected readonly AppDbContext _appDbContext;
+    private readonly TenantContext _tenantContext;
 
-    public Repository(AppDbContext appDbContext)
+    public Repository(AppDbContext appDbContext, TenantContext tenantContext)
     {
         _appDbContext = appDbContext;
+        _tenantContext = tenantContext;
     }
 
     public async Task<List<T>> GetAllAsync()
@@ -19,9 +22,11 @@ public class Repository<T> : IRepository<T> where T : class
         return await _appDbContext.Set<T>().ToListAsync();
     }
 
-    public async Task<T?> GetByIdAsync(Guid id)
+    public async Task<T?> GetByIdAsync(params object[] keyValues)
     {
-        return await _appDbContext.Set<T>().FindAsync(id);
+        var validKeyValues = CheckIfItsValid(keyValues);
+
+        return await _appDbContext.Set<T>().FindAsync(validKeyValues);
     }
     public async Task AddAsync(T entity)
     {
@@ -71,10 +76,15 @@ public class Repository<T> : IRepository<T> where T : class
             };
         }
         else
-            query = query.OrderBy(p => EF.Property<object>(p, "Name"));
+        {
+            if (HasProperty<T>("Name"))
+                query = query.OrderBy(p => EF.Property<object>(p, "Name"));
+            else
+                query = query.OrderBy(p => EF.Property<object>(p, "CreatedAt"));
+        }
 
 
-        var pageNumber = Math.Max(page, 1);
+            var pageNumber = Math.Max(page, 1);
         var pageSizeClamped = Math.Clamp(pageSize, 1, 100);
 
         return await query
@@ -85,5 +95,22 @@ public class Repository<T> : IRepository<T> where T : class
     private bool HasProperty<T>(string propertyName)
     {
         return typeof(T).GetProperty(propertyName) != null;
+    }
+
+    private object[] CheckIfItsValid(params object[] keyValues)
+    {
+        if(keyValues == null || keyValues.Length == 0)
+            throw new ArgumentException("At least one key must be provided.");
+
+        if (typeof(T) != typeof(Tenant))
+        {
+            var updatedKeyValues = new object[keyValues.Length + 1];
+            updatedKeyValues[0] = _tenantContext.TenantId;
+            Array.Copy(keyValues, 0, updatedKeyValues, 1, keyValues.Length);
+
+            return updatedKeyValues;
+        }
+
+        return keyValues;
     }
 }
