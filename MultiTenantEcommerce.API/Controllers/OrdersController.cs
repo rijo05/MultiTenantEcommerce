@@ -16,7 +16,6 @@ public class OrdersController : ControllerBase
         _orderService = orderService;
     }
 
-    #region GETs
 
     [HttpGet]
     public async Task<ActionResult<List<OrderResponseDTO>>> GetOrders([FromQuery] OrderFilterDTO filter)
@@ -36,32 +35,15 @@ public class OrdersController : ControllerBase
         return Ok(order);
     }
 
-    [HttpGet("{id:Guid}/items")]
-    public async Task<ActionResult<List<OrderItemResponseDTO>>> GetOrderItems(Guid id)
-    {
-        var orderItems = await _orderService.GetOrderItemsAsync(id);
 
-        return Ok(orderItems);
-    }
-
-
-    #endregion
-
-
-    #region CHANGE ORDER STATUS
-
-
-    [HttpPost("{id:guid}/status")]
+    [HttpPatch("{id:guid}/status")]
     public async Task<ActionResult<OrderResponseDTO>> ChangeOrderStatus(Guid id, [FromBody] ChangeOrderStatusDTO statusDTO)
     {
         var order = await _orderService.ChangeOrderStatus(id, statusDTO);
 
         return Ok(order);
     }
-    #endregion
 
-
-    #region CREATE ORDER
 
     [HttpPost]
     public async Task<ActionResult<OrderResponseDTO>> CreateOrder([FromBody] CreateOrderDTO orderDTO)
@@ -77,6 +59,4 @@ public class OrdersController : ControllerBase
             order
             );
     }
-
-    #endregion
 }

@@ -101,7 +101,6 @@ public class ProductService : IProductService
         if (!validationResult.IsValid) 
             throw new ValidationException(validationResult.Errors);
 
-
         //Validar se a categoria existe
         await EnsureCategoryExists(createProductDTO.ProductDTO.CategoryId);
 
@@ -183,6 +182,7 @@ public class ProductService : IProductService
         if (await _categoryRepository.GetByIdAsync(categoryId) is null)
             throw new Exception($"Category with ID {categoryId} does not exist.");
     }
+
     private async Task<Product?> EnsureProductExists(Guid id)
     {
         return await _productRepository.GetByIdAsync(id) ?? throw new Exception("Product doesn't exist.");
