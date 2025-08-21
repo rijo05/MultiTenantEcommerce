@@ -17,12 +17,13 @@ public class StockConfiguration : IEntityTypeConfiguration<Stock>
     {
         builder.HasKey(x => new { x.TenantId, x.Id });
 
-
         builder.HasOne<Product>()
                 .WithOne()
                 .HasForeignKey<Stock>(s => new { s.TenantId, s.ProductId })
                 .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Property(x => x.RowVersion)
+            .IsRowVersion();
 
         builder.HasIndex(s => s.TenantId)
                 .HasDatabaseName("IX_Stock_TenantId");

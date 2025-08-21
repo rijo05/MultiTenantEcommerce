@@ -8,7 +8,8 @@ using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.ValueObjects;
 using MultiTenantEcommerce.Domain.Interfaces;
 using MultiTenantEcommerce.Infrastructure.Context;
-using System.Net.Quic;
+using System.Transactions;
+using Microsoft.EntityFrameworkCore;
 
 namespace MultiTenantEcommerce.Application.Services;
 
@@ -17,36 +18,46 @@ public class OrderService : IOrderService
     private readonly IOrderRepository _orderRepository;
     private readonly IProductRepository _productRepository;
     private readonly ICustomerRepository _customerRepository;
+    private readonly IOrderItemRepository _orderItemRepository;
+    private readonly IStockRepository _stockRepository;
     private readonly OrderMapper _orderMapper;
     private readonly OrderItemMapper _orderItemMapper;
     private readonly IUnitOfWork _unitOfWork;
     private readonly IValidator<CreateOrderDTO> _validatorCreate;
     private readonly TenantContext _tenantContext;
+    private readonly AppDbContext _appDbContext;
 
     public OrderService(IOrderRepository orderRepository, 
         IProductRepository productRepository, 
         ICustomerRepository customerRepository,
+        IOrderItemRepository orderItemRepository,
+        IStockRepository stockRepository,
         OrderMapper orderMapper, 
         OrderItemMapper orderItemMapper,  
         IUnitOfWork unitOfWork, 
         IValidator<CreateOrderDTO> orderValidator, 
-        TenantContext tenantContext)
+        TenantContext tenantContext,
+        AppDbContext appDbContext)
     {
         _orderRepository = orderRepository;
         _productRepository = productRepository;
         _customerRepository = customerRepository;
+        _orderItemRepository = orderItemRepository;
+        _stockRepository = stockRepository;
         _orderMapper = orderMapper;
         _orderItemMapper = orderItemMapper;
         _unitOfWork = unitOfWork;
         _validatorCreate = orderValidator;
         _tenantContext = tenantContext;
+        _appDbContext = appDbContext;
     }
 
     #region GETs
 
-    public async Task<List<OrderResponseDTO>> GetFilteredOrdersAsync(OrderFilterDTO order)
+    public async Task<List<MultipleOrderResponseDTO>> GetFilteredOrdersAsync(OrderFilterDTO order)
     {
-        var orders = await _orderRepository.GetFilteredAsync(order.customerId,
+        var orders = await _orderRepository.GetFilteredAsync(
+            order.customerId,
             order.status,
             order.minDate,
             order.maxDate,
@@ -57,7 +68,7 @@ public class OrderService : IOrderService
             order.PageSize,
             order.Sort);
 
-        return _orderMapper.ToOrderResponseDTOList(orders);
+        return _orderMapper.ToMultipleOrderResponseDTOList(orders);
     }
 
     public async Task<OrderResponseDTO> GetOrderByIdAsync(Guid id)
@@ -67,14 +78,13 @@ public class OrderService : IOrderService
         if (order is null)
             throw new Exception("Order not found");
 
-        return _orderMapper.ToOrderResponseDTO(order);
+        var items = await GetOrderItemsAsync(id);
+
+        return _orderMapper.ToOrderResponseDTO(order, items);
     }
 
     public async Task<List<OrderItemResponseDTO>> GetOrderItemsAsync(Guid id)
     {
-        if (!await _orderRepository.ExistsAsync(id))
-            throw new Exception("Order doesnt exist");
-
         var orderItems = await _orderRepository.GetItemsByOrderIdAsync(id);
 
         return _orderItemMapper.ToOrderItemResponseDTOList(orderItems);
@@ -92,8 +102,10 @@ public class OrderService : IOrderService
             throw new Exception("Invalid order status");
 
         order.ChangeStatus(newStatus);
+        var items = await GetOrderItemsAsync(orderId);
+
         await _unitOfWork.CommitAsync();
-        return _orderMapper.ToOrderResponseDTO(order);
+        return _orderMapper.ToOrderResponseDTO(order, items);
     }
 
     #endregion
@@ -116,20 +128,10 @@ public class OrderService : IOrderService
         if (products.Count != productIds.Count)
             throw new Exception("Some products are invalid or do not exist.");
 
-
         var orderId = Guid.NewGuid();
-        List<OrderItem> itemList = new();
-
-        //VER COMO FAZER STOCK TODO() #####################################################
-        foreach (var product in products)
-        {
-            var quantity = orderDTO.Items.First(x => x.Id == product.Id).Quantity;
-
-            //if (product.StockAvailableAtMoment < quantity)
-            //    throw new Exception($"Not enough stock for product {product.Name}.");
-
-            itemList.Add(new OrderItem(orderId, _tenantContext.TenantId, product, quantity));
-        }
+        var itemList = orderDTO.Items.Select(item => new OrderItem(
+            orderId, _tenantContext.TenantId, products.First(p => p.Id == item.Id), item.Quantity))
+            .ToList();
 
         var order = new Order(orderId, _tenantContext.TenantId, orderDTO.CustomerId, 
             new Address(orderDTO.Address.Street, 
@@ -138,13 +140,17 @@ public class OrderService : IOrderService
             orderDTO.Address.Country, 
             orderDTO.Address.HouseNumber), 
             itemList, orderDTO.PaymentMethod);
-        
-        //DISPARAR EVENTOS DE RESERVAR STOCK ###############################
 
-        await _orderRepository.AddAsync(order);
+        var stockedReserved = await TryReserveStockWithRetries(productIds, itemList, order);
+
+        if (!stockedReserved)
+            throw new Exception("Fail to process stock. Please try again in a couple of seconds");
+
         await _unitOfWork.CommitAsync();
 
-        return _orderMapper.ToOrderResponseDTO(order);
+        var items = _orderItemMapper.ToOrderItemResponseDTOList(itemList);
+
+        return _orderMapper.ToOrderResponseDTO(order, items);
     }
 
 
@@ -155,6 +161,70 @@ public class OrderService : IOrderService
     private async Task<Order?> EnsureOrderExists(Guid id)
     {
         return await _orderRepository.GetByIdAsync(id) ?? throw new Exception("Order doesn't exist.");
+    }
+
+    private async Task ProcessStock(List<Guid> productIds, List<OrderItem> itens, Order order)
+    {
+        var stocks = await _stockRepository.GetBulkByIdsAsync(productIds);
+
+        if (stocks.Count != itens.Count)
+            throw new Exception("error");
+
+        itens = itens.OrderBy(x => x.ProductId).ToList();
+        stocks = stocks.OrderBy(x => x.ProductId).ToList();
+
+        foreach (var item in itens)
+        {
+            var stock = stocks.FirstOrDefault(s => s.ProductId == item.ProductId);
+            if (stock == null || item.Quantity > stock.StockAvailableAtMoment)
+                throw new Exception($"Not enough stock of product {item.Name}");
+
+            stock.ReserveStock(item.Quantity);
+        }
+        await _orderRepository.AddAsync(order);
+        await _orderItemRepository.AddBulkAsync(itens);
+
+
+        foreach (var stock in stocks)
+        {
+            try
+            {
+                await _stockRepository.SaveAsync(stock);
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw new Exception($"Concurrency conflict while reserving stock for product {stock.ProductId}");
+            }
+        }
+
+
+
+        await _appDbContext.SaveChangesAsync();
+    }
+
+    private async Task<bool> TryReserveStockWithRetries(List<Guid> productIds, List<OrderItem> itens, Order order)
+    {
+        bool success = false;
+        int retries = 3;
+        int delayBetweenRetries = 1000;
+
+        for (int attempt = 0; attempt < retries; attempt++)
+        {
+            try
+            {
+                await ProcessStock(productIds, itens, order);
+                success = true;
+                break;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (attempt == retries - 1)
+                    throw;
+                await Task.Delay(delayBetweenRetries);
+            }
+        }
+
+        return success;
     }
     #endregion
 }
