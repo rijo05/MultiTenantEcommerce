@@ -14,6 +14,7 @@ public class Category : TenantBase
         GuardCommon.AgainstNullOrEmpty(name, nameof(name));
         GuardCommon.AgainstMaxLength(description, 255, nameof(description));
 
+        Id = Guid.NewGuid();
         Name = name;
         Description = description;
         IsActive = true;
