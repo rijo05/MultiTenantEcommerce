@@ -5,6 +5,14 @@ namespace MultiTenantEcommerce.Application.Validators.Common;
 
 public static class ValidationRules
 {
+    public static async Task ValidateAsync<T>(T entity, IValidator<T> validator)
+    {
+        var validationResults = await validator.ValidateAsync(entity);
+
+        if (!validationResults.IsValid)
+            throw new ValidationException(validationResults.Errors);
+    }
+
     //Username - No numbers allowed
     public static IRuleBuilderOptions<T, string?> UserNameRules<T>(this IRuleBuilder<T, string?> ruleBuilder)
     {
@@ -146,5 +154,21 @@ public static class ValidationRules
     {
         return ruleBuilder
             .NotEqual(Guid.Empty).WithMessage("Id must be valid.");
+    }
+
+    //Country Code - Phone Number
+    public static IRuleBuilderOptions<T, string?> CountryCodeRules<T>(this IRuleBuilder<T, string?> ruleBuilder)
+    {
+        return ruleBuilder
+            .NotEmpty().WithMessage("CountryCode is required.")
+            .MaximumLength(5).WithMessage("CountryCode cannot exceed 5 characters");
+    }
+
+    //Phone Number
+    public static IRuleBuilderOptions<T, string?> PhoneNumberRules<T>(this IRuleBuilder<T, string?> ruleBuilder)
+    {
+        return ruleBuilder
+            .NotEmpty().WithMessage("PhoneNumber is required.")
+            .MaximumLength(20).WithMessage("PhoneNumber cannot exceed 20 characters");
     }
 }
