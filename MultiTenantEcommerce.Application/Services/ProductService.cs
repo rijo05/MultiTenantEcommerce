@@ -2,10 +2,14 @@
 using MultiTenantEcommerce.Application.DTOs.Product;
 using MultiTenantEcommerce.Application.Interfaces;
 using MultiTenantEcommerce.Application.Mappers;
-using MultiTenantEcommerce.Domain.Entities;
+using MultiTenantEcommerce.Application.Validators.Common;
+using MultiTenantEcommerce.Domain.Catalog.Entities;
+using MultiTenantEcommerce.Domain.Catalog.Interfaces;
+using MultiTenantEcommerce.Domain.Common.Interfaces;
+using MultiTenantEcommerce.Domain.Inventory.Entities;
+using MultiTenantEcommerce.Domain.Inventory.Interfaces;
 using MultiTenantEcommerce.Domain.ValueObjects;
-using MultiTenantEcommerce.Domain.Interfaces;
-using MultiTenantEcommerce.Infrastructure.Context;
+using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Application.Services;
 
@@ -96,10 +100,7 @@ public class ProductService : IProductService
 
     public async Task<ProductResponseDTO> AddProductAsync(CreateProductDTO createProductDTO)
     {
-        //Validar os dados
-        var validationResult = await _validatorCreate.ValidateAsync(createProductDTO);
-        if (!validationResult.IsValid) 
-            throw new ValidationException(validationResult.Errors);
+        await ValidationRules.ValidateAsync(createProductDTO, _validatorCreate);
 
         //Validar se a categoria existe
         await EnsureCategoryExists(createProductDTO.ProductDTO.CategoryId);
@@ -116,8 +117,7 @@ public class ProductService : IProductService
 
         await _productRepository.AddAsync(product);
         await _stockRepository.AddAsync(stock);
-
-        
+      
 
         await _unitOfWork.CommitAsync();
         return _productMapper.ToProductResponseDTO(product);
@@ -128,11 +128,7 @@ public class ProductService : IProductService
         //Ver se o produto realmente existe
         var product = await EnsureProductExists(id);
 
-
-        //Validar os dados
-        var validationResult = await _validatorUpdate.ValidateAsync(productDTO);
-        if (!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
+        await ValidationRules.ValidateAsync(productDTO, _validatorUpdate);
 
 
         //Ver se a nova categoria vai ser alterada e se sim se existe
