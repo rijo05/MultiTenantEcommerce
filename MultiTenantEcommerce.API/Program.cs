@@ -1,5 +1,6 @@
 using FluentValidation;
 using MediatR;
+using MultiTenantEcommerce.Application;
 using Microsoft.EntityFrameworkCore;
 using MultiTenantEcommerce.API.Middleware;
 using MultiTenantEcommerce.Application.DTOs.Category;
@@ -10,16 +11,24 @@ using MultiTenantEcommerce.Application.Validators.CategoryValidator;
 using MultiTenantEcommerce.Application.Validators.ProductValidator;
 using MultiTenantEcommerce.Application.Mappers;
 using MultiTenantEcommerce.Application.Services;
-using MultiTenantEcommerce.Domain.Events.Products;
-using MultiTenantEcommerce.Domain.Interfaces;
-using MultiTenantEcommerce.Infrastructure.Configurations;
-using MultiTenantEcommerce.Infrastructure.Context;
-using MultiTenantEcommerce.Infrastructure.Repositories;
 using MultiTenantEcommerce.Application.DTOs.Order;
 using MultiTenantEcommerce.Application.Validators.OrderValidator;
 using MultiTenantEcommerce.Application.Validators.EmployeeValidator;
 using MultiTenantEcommerce.Application.DTOs.Tenant;
 using MultiTenantEcommerce.Application.Validators.TenantValidator;
+using MultiTenantEcommerce.Application.DTOs.Customer;
+using MultiTenantEcommerce.Application.Validators.CustomerValidator;
+using MultiTenantEcommerce.Domain.Catalog.Interfaces;
+using MultiTenantEcommerce.Domain.Sales.Interfaces;
+using MultiTenantEcommerce.Domain.Inventory.Interfaces;
+using MultiTenantEcommerce.Domain.Users.Interfaces;
+using MultiTenantEcommerce.Domain.Tenancy.Interfaces;
+using MultiTenantEcommerce.Domain.Common.Interfaces;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using System.Reflection;
+using MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
+using MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
+using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -36,7 +45,9 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddRouting();
 
 //Configurações do MediatR
-builder.Services.AddMediatR(typeof(ProductOutOfStockEvent).Assembly);
+builder.Services.AddMediatR(typeof(ApplicationMarker).Assembly);
+
+
 
 //Repositorios
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
@@ -82,12 +93,17 @@ builder.Services.AddScoped<AddressMapper>();
 builder.Services.AddScoped<OrderItemMapper>();
 builder.Services.AddScoped<IValidator<CreateOrderDTO>, CreateOrderDTOValidator>();
 
+//CustomerService
+builder.Services.AddScoped<ICustomerService, CustomerService>();
+builder.Services.AddScoped<CustomerMapper>();
+builder.Services.AddScoped<IValidator<CreateCustomerDTO>, CreateCustomerDTOValidator>();
+builder.Services.AddScoped<IValidator<UpdateCustomerDTO>, UpdateCustomerDTOValidator>();
+
 //Tenant Service
 builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<TenantMapper>();
 builder.Services.AddScoped<IValidator<CreateTenantDTO>, CreateTenantDTOValidator>();
 builder.Services.AddScoped<IValidator<UpdateTenantDTO>, UpdateTenantDTOValidator>();
-
 
 
 
@@ -104,6 +120,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseMiddleware<TenantMiddleware>();
+
+app.UseMiddleware<ExceptionHandlingMiddleware>();
 
 app.UseAuthorization();
 
