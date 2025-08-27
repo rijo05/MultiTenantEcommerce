@@ -11,4 +11,11 @@
     <PackageReference Include="MediatR" Version="11.1.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Catalog\Events\" />
+    <Folder Include="Inventory\Events\" />
+    <Folder Include="Tenancy\Events\" />
+    <Folder Include="Users\Events\" />
+  </ItemGroup>
+
 </Project>
