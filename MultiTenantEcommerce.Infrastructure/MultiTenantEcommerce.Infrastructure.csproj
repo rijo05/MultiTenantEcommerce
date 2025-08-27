@@ -22,4 +22,8 @@
     <ProjectReference Include="..\MultiTenantEcommerce.Domain\MultiTenantEcommerce.Domain.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Messaging\" />
+  </ItemGroup>
+
 </Project>
