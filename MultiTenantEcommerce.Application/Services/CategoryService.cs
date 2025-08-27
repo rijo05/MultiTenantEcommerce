@@ -2,9 +2,11 @@
 using MultiTenantEcommerce.Application.DTOs.Category;
 using MultiTenantEcommerce.Application.Interfaces;
 using MultiTenantEcommerce.Application.Mappers;
-using MultiTenantEcommerce.Domain.Entities;
-using MultiTenantEcommerce.Domain.Interfaces;
-using MultiTenantEcommerce.Infrastructure.Context;
+using MultiTenantEcommerce.Application.Validators.Common;
+using MultiTenantEcommerce.Domain.Catalog.Entities;
+using MultiTenantEcommerce.Domain.Catalog.Interfaces;
+using MultiTenantEcommerce.Domain.Common.Interfaces;
+using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Application.Services;
 
@@ -59,11 +61,7 @@ public class CategoryService : ICategoryService
 
     public async Task<CategoryResponseDTO> AddCategoryAsync(CreateCategoryDTO categoryDTO)
     {
-        //Valida os dados
-        var validationResult = await _validatorCreate.ValidateAsync(categoryDTO);
-        if (!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
-
+        await ValidationRules.ValidateAsync(categoryDTO, _validatorCreate);
 
         //Ve se o nome da categoria já existe
         if (await _categoryRepository.GetByExactNameAsync(categoryDTO.Name) is not null)
@@ -71,6 +69,7 @@ public class CategoryService : ICategoryService
 
 
         var category = new Category(_tenantContext.TenantId, categoryDTO.Name, categoryDTO.Description);
+
         await _categoryRepository.AddAsync(category);
         await _unitOfWork.CommitAsync();
         return _categoryMapper.ToCategoryResponseDTO(category);
@@ -81,10 +80,7 @@ public class CategoryService : ICategoryService
         //Ve se o Id realmente pertence a uma categoria
         var category = await EnsureCategoryExists(id);
 
-        //Valida os dados
-        var validationResult = await _validatorUpdate.ValidateAsync(categoryDTO);
-        if (!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
+        await ValidationRules.ValidateAsync(categoryDTO, _validatorUpdate);
 
         //Ve se o nome da categoria já existe
         if (!string.IsNullOrWhiteSpace(categoryDTO.Name) && categoryDTO.Name != category.Name)

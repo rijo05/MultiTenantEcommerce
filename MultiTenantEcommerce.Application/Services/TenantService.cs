@@ -3,11 +3,11 @@ using MultiTenantEcommerce.Application.DTOs.Employees;
 using MultiTenantEcommerce.Application.DTOs.Tenant;
 using MultiTenantEcommerce.Application.Interfaces;
 using MultiTenantEcommerce.Application.Mappers;
-using MultiTenantEcommerce.Domain.Entities;
-using MultiTenantEcommerce.Domain.Interfaces;
+using MultiTenantEcommerce.Application.Validators.Common;
+using MultiTenantEcommerce.Domain.Common.Interfaces;
+using MultiTenantEcommerce.Domain.Tenancy.Entities;
+using MultiTenantEcommerce.Domain.Tenancy.Interfaces;
 using MultiTenantEcommerce.Domain.ValueObjects;
-using MultiTenantEcommerce.Infrastructure.Context;
-using MultiTenantEcommerce.Infrastructure.Repositories;
 
 namespace MultiTenantEcommerce.Application.Services;
 public class TenantService : ITenantService
@@ -49,11 +49,7 @@ public class TenantService : ITenantService
 
     public async Task<TenantResponseDTO> AddTenantAsync(CreateTenantDTO tenantDTO)
     {
-        //Validar os dados
-        var validationResult = await _validatorCreate.ValidateAsync(tenantDTO);
-        if (!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
-
+        await ValidationRules.ValidateAsync(tenantDTO, _validatorCreate);
 
         //Verificar se o email já está a ser usado por outro Employee
         var existingTenant = await _tenantRepository.GetByCompanyName(tenantDTO.CompanyName);
@@ -83,9 +79,7 @@ public class TenantService : ITenantService
         if (existingTenant is not null)
             throw new Exception("Company with this name already exists.");
 
-        var validationResult = await _validatorUpdate.ValidateAsync(updatedTenant);
-        if (!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
+        await ValidationRules.ValidateAsync(updatedTenant, _validatorUpdate);
 
         if (!string.IsNullOrEmpty(updatedTenant.CompanyName))
             tenant.UpdateCompanyName(updatedTenant.CompanyName);

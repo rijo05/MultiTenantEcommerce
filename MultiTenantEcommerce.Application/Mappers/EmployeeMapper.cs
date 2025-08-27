@@ -1,6 +1,6 @@
 ﻿using MultiTenantEcommerce.Application.DTOs.Employees;
 using MultiTenantEcommerce.Application.Services;
-using MultiTenantEcommerce.Domain.Entities;
+using MultiTenantEcommerce.Domain.Users.Entities;
 
 namespace MultiTenantEcommerce.Application.Mappers;
 

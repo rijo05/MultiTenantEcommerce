@@ -1,6 +1,5 @@
 ﻿using MultiTenantEcommerce.Application.DTOs.OrderItems;
 using MultiTenantEcommerce.Domain.Enums;
-using MultiTenantEcommerce.Domain.Entities;
 using MultiTenantEcommerce.Application.DTOs.Address;
 
 namespace MultiTenantEcommerce.Application.DTOs.Order;

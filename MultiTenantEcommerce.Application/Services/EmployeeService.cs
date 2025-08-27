@@ -2,10 +2,12 @@
 using MultiTenantEcommerce.Application.DTOs.Employees;
 using MultiTenantEcommerce.Application.Interfaces;
 using MultiTenantEcommerce.Application.Mappers;
-using MultiTenantEcommerce.Domain.Entities;
-using MultiTenantEcommerce.Domain.Interfaces;
+using MultiTenantEcommerce.Application.Validators.Common;
+using MultiTenantEcommerce.Domain.Common.Interfaces;
+using MultiTenantEcommerce.Domain.Users.Entities;
+using MultiTenantEcommerce.Domain.Users.Interfaces;
 using MultiTenantEcommerce.Domain.ValueObjects;
-using MultiTenantEcommerce.Infrastructure.Context;
+using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Application.Services;
 
@@ -65,10 +67,7 @@ public class EmployeeService : IEmployeeService
 
     public async Task<EmployeeResponseDTO> AddEmployeeAsync(CreateEmployeeDTO EmployeeDTO)
     {
-        //Validar os dados
-        var validationResult = await _validatorCreate.ValidateAsync(EmployeeDTO);
-        if (!validationResult.IsValid) 
-            throw new ValidationException(validationResult.Errors);
+        await ValidationRules.ValidateAsync(EmployeeDTO, _validatorCreate);
 
 
         //Verificar se o email já está a ser usado por outro Employee
@@ -97,10 +96,7 @@ public class EmployeeService : IEmployeeService
                 throw new Exception("Email already in use.");
         }
 
-        //Validar DTO
-        var validationResult = await _validatorUpdate.ValidateAsync(updateEmployeeDTO);
-        if (!validationResult.IsValid)
-            throw new ValidationException(validationResult.Errors);
+        await ValidationRules.ValidateAsync(updateEmployeeDTO, _validatorUpdate);
 
 
 

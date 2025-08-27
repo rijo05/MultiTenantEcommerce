@@ -1,15 +1,20 @@
 ﻿using FluentValidation;
+using Microsoft.EntityFrameworkCore;
 using MultiTenantEcommerce.Application.DTOs.Order;
 using MultiTenantEcommerce.Application.DTOs.OrderItems;
 using MultiTenantEcommerce.Application.Interfaces;
 using MultiTenantEcommerce.Application.Mappers;
-using MultiTenantEcommerce.Domain.Entities;
+using MultiTenantEcommerce.Application.Validators.Common;
+using MultiTenantEcommerce.Domain.Catalog.Interfaces;
+using MultiTenantEcommerce.Domain.Common.Interfaces;
 using MultiTenantEcommerce.Domain.Enums;
+using MultiTenantEcommerce.Domain.Inventory.Interfaces;
+using MultiTenantEcommerce.Domain.Sales.Entities;
+using MultiTenantEcommerce.Domain.Sales.Interfaces;
+using MultiTenantEcommerce.Domain.Users.Interfaces;
 using MultiTenantEcommerce.Domain.ValueObjects;
-using MultiTenantEcommerce.Domain.Interfaces;
-using MultiTenantEcommerce.Infrastructure.Context;
+using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 using System.Transactions;
-using Microsoft.EntityFrameworkCore;
 
 namespace MultiTenantEcommerce.Application.Services;
 
@@ -112,45 +117,44 @@ public class OrderService : IOrderService
 
     #region CREATE ORDER
 
-    public async Task<OrderResponseDTO> CreateOrderAsync(CreateOrderDTO orderDTO)
+    public async Task<OrderResponseDTO?> CreateOrderAsync(CreateOrderDTO orderDTO)
     {
-        var validationResults = await _validatorCreate.ValidateAsync(orderDTO);
-        if (!validationResults.IsValid)
-            throw new ValidationException(validationResults.Errors);
+        //await ValidationRules.ValidateAsync(orderDTO, _validatorCreate);
 
-        if (!await _customerRepository.ExistsAsync(orderDTO.CustomerId))
-            throw new Exception("Customer doesnt exist");
+        //if (!await _customerRepository.ExistsAsync(orderDTO.CustomerId))
+        //    throw new Exception("Customer doesnt exist");
 
 
-        var productIds = orderDTO.Items.Select(x => x.Id).ToList();
-        var products = await _productRepository.GetByIdsAsync(productIds);
+        //var productIds = orderDTO.Items.Select(x => x.Id).ToList();
+        //var products = await _productRepository.GetByIdsAsync(productIds);
 
-        if (products.Count != productIds.Count)
-            throw new Exception("Some products are invalid or do not exist.");
+        //if (products.Count != productIds.Count)
+        //    throw new Exception("Some products are invalid or do not exist.");
 
-        var orderId = Guid.NewGuid();
-        var itemList = orderDTO.Items.Select(item => new OrderItem(
-            orderId, _tenantContext.TenantId, products.First(p => p.Id == item.Id), item.Quantity))
-            .ToList();
+        //var orderId = Guid.NewGuid();
+        //var itemList = orderDTO.Items.Select(item => new OrderItem(
+        //    orderId, _tenantContext.TenantId, products.First(p => p.Id == item.Id), item.Quantity))
+        //    .ToList();
 
-        var order = new Order(orderId, _tenantContext.TenantId, orderDTO.CustomerId, 
-            new Address(orderDTO.Address.Street, 
-            orderDTO.Address.City, 
-            orderDTO.Address.PostalCode, 
-            orderDTO.Address.Country, 
-            orderDTO.Address.HouseNumber), 
-            itemList, orderDTO.PaymentMethod);
+        //var order = new Order(orderId, _tenantContext.TenantId, orderDTO.CustomerId, 
+        //    new Address(orderDTO.Address.Street, 
+        //    orderDTO.Address.City, 
+        //    orderDTO.Address.PostalCode, 
+        //    orderDTO.Address.Country, 
+        //    orderDTO.Address.HouseNumber), 
+        //    itemList, orderDTO.PaymentMethod);
 
-        var stockedReserved = await TryReserveStockWithRetries(productIds, itemList, order);
+        //var stockedReserved = await TryReserveStockWithRetries(productIds, itemList, order);
 
-        if (!stockedReserved)
-            throw new Exception("Fail to process stock. Please try again in a couple of seconds");
+        //if (!stockedReserved)
+        //    throw new Exception("Fail to process stock. Please try again in a couple of seconds");
 
-        await _unitOfWork.CommitAsync();
+        //await _unitOfWork.CommitAsync();
 
-        var items = _orderItemMapper.ToOrderItemResponseDTOList(itemList);
+        //var items = _orderItemMapper.ToOrderItemResponseDTOList(itemList);
 
-        return _orderMapper.ToOrderResponseDTO(order, items);
+        //return _orderMapper.ToOrderResponseDTO(order, items);
+        return null;
     }
 
 
@@ -170,20 +174,15 @@ public class OrderService : IOrderService
         if (stocks.Count != itens.Count)
             throw new Exception("error");
 
-        itens = itens.OrderBy(x => x.ProductId).ToList();
-        stocks = stocks.OrderBy(x => x.ProductId).ToList();
+        var stockDictionary = stocks.ToDictionary(x => x.ProductId);
 
         foreach (var item in itens)
         {
-            var stock = stocks.FirstOrDefault(s => s.ProductId == item.ProductId);
-            if (stock == null || item.Quantity > stock.StockAvailableAtMoment)
-                throw new Exception($"Not enough stock of product {item.Name}");
+            if (!stockDictionary.TryGetValue(item.ProductId, out var stock))
+                throw new Exception($"Stock for product {item.ProductId} not found");
 
             stock.ReserveStock(item.Quantity);
         }
-        await _orderRepository.AddAsync(order);
-        await _orderItemRepository.AddBulkAsync(itens);
-
 
         foreach (var stock in stocks)
         {
@@ -196,8 +195,6 @@ public class OrderService : IOrderService
                 throw new Exception($"Concurrency conflict while reserving stock for product {stock.ProductId}");
             }
         }
-
-
 
         await _appDbContext.SaveChangesAsync();
     }

@@ -1,6 +1,6 @@
 ﻿using MultiTenantEcommerce.Application.DTOs.Category;
 using MultiTenantEcommerce.Application.Services;
-using MultiTenantEcommerce.Domain.Entities;
+using MultiTenantEcommerce.Domain.Catalog.Entities;
 
 namespace MultiTenantEcommerce.Application.Mappers;
 

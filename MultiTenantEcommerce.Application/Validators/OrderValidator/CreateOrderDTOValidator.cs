@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MultiTenantEcommerce.Application.DTOs.Order;
+using MultiTenantEcommerce.Application.Validators.AddressValidator;
 using MultiTenantEcommerce.Application.Validators.Common;
 using MultiTenantEcommerce.Application.Validators.OrderItemValidator;
 

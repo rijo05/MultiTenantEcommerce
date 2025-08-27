@@ -1,6 +1,6 @@
 ﻿using MultiTenantEcommerce.Application.DTOs.OrderItems;
 using MultiTenantEcommerce.Application.Services;
-using MultiTenantEcommerce.Domain.Entities;
+using MultiTenantEcommerce.Domain.Sales.Entities;
 
 namespace MultiTenantEcommerce.Application.Mappers;
 

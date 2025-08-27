@@ -1,7 +1,7 @@
 ﻿using MultiTenantEcommerce.Application.DTOs.Product;
 using MultiTenantEcommerce.Application.DTOs.Tenant;
 using MultiTenantEcommerce.Application.Services;
-using MultiTenantEcommerce.Domain.Entities;
+using MultiTenantEcommerce.Domain.Tenancy.Entities;
 
 namespace MultiTenantEcommerce.Application.Mappers;
 
@@ -21,7 +21,7 @@ public class TenantMapper
             CompanyName = tenant.Name,
             CreatedAt = tenant.CreatedAt,
             TenantId = tenant.Id,
-            UpdatedAt = tenant.UpdateAt       
+            UpdatedAt = tenant.UpdatedAt       
         };
     }
 
