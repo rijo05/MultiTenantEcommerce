@@ -1,6 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MultiTenantEcommerce.Application.DTOs.Product;
-using MultiTenantEcommerce.Application.Interfaces;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using MultiTenantEcommerce.Application.Catalog.Products.Commands.Create;
+using MultiTenantEcommerce.Application.Catalog.Products.Commands.Delete;
+using MultiTenantEcommerce.Application.Catalog.Products.Commands.Update;
+using MultiTenantEcommerce.Application.Catalog.Products.DTOs;
+using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetById;
+using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetFiltered;
+using MultiTenantEcommerce.Application.Common.Interfaces;
 
 namespace MultiTenantEcommerce.API.Controllers;
 
@@ -8,18 +14,18 @@ namespace MultiTenantEcommerce.API.Controllers;
 [Route("api/[controller]")]
 public class ProductsController : ControllerBase
 {
-    private readonly IProductService _productService;
+    private readonly IMediator _mediator;
 
-    public ProductsController(IProductService productService)
+    public ProductsController(IMediator mediator)
     {
-        _productService = productService;
+        _mediator = mediator;
     }
 
 
     [HttpGet]
-    public async Task<ActionResult<List<ProductResponseDTO>>> GetProducts([FromQuery] ProductFilterDTO productFilterDTO)
+    public async Task<ActionResult<List<ProductResponseDTO>>> GetProducts([FromQuery] GetFilteredProductsQuery filteredQuery)
     {
-        var products = await _productService.GetFilteredProductsAsync(productFilterDTO);
+        var products = await _mediator.Send(filteredQuery);
 
         return Ok(products);
     }
@@ -28,19 +34,19 @@ public class ProductsController : ControllerBase
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<ProductResponseDTO>> GetById(Guid id)
     {
-        var product = await _productService.GetProductByIdAsync(id);
+        var query = new GetProductByIdQuery(id);
+        var product = await _mediator.Send(query);
 
         return Ok(product);
     }
 
-
     [HttpPost]
-    public async Task<ActionResult<ProductResponseDTO>> Create([FromBody] CreateProductDTO productDTO)
+    public async Task<ActionResult<ProductResponseDTO>> Create([FromBody] CreateProductCommand command)
     {
-        if (productDTO is null)
+        if (command is null)
             return BadRequest("Product data must be provided.");
 
-        var product = await _productService.AddProductAsync(productDTO);
+        var product = await _mediator.Send(command);
 
         return CreatedAtAction(
             nameof(GetById),
@@ -55,14 +61,22 @@ public class ProductsController : ControllerBase
         if (productDTO is null)
             return BadRequest("Product data must be provided.");
 
-        var product = await _productService.UpdateProductAsync(id, productDTO);
+        var command = new UpdateProductCommand(id, 
+            productDTO.Name, 
+            productDTO.Description, 
+            productDTO.Price, 
+            productDTO.IsActive, 
+            productDTO.CategoryId);
+
+        var product = await _mediator.Send(command);
         return Ok(product);
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _productService.DeleteProductAsync(id);
+        var command = new DeleteProductCommand(id);
+        await _mediator.Send(command);
         return NoContent();
     }
 }

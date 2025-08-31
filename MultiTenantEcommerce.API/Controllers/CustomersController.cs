@@ -1,8 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MultiTenantEcommerce.Application.DTOs;
-using MultiTenantEcommerce.Application.DTOs.Customer;
-using MultiTenantEcommerce.Application.Interfaces;
-using MultiTenantEcommerce.Application.Services;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using MultiTenantEcommerce.Application.Common.Interfaces;
+using MultiTenantEcommerce.Application.Users.Customers.Commands.Create;
+using MultiTenantEcommerce.Application.Users.Customers.Commands.Delete;
+using MultiTenantEcommerce.Application.Users.Customers.Commands.Update;
+using MultiTenantEcommerce.Application.Users.Customers.DTOs;
+using MultiTenantEcommerce.Application.Users.Customers.Queries.GetByEmail;
+using MultiTenantEcommerce.Application.Users.Customers.Queries.GetById;
+using MultiTenantEcommerce.Application.Users.Customers.Queries.GetByPhoneNumber;
+using MultiTenantEcommerce.Application.Users.Customers.Queries.GetFiltered;
 
 namespace MultiTenantEcommerce.API.Controllers;
 
@@ -10,18 +16,27 @@ namespace MultiTenantEcommerce.API.Controllers;
 [Route("api/[controller]")]
 public class CustomersController : ControllerBase 
 {
-    private ICustomerService _customerService;
+    private IMediator _mediator;
 
-    public CustomersController(ICustomerService customerService) 
+    public CustomersController(IMediator mediator) 
     {
-        _customerService = customerService;
+        _mediator = mediator;
     }
 
+
+    [HttpGet]
+    public async Task<ActionResult<List<CustomerResponseDTO>>> GetCustomers([FromQuery] GetFilteredCustomerQuery customerQuery)
+    {
+        var customers = await _mediator.Send(customerQuery);
+
+        return Ok(customers);
+    }
 
     [HttpGet("{id:guid}")]
     public async Task<ActionResult<CustomerResponseDTO>> GetById(Guid id)
     {
-        var customer = await _customerService.GetCustomerByIdAsync(id);
+        var query = new GetCustomerByIdQuery(id);
+        var customer = await _mediator.Send(query);
 
         return Ok(customer);
     }
@@ -29,26 +44,28 @@ public class CustomersController : ControllerBase
     [HttpGet("email/{email}")]
     public async Task<ActionResult<CustomerResponseDTO>> GetByEmail(string email)
     {
-        var customer = await _customerService.GetCustomerByEmailAsync(email);
+        var query = new GetCustomerByEmailQuery(email);
+        var customer = await _mediator.Send(query);
 
         return Ok(customer);
     }
 
     [HttpGet("phonenumber/{number}")]
-    public async Task<ActionResult<CustomerResponseDTO>> GetByPhoneNumber(string number)
+    public async Task<ActionResult<CustomerResponseDTO>> GetByPhoneNumber(string number, string countryCode)
     {
-        var customer = await _customerService.GetCustomerByPhoneNumberAsync(number);
+        var query = new GetCustomerByPhoneNumberQuery(countryCode, number);
+        var customer = await _mediator.Send(query);
 
         return Ok(customer);
     }
 
     [HttpPost]
-    public async Task<ActionResult<CustomerResponseDTO>> Create([FromBody] CreateCustomerDTO customerDTO)
+    public async Task<ActionResult<CustomerResponseDTO>> Create([FromBody] CreateCustomerCommand command)
     {
-        if(customerDTO == null)
+        if(command == null)
             return BadRequest("Customer data must be provided.");
 
-        var customer = await _customerService.AddCustomerAsync(customerDTO);
+        var customer = await _mediator.Send(command);
 
         return CreatedAtAction(
             nameof(GetById),
@@ -60,14 +77,23 @@ public class CustomersController : ControllerBase
     [HttpPatch("{id:guid}")]
     public async Task<ActionResult<CustomerResponseDTO>> Update(Guid id, [FromBody] UpdateCustomerDTO customerDTO)
     {
-        var customer = await _customerService.UpdateCustomerAsync(id, customerDTO);
+        var command = new UpdateCustomerCommand(id,
+            customerDTO.Name,
+            customerDTO.Email,
+            customerDTO.Password,
+            customerDTO.CountryCode,
+            customerDTO.PhoneNumber,
+            customerDTO.Address);
+
+        var customer = await _mediator.Send(command);
         return Ok(customer);
     }
 
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> Delete(Guid id)
     {
-        await _customerService.DeleteCustomerAsync(id);
-        return Ok();
+        var command = new DeleteCustomerCommand(id);
+        await _mediator.Send(command);
+        return NoContent();
     }
 }
