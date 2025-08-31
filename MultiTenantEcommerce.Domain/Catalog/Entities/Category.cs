@@ -9,7 +9,8 @@ public class Category : TenantBase
     public bool IsActive { get; private set; }
 
     private Category() { }
-    public Category(Guid tenantId, string name, string? description, bool isActive = true) : base(tenantId)
+    public Category(Guid tenantId, string name, string? description, bool isActive = true) 
+        : base(tenantId)
     {
         GuardCommon.AgainstNullOrEmpty(name, nameof(name));
         GuardCommon.AgainstMaxLength(description, 255, nameof(description));
@@ -21,6 +22,25 @@ public class Category : TenantBase
 
     #region UPDATE DATA
 
+    public void UpdateCategory(
+        string? Name,
+        string? Description,
+        bool? IsActive)
+    {
+        if (IsActive.HasValue)
+            SetActive(IsActive.Value);
+
+        if (Description is not null)
+        {
+            if (Description == "")
+                ClearDescription();
+            else
+                UpdateDescription(Description);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Name))
+            UpdateName(Name);
+    }
     public void UpdateName(string newName)
     {
         GuardCommon.AgainstNullOrEmpty(newName, nameof(newName));
