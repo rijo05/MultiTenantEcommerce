@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MultiTenantEcommerce.Domain.Catalog.Entities;
-using MultiTenantEcommerce.Domain.Tenancy.Entities;
+using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;

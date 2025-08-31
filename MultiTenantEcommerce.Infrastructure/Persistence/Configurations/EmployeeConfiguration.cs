@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Domain.Tenancy.Entities;
+using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Domain.Users.Entities;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
@@ -52,6 +52,9 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
 
         builder.HasIndex(e => e.TenantId)
                 .HasDatabaseName("IX_Employee_TenantId");
+
+        builder.HasIndex("TenantId", "Email")
+            .IsUnique();
 
         //builder.HasIndex(e => new { e.TenantId, e.Email.Value })
         //        .HasDatabaseName("IX_Employee_TenantId_Email");

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Domain.Tenancy.Entities;
+using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Domain.Users.Entities;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
@@ -63,6 +63,12 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
         builder.HasIndex(c => c.TenantId)
                 .HasDatabaseName("IX_Customer_TenantId");
+
+        builder.HasIndex("TenantId", "Email")
+            .IsUnique();
+
+        builder.HasIndex("TenantId", "PhoneNumber_CountryCode", "PhoneNumber_Number")
+               .IsUnique();
 
         //builder.HasIndex(c => new { c.TenantId, c.Email.Value })
         //        .HasDatabaseName("IX_Customer_TenantId_Email");

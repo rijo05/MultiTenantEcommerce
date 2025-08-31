@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Domain.Tenancy.Entities;
+using MultiTenantEcommerce.Domain.Tenants.Entities;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
 public class TenantConfiguration : IEntityTypeConfiguration<Tenant>

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MultiTenantEcommerce.Domain.Catalog.Entities;
-using MultiTenantEcommerce.Domain.Tenancy.Entities;
+using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
@@ -28,7 +28,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 .WithMany()
                 .HasForeignKey(x => new { x.TenantId, x.CategoryId })
                 .OnDelete(DeleteBehavior.Restrict);
-
 
         builder.OwnsOne(u => u.Price, price =>
         {
