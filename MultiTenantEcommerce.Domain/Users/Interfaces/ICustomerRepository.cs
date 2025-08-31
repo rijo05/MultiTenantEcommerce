@@ -12,10 +12,10 @@ public interface ICustomerRepository : IRepository<Customer>
     public Task<List<Customer>> GetFilteredAsync(
     string? name = null,
     string? email = null,
-    bool? isActive = null,
     string? phoneNumber = null,
+    bool? isActive = null,
     int page = 1,
     int pageSize = 20,
-    SortOptions? sort = null);
+    SortOptions sort = SortOptions.TimeDesc);
 }
 

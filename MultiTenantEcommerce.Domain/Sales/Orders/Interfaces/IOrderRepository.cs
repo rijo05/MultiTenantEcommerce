@@ -1,8 +1,8 @@
 ﻿using MultiTenantEcommerce.Domain.Common.Interfaces;
 using MultiTenantEcommerce.Domain.Enums;
-using MultiTenantEcommerce.Domain.Sales.Entities;
+using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
 
-namespace MultiTenantEcommerce.Domain.Sales.Interfaces;
+namespace MultiTenantEcommerce.Domain.Sales.Orders.Interfaces;
 
 public interface IOrderRepository : IRepository<Order>
 {
@@ -17,6 +17,6 @@ public interface IOrderRepository : IRepository<Order>
         decimal? maxPrice = null,
         int page = 1,
         int pageSize = 20,
-        SortOptions? sort = null);
+        SortOptions sort = SortOptions.TimeDesc);
 }
 

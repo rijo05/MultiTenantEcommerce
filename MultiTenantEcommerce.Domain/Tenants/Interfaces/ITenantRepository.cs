@@ -1,14 +1,15 @@
 ﻿using MultiTenantEcommerce.Domain.Common.Interfaces;
 using MultiTenantEcommerce.Domain.Enums;
-using MultiTenantEcommerce.Domain.Tenancy.Entities;
+using MultiTenantEcommerce.Domain.Tenants.Entities;
 
-namespace MultiTenantEcommerce.Domain.Tenancy.Interfaces;
+namespace MultiTenantEcommerce.Domain.Tenants.Interfaces;
 public interface ITenantRepository : IRepository<Tenant>
 {
     public Task<Tenant?> GetByCompanyName(string companyName);
 
     public Task<List<Tenant>> GetFilteredAsync(
+        string? companyName,
         int page = 1,
         int pageSize = 20,
-        SortOptions? sort = null);
+        SortOptions sort = SortOptions.TimeDesc);
 }

@@ -16,5 +16,5 @@ public interface IEmployeeRepository : IRepository<Employee>
         bool? isActive = null,
         int page = 1,
         int pageSize = 20,
-        SortOptions? sort = null);
+        SortOptions sort = SortOptions.TimeDesc);
 }
