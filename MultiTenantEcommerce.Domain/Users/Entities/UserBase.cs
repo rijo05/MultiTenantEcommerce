@@ -1,5 +1,7 @@
-﻿using MultiTenantEcommerce.Domain.Common.Entities;
+﻿using MediatR;
+using MultiTenantEcommerce.Domain.Common.Entities;
 using MultiTenantEcommerce.Domain.Common.Guard;
+using MultiTenantEcommerce.Domain.Users.Interfaces;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Domain.Users.Entities;
@@ -11,7 +13,8 @@ public abstract class UserBase : TenantBase
 
     protected UserBase() { }
 
-    protected UserBase(Guid tenantId, string name, Email email) : base(tenantId)
+    protected UserBase(Guid tenantId, string name, Email email) 
+        : base(tenantId)
     {
         UserBaseGuard.AgainstNullOrEmptyName(name);
         UserBaseGuard.AgainstInvalidEmail(email.Value);
@@ -20,6 +23,7 @@ public abstract class UserBase : TenantBase
         Email = email;
         IsActive = true;
     }
+
 
     public void UpdateName(string? newName)
     {
