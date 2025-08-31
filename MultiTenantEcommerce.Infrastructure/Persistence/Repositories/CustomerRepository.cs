@@ -21,14 +21,15 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
         return await _appDbContext.Customers.FirstOrDefaultAsync(x => x.PhoneNumber.Number == phoneNumber.Number);
     }
 
+    //talvez remover TODO() ##########
     public async Task<List<Customer>> GetFilteredAsync(
     string? name = null, 
-    string? email = null, 
+    string? email = null,
+    string? phoneNumber = null,
     bool? isActive = null, 
-    string? phoneNumber = null, 
     int page = 1, 
     int pageSize = 20, 
-    SortOptions? sort = null)
+    SortOptions sort = SortOptions.TimeDesc)
     {
         var query = _appDbContext.Customers.AsQueryable();
 

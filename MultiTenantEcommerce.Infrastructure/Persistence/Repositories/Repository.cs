@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MultiTenantEcommerce.Domain.Common.Interfaces;
 using MultiTenantEcommerce.Domain.Enums;
-using MultiTenantEcommerce.Domain.Tenancy.Entities;
+using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
@@ -52,14 +52,14 @@ public class Repository<T> : IRepository<T> where T : class
         return await _appDbContext.Set<T>().Where(x => ids.Contains(EF.Property<Guid>(x, "Id"))).ToListAsync();
     }
 
-    protected async Task<List<T>> SortAndPageAsync(IQueryable<T> query, SortOptions? sort, int page, int pageSize)
+    protected async Task<List<T>> SortAndPageAsync(IQueryable<T> query, SortOptions sort, int page, int pageSize)
     {
         var sortProperty = sort switch
         {
             SortOptions.NameAsc or SortOptions.NameDesc => "Name",
             SortOptions.PriceAsc or SortOptions.PriceDesc => "Price",
             SortOptions.TimeAsc or SortOptions.TimeDesc => "CreatedAt",
-            _ => "Name"
+            _ => "CreatedAt"
         };
 
         if (HasProperty<T>(sortProperty))
@@ -72,15 +72,12 @@ public class Repository<T> : IRepository<T> where T : class
                 SortOptions.PriceDesc => query.OrderByDescending(p => EF.Property<object>(p, sortProperty)),
                 SortOptions.TimeAsc => query.OrderBy(p => EF.Property<object>(p, sortProperty)),
                 SortOptions.TimeDesc => query.OrderByDescending(p => EF.Property<object>(p, sortProperty)),
-                _ => query.OrderBy(p => EF.Property<object>(p, "Name"))
+                _ => query.OrderBy(p => EF.Property<object>(p, "CreatedAt"))
             };
         }
         else
         {
-            if (HasProperty<T>("Name"))
-                query = query.OrderBy(p => EF.Property<object>(p, "Name"));
-            else
-                query = query.OrderBy(p => EF.Property<object>(p, "CreatedAt"));
+            query = query.OrderBy(p => EF.Property<object>(p, "CreatedAt"));
         }
 
 

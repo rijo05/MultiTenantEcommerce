@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MultiTenantEcommerce.Domain.Enums;
-using MultiTenantEcommerce.Domain.Tenancy.Entities;
-using MultiTenantEcommerce.Domain.Tenancy.Interfaces;
+using MultiTenantEcommerce.Domain.Tenants.Entities;
+using MultiTenantEcommerce.Domain.Tenants.Interfaces;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using System.Xml.Linq;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 public class TenantRepository : Repository<Tenant>, ITenantRepository
@@ -15,11 +16,16 @@ public class TenantRepository : Repository<Tenant>, ITenantRepository
     }
 
     public async Task<List<Tenant>> GetFilteredAsync(
+        string? companyName,
         int page = 1,
         int pageSize = 20,
-        SortOptions? sort = null)
+        SortOptions sort = SortOptions.TimeDesc)
     {
         var query = _appDbContext.Tenants.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(companyName))
+            query = query.Where(p => EF.Functions.Like(p.Name, $"%{companyName}%"));
+
 
         return await SortAndPageAsync(query, sort, page, pageSize);
     }

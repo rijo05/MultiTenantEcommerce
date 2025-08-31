@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MultiTenantEcommerce.Domain.Enums;
-using MultiTenantEcommerce.Domain.Sales.Entities;
-using MultiTenantEcommerce.Domain.Sales.Interfaces;
+using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
+using MultiTenantEcommerce.Domain.Sales.Orders.Interfaces;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
@@ -20,7 +20,7 @@ public class OrderRepository : Repository<Order>, IOrderRepository
         decimal? maxPrice = null,
         int page = 1,
         int pageSize = 20,
-        SortOptions? sort = null)
+        SortOptions sort = SortOptions.TimeDesc)
     {
         var query = _appDbContext.Orders.AsQueryable();
 

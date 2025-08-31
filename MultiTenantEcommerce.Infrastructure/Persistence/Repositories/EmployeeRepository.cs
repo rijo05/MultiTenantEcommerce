@@ -22,7 +22,7 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
     bool? isActive = null,
     int page = 1,
     int pageSize = 20,
-    SortOptions? sort = null)
+    SortOptions sort = SortOptions.TimeDesc)
     {
         var query = _appDbContext.Employees.AsQueryable();
 

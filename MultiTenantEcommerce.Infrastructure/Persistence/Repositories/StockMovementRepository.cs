@@ -18,7 +18,7 @@ public class StockMovementRepository : Repository<StockMovement>, IStockMovement
     string? reason = null, 
     int page = 1, 
     int pageSize = 20, 
-    SortOptions? sort = null)
+    SortOptions sort = SortOptions.TimeDesc)
     {
         var query = _appDbContext.StockMovements.AsQueryable();
 
