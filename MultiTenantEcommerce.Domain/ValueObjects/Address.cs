@@ -1,4 +1,7 @@
-﻿namespace MultiTenantEcommerce.Domain.ValueObjects;
+﻿using System.Diagnostics.Metrics;
+using System.IO;
+
+namespace MultiTenantEcommerce.Domain.ValueObjects;
 public class Address
 {
     public string Street { get; private set; }
@@ -11,21 +14,7 @@ public class Address
 
     public Address(string street, string city, string postalCode, string country, string houseNumber)
     {
-        if (string.IsNullOrWhiteSpace(street))
-            throw new ArgumentException("Street cannot be empty.", nameof(street));
-
-        if (string.IsNullOrWhiteSpace(city))
-            throw new ArgumentException("City cannot be empty.", nameof(city));
-
-        if (string.IsNullOrWhiteSpace(postalCode))
-            throw new ArgumentException("PostalCode cannot be empty.", nameof(postalCode));
-
-        if (string.IsNullOrWhiteSpace(country))
-            throw new ArgumentException("Country cannot be empty.", nameof(country));
-
-        if (string.IsNullOrWhiteSpace(houseNumber))
-            throw new ArgumentException("HouseNumber cannot be empty.", nameof(houseNumber));
-
+        ValidateAddress(street, city, postalCode, country, houseNumber);
 
         Street = street;
         City = city;
@@ -52,5 +41,27 @@ public class Address
     public override string ToString()
     {
         return $"{Street} {HouseNumber}, {PostalCode} {City}, {Country}";
+    }
+
+    private void ValidateAddress(string street,
+        string city,
+        string postalCode,
+        string country,
+        string houseNumber)
+    {
+        if (string.IsNullOrWhiteSpace(street))
+            throw new ArgumentException("Street cannot be empty.", nameof(street));
+
+        if (string.IsNullOrWhiteSpace(city))
+            throw new ArgumentException("City cannot be empty.", nameof(city));
+
+        if (string.IsNullOrWhiteSpace(postalCode))
+            throw new ArgumentException("PostalCode cannot be empty.", nameof(postalCode));
+
+        if (string.IsNullOrWhiteSpace(country))
+            throw new ArgumentException("Country cannot be empty.", nameof(country));
+
+        if (string.IsNullOrWhiteSpace(houseNumber))
+            throw new ArgumentException("HouseNumber cannot be empty.", nameof(houseNumber));
     }
 }
