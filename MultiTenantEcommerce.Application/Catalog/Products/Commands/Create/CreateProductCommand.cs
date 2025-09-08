@@ -1,6 +1,5 @@
-﻿using MediatR;
-using MultiTenantEcommerce.Application.Catalog.Products.DTOs;
-using MultiTenantEcommerce.Application.Common.Interfaces;
+﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs;
+using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.Commands.Create;
 public record CreateProductCommand(
@@ -8,5 +7,6 @@ public record CreateProductCommand(
     string? Description,
     decimal Price,
     Guid CategoryId,
+    bool? IsActive,
     int? Quantity,
     int? MinimumQuantity) : ICommand<ProductResponseDTO>;
