@@ -1,8 +1,6 @@
-﻿using MultiTenantEcommerce.Application.DTOs.OrderItems;
-using MultiTenantEcommerce.Domain.Enums;
-using MultiTenantEcommerce.Application.DTOs.Address;
+﻿using MultiTenantEcommerce.Application.Common.DTOs.Address;
 
-namespace MultiTenantEcommerce.Application.DTOs.Order;
+namespace MultiTenantEcommerce.Application.Sales.Orders.DTOs;
 
 public class OrderResponseDTO
 {
@@ -11,7 +9,6 @@ public class OrderResponseDTO
     public string OrderStatus { get; init; }
     public DateTime CreatedAt { get; init; }
     public DateTime UpdatedAt { get; init; }
-    public DateTime? PayedAt { get; init; }
     public AddressResponseDTO Address { get; init; }
     public List<OrderItemResponseDTO> Items { get; init; }
     public decimal TotalPrice { get; init; }

@@ -1,4 +1,4 @@
-﻿namespace MultiTenantEcommerce.Application.DTOs.OrderItems;
+﻿namespace MultiTenantEcommerce.Application.Sales.Orders.DTOs;
 
 public class OrderItemResponseDTO
 {
