@@ -24,10 +24,10 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 .HasForeignKey(x => x.TenantId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<Category>()
-                .WithMany()
-                .HasForeignKey(x => new { x.TenantId, x.CategoryId })
-                .OnDelete(DeleteBehavior.Restrict);
+        builder.HasOne(p => p.Category)
+               .WithMany()
+               .HasForeignKey(p => new { p.TenantId, p.CategoryId })
+               .OnDelete(DeleteBehavior.Restrict);
 
         builder.OwnsOne(u => u.Price, price =>
         {
@@ -37,14 +37,14 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         });
 
 
-        builder.HasIndex(p => p.TenantId)
-                .HasDatabaseName("IX_Product_TenantId");
+        //builder.HasIndex(p => p.TenantId)
+        //        .HasDatabaseName("IX_Product_TenantId");
 
-        builder.HasIndex(p => new { p.TenantId, p.CategoryId })
-                .HasDatabaseName("IX_Product_TenantId_CategoryId");
+        //builder.HasIndex(p => new { p.TenantId, p.CategoryId })
+        //        .HasDatabaseName("IX_Product_TenantId_CategoryId");
 
-        builder.HasIndex(p => new { p.TenantId, p.Name })
-                .HasDatabaseName("IX_Product_TenantId_ProductName");
+        //builder.HasIndex(p => new { p.TenantId, p.Name })
+        //        .HasDatabaseName("IX_Product_TenantId_ProductName");
 
         builder.HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
     }

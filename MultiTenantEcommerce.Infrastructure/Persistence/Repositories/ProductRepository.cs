@@ -16,6 +16,15 @@ public class ProductRepository : Repository<Product>, IProductRepository
         return await _appDbContext.Products
                         .Where(p => p.CategoryId == categoryId)
                         .ToListAsync();
+
+        //MUDAR PARA RECEBER APENAS UM BOOL A DIZER SE EXISTE OU NAO ########## TODO()
+    }
+
+    public async Task<Product?> GetByIdWithCategoryAsync(Guid productId)
+    {
+        return await _appDbContext.Products
+            .Include(p => p.Category)
+            .FirstOrDefaultAsync(p => p.Id == productId);
     }
 
     public async Task<List<Product>> GetFilteredAsync(
@@ -26,9 +35,11 @@ public class ProductRepository : Repository<Product>, IProductRepository
     bool? isActive = null,
     int page = 1,
     int pageSize = 20,
-    SortOptions? sort = null)
+    SortOptions sort = SortOptions.TimeDesc)
     {
-        var query = _appDbContext.Products.AsQueryable();
+        var query = _appDbContext.Products
+            .Include(p => p.Category)
+            .AsQueryable();
 
         if (categoryId.HasValue)
             query = query.Where(p => p.CategoryId == categoryId.Value);
@@ -52,10 +63,5 @@ public class ProductRepository : Repository<Product>, IProductRepository
     public async Task AddBulkAsync(List<Product> products)
     {
         await _appDbContext.Products.AddRangeAsync(products);
-    }
-
-    public async Task<Product?> GetBySKUAsync(string sku)
-    {
-        return await _appDbContext.Products.FirstOrDefaultAsync(x => x.SKU == sku);
     }
 }

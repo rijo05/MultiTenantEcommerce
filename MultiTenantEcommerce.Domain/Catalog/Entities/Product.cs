@@ -1,6 +1,4 @@
-﻿using MediatR;
-using MultiTenantEcommerce.Domain.Catalog.Interfaces;
-using MultiTenantEcommerce.Domain.Common.Entities;
+﻿using MultiTenantEcommerce.Domain.Common.Entities;
 using MultiTenantEcommerce.Domain.Common.Guard;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
@@ -12,21 +10,26 @@ public class Product : TenantBase
     public Money Price { get; private set; }
     public bool IsActive { get; private set; }
     public Guid CategoryId { get; private set; }
+    public Category Category { get; private set; }
 
     private Product() { }
-    public Product(Guid tenantId, string name, Money price, Guid categoryId, string? description, bool isActive = true) 
-        : base(tenantId)
+    public Product(Guid tenantId,
+        string name,
+        Money price,
+        Category category,
+        string? description,
+        bool? isActive) : base(tenantId)
     {
         GuardCommon.AgainstNullOrEmpty(name, nameof(name));
         GuardCommon.AgainstMaxLength(name, 100, nameof(name));
-        GuardCommon.AgainstEmptyGuid(categoryId, nameof(categoryId));
         GuardCommon.AgainstEmptyGuid(tenantId, nameof(tenantId));
 
         Name = name;
         Description = description;
         Price = price;
-        IsActive = isActive;
-        CategoryId = categoryId;
+        IsActive = isActive ?? true;
+        CategoryId = category.Id;
+        Category = category;
     }
 
     #region UPDATE DATA
