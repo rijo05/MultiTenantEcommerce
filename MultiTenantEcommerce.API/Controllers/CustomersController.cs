@@ -1,7 +1,5 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MultiTenantEcommerce.Application.Common.Interfaces;
-using MultiTenantEcommerce.Application.Users.Customers.Commands.Create;
 using MultiTenantEcommerce.Application.Users.Customers.Commands.Delete;
 using MultiTenantEcommerce.Application.Users.Customers.Commands.Update;
 using MultiTenantEcommerce.Application.Users.Customers.DTOs;
@@ -14,11 +12,11 @@ namespace MultiTenantEcommerce.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class CustomersController : ControllerBase 
+public class CustomersController : ControllerBase
 {
     private IMediator _mediator;
 
-    public CustomersController(IMediator mediator) 
+    public CustomersController(IMediator mediator)
     {
         _mediator = mediator;
     }
@@ -57,21 +55,6 @@ public class CustomersController : ControllerBase
         var customer = await _mediator.Send(query);
 
         return Ok(customer);
-    }
-
-    [HttpPost]
-    public async Task<ActionResult<CustomerResponseDTO>> Create([FromBody] CreateCustomerCommand command)
-    {
-        if(command == null)
-            return BadRequest("Customer data must be provided.");
-
-        var customer = await _mediator.Send(command);
-
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = customer.Id },
-            customer
-            );
     }
 
     [HttpPatch("{id:guid}")]
