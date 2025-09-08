@@ -25,4 +25,9 @@ public class Money
     {
         GuardCommon.AgainstNegativeOrZero(price, nameof(price));
     }
+
+    public long ToLong()
+    {
+        return long.Parse(Value.ToString());
+    }
 }
