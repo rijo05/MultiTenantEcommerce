@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
-using MultiTenantEcommerce.Application.Common.Validators;
-using MultiTenantEcommerce.Application.Users.DTOs.Employees;
+using MultiTenantEcommerce.Application.Common.Helpers.Validators;
 using MultiTenantEcommerce.Application.Users.Employees.Commands.Delete;
 
 namespace MultiTenantEcommerce.Application.Users.Employees.Validators;
@@ -18,7 +17,7 @@ public class UpdateEmployeeCommandValidator : AbstractValidator<UpdateEmployeeCo
         RuleFor(x => x.Password).PasswordRules()
                             .When(x => !string.IsNullOrEmpty(x.Password));
 
-        RuleFor(x => x.Role).RoleRules()
-                            .When(x => !string.IsNullOrEmpty(x.Role));
+        //RuleFor(x => x.Role).RoleRules()
+        //                    .When(x => !string.IsNullOrEmpty(x.Role));
     }
 }

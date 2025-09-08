@@ -1,13 +1,8 @@
-﻿using MultiTenantEcommerce.Application.Common.Interfaces;
+﻿using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Users.Employees.DTOs;
 using MultiTenantEcommerce.Application.Users.Employees.Mappers;
 using MultiTenantEcommerce.Domain.Users.Interfaces;
 using MultiTenantEcommerce.Domain.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Users.Employees.Queries.GetByEmail;
 public class GetEmployeeByEmailQueryHandler : IQueryHandler<GetEmployeeByEmailQuery, EmployeeResponseDTO>
@@ -24,7 +19,7 @@ public class GetEmployeeByEmailQueryHandler : IQueryHandler<GetEmployeeByEmailQu
 
     public async Task<EmployeeResponseDTO> Handle(GetEmployeeByEmailQuery request, CancellationToken cancellationToken)
     {
-        var employee = await _employeeRepository.GetByEmailAsync(new Email(request.Email)) 
+        var employee = await _employeeRepository.GetByEmailWithRolesAsync(new Email(request.Email))
             ?? throw new Exception("Employee with that email doesnt exist.");
 
         return _employeeMapper.ToEmployeeResponseDTO(employee);
