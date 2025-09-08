@@ -1,14 +1,10 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Categories.DTOs;
 using MultiTenantEcommerce.Application.Catalog.Categories.Mappers;
 using MultiTenantEcommerce.Application.Common.Interfaces;
+using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
+using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
+using MultiTenantEcommerce.Domain.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
-using MultiTenantEcommerce.Domain.Common.Interfaces;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Catalog.Categories.Commands.Create;
 public class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryCommand, CategoryResponseDTO>
@@ -16,13 +12,13 @@ public class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryComman
     private readonly ICategoryRepository _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly CategoryMapper _categoryMapper;
-    private readonly TenantContext _tenantContext;
+    private readonly ITenantContext _tenantContext;
 
     public CreateCategoryCommandHandler(
-        ICategoryRepository categoryRepository, 
-        IUnitOfWork unitOfWork, 
+        ICategoryRepository categoryRepository,
+        IUnitOfWork unitOfWork,
         CategoryMapper categoryMapper,
-        TenantContext tenantContext)
+        ITenantContext tenantContext)
     {
         _categoryRepository = categoryRepository;
         _unitOfWork = unitOfWork;
@@ -38,7 +34,7 @@ public class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryComman
         if (await _categoryRepository.GetByExactNameAsync(request.Name) is not null)
             throw new Exception("A category with that name already exists.");
 
-        var category = new Domain.Catalog.Entities.Category(
+        var category = new Category(
             _tenantContext.TenantId,
             request.Name,
             request.Description

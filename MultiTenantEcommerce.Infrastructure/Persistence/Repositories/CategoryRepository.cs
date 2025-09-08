@@ -2,7 +2,6 @@
 using MultiTenantEcommerce.Domain.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
 using MultiTenantEcommerce.Domain.Enums;
-using MultiTenantEcommerce.Domain.ValueObjects;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;

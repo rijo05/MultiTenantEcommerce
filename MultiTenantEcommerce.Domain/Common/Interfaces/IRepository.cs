@@ -1,4 +1,6 @@
-﻿namespace MultiTenantEcommerce.Domain.Common.Interfaces;
+﻿using MultiTenantEcommerce.Domain.Enums;
+
+namespace MultiTenantEcommerce.Domain.Common.Interfaces;
 
 public interface IRepository<T> where T : class
 {

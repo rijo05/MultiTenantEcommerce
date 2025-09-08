@@ -1,13 +1,12 @@
 ﻿using FluentValidation;
-using MultiTenantEcommerce.Application.Catalog.DTOs.Product;
 using MultiTenantEcommerce.Application.Catalog.Products.Commands.Create;
-using MultiTenantEcommerce.Application.Common.Validators;
+using MultiTenantEcommerce.Application.Common.Helpers.Validators;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.Validators;
 
 public class CreateProductCommandValidator : AbstractValidator<CreateProductCommand>
 {
-    public CreateProductCommandValidator() 
+    public CreateProductCommandValidator()
     {
         RuleFor(x => x.Name).NameRules();
 

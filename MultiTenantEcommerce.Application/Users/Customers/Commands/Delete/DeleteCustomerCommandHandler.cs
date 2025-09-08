@@ -1,12 +1,7 @@
 ﻿using MediatR;
-using MultiTenantEcommerce.Application.Common.Interfaces;
-using MultiTenantEcommerce.Domain.Common.Interfaces;
+using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
+using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Users.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Users.Customers.Commands.Delete;
 public class DeleteCustomerCommandHandler : ICommandHandler<DeleteCustomerCommand, Unit>

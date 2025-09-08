@@ -1,5 +1,4 @@
-﻿using MultiTenantEcommerce.Application.Catalog.DTOs.Product;
-using MultiTenantEcommerce.Application.Common.Interfaces;
+﻿using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Users.Employees.DTOs;
 
 

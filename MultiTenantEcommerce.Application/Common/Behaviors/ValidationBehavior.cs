@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using MediatR;
-using MultiTenantEcommerce.Application.Common.Validators;
+using MultiTenantEcommerce.Application.Common.Helpers.Validators;
 
 namespace MultiTenantEcommerce.Application.Common.Behaviors;
 public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>

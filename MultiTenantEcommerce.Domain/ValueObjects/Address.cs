@@ -1,7 +1,4 @@
-﻿using System.Diagnostics.Metrics;
-using System.IO;
-
-namespace MultiTenantEcommerce.Domain.ValueObjects;
+﻿namespace MultiTenantEcommerce.Domain.ValueObjects;
 public class Address
 {
     public string Street { get; private set; }

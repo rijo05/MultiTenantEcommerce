@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using MultiTenantEcommerce.Application.Catalog.Categories.Commands.Create;
-using MultiTenantEcommerce.Application.Catalog.DTOs.Category;
-using MultiTenantEcommerce.Application.Common.Validators;
+using MultiTenantEcommerce.Application.Common.Helpers.Validators;
 
 namespace MultiTenantEcommerce.Application.Catalog.Categories.Validators;
 

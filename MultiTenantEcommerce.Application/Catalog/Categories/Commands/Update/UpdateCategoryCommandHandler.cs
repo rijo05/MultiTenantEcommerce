@@ -1,15 +1,8 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Categories.DTOs;
 using MultiTenantEcommerce.Application.Catalog.Categories.Mappers;
-using MultiTenantEcommerce.Application.Common.Interfaces;
-using MultiTenantEcommerce.Application.Common.Validators;
+using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
+using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
-using MultiTenantEcommerce.Domain.Common.Interfaces;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Catalog.Categories.Commands.Update;
 public class UpdateCategoryCommandHandler : ICommandHandler<UpdateCategoryCommand, CategoryResponseDTO>
@@ -17,18 +10,15 @@ public class UpdateCategoryCommandHandler : ICommandHandler<UpdateCategoryComman
     private readonly ICategoryRepository _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
     private readonly CategoryMapper _categoryMapper;
-    private readonly TenantContext _tenantContext;
 
     public UpdateCategoryCommandHandler(
         ICategoryRepository categoryRepository,
         IUnitOfWork unitOfWork,
-        CategoryMapper categoryMapper,
-        TenantContext tenantContext)
+        CategoryMapper categoryMapper)
     {
         _categoryRepository = categoryRepository;
         _unitOfWork = unitOfWork;
         _categoryMapper = categoryMapper;
-        _tenantContext = tenantContext;
     }
 
     public async Task<CategoryResponseDTO> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)

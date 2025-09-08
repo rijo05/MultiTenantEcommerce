@@ -1,7 +1,5 @@
 ﻿using MediatR;
-using MultiTenantEcommerce.Application.Common.Interfaces;
-using MultiTenantEcommerce.Application.Users.DTOs.Customer;
-using System.Windows.Input;
+using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 
 
 namespace MultiTenantEcommerce.Application.Users.Customers.Commands.Delete;

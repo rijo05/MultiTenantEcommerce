@@ -1,13 +1,7 @@
 ﻿using FluentValidation;
-using MultiTenantEcommerce.Application.Common.Validators;
-using MultiTenantEcommerce.Application.Common.Validators.AddressValidator;
-using MultiTenantEcommerce.Application.Users.Customers.Commands.Create;
-using MultiTenantEcommerce.Application.Users.DTOs.Customer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using MultiTenantEcommerce.Application.Auth.Commands.CreateCustomer;
+using MultiTenantEcommerce.Application.Common.Helpers.Validators;
+using MultiTenantEcommerce.Application.Common.Helpers.Validators.AddressValidator;
 
 namespace MultiTenantEcommerce.Application.Users.Customers.Validators;
 public class CreateCustomerCommandValidator : AbstractValidator<CreateCustomerCommand>

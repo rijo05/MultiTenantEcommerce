@@ -1,12 +1,6 @@
-﻿using MultiTenantEcommerce.Application.Common.Interfaces;
+﻿using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Users.Customers.DTOs;
-using MultiTenantEcommerce.Application.Users.DTOs.Employees;
 using MultiTenantEcommerce.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Users.Customers.Queries.GetFiltered;
 public record GetFilteredCustomerQuery(

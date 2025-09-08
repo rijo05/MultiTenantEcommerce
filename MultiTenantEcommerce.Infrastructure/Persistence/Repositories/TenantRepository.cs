@@ -3,7 +3,6 @@ using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Domain.Tenants.Interfaces;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
-using System.Xml.Linq;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 public class TenantRepository : Repository<Tenant>, ITenantRepository

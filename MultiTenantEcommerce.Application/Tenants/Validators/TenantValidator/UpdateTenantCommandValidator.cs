@@ -1,6 +1,5 @@
 ﻿using FluentValidation;
-using MultiTenantEcommerce.Application.Common.Validators;
-using MultiTenantEcommerce.Application.Tenancy.DTOs.Tenant;
+using MultiTenantEcommerce.Application.Common.Helpers.Validators;
 using MultiTenantEcommerce.Application.Tenants.Commands.Tenant.Update;
 
 namespace MultiTenantEcommerce.Application.Tenants.Validators.TenantValidator;

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace MultiTenantEcommerce.Application.Common.DTOs.Address;
+﻿namespace MultiTenantEcommerce.Application.Common.DTOs.Address;
 public class AddressResponseDTO
 {
     public string Street { get; init; }

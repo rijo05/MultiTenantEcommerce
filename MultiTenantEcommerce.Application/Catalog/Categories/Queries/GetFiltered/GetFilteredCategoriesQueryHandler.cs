@@ -1,7 +1,6 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Categories.DTOs;
 using MultiTenantEcommerce.Application.Catalog.Categories.Mappers;
-using MultiTenantEcommerce.Application.Catalog.DTOs.Product;
-using MultiTenantEcommerce.Application.Common.Interfaces;
+using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
 
 namespace MultiTenantEcommerce.Application.Catalog.Categories.Queries.GetFiltered;

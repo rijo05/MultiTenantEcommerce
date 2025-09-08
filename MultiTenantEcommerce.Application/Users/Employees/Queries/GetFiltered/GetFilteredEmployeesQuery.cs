@@ -1,12 +1,6 @@
-﻿using MultiTenantEcommerce.Application.Catalog.DTOs.Product;
-using MultiTenantEcommerce.Application.Common.Interfaces;
+﻿using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Users.Employees.DTOs;
 using MultiTenantEcommerce.Domain.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Users.Employees.Queries.GetFiltered;
 public record GetFilteredEmployeesQuery(

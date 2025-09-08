@@ -1,14 +1,7 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs;
 using MultiTenantEcommerce.Application.Catalog.Products.Mappers;
-using MultiTenantEcommerce.Application.Common.Interfaces;
+using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
-using MultiTenantEcommerce.Domain.Common.Interfaces;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.Queries.GetById;
 public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, ProductResponseDTO>
@@ -24,7 +17,8 @@ public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, Pro
 
     public async Task<ProductResponseDTO> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetByIdAsync(request.ProductId) ?? throw new Exception("Product not found");
+        var product = await _productRepository.GetByIdWithCategoryAsync(request.ProductId)
+            ?? throw new Exception("Product not found");
 
         return _productMapper.ToProductResponseDTO(product);
     }

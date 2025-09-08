@@ -1,11 +1,6 @@
 ﻿using MediatR;
-using MultiTenantEcommerce.Domain.Common.Interfaces;
+using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Tenants.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Tenants.Commands.Tenant.Delete;
 public class DeleteTenantCommandHandler : IRequestHandler<DeleteTenantCommand, Unit>

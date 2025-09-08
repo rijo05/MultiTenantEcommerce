@@ -1,13 +1,7 @@
-﻿using MultiTenantEcommerce.Application.Common.Interfaces;
+﻿using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Users.Customers.DTOs;
 using MultiTenantEcommerce.Application.Users.Customers.Mappers;
-using MultiTenantEcommerce.Application.Users.DTOs.Employees;
 using MultiTenantEcommerce.Domain.Users.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Users.Customers.Queries.GetFiltered;
 public class GetFilteredCustomerQueryHandler : IQueryHandler<GetFilteredCustomerQuery, List<CustomerResponseDTO>>

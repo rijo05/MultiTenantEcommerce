@@ -1,13 +1,12 @@
 ﻿using FluentValidation;
-using MultiTenantEcommerce.Application.Catalog.DTOs.Product;
 using MultiTenantEcommerce.Application.Catalog.Products.Commands.Update;
-using MultiTenantEcommerce.Application.Common.Validators;
+using MultiTenantEcommerce.Application.Common.Helpers.Validators;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.Validators;
 
 public class UpdateProductCommandValidator : AbstractValidator<UpdateProductCommand>
 {
-    public UpdateProductCommandValidator() 
+    public UpdateProductCommandValidator()
     {
         RuleFor(x => x.Name).NameRules()
             .When(x => !string.IsNullOrEmpty(x.Name));

@@ -1,12 +1,6 @@
 ﻿using FluentValidation;
-using MultiTenantEcommerce.Application.Common.Validators;
+using MultiTenantEcommerce.Application.Common.Helpers.Validators;
 using MultiTenantEcommerce.Application.Users.Customers.Commands.Update;
-using MultiTenantEcommerce.Application.Users.DTOs.Customer;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Users.Customers.Validators;
 public class UpdateCustomerCommandValidator : AbstractValidator<UpdateCustomerCommand>

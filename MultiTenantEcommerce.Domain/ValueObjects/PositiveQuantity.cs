@@ -1,9 +1,4 @@
 ﻿using MultiTenantEcommerce.Domain.Common.Guard;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Domain.ValueObjects;
 public class PositiveQuantity
@@ -33,9 +28,16 @@ public class PositiveQuantity
         Value = quantity;
     }
 
+    public long ToLong()
+    {
+        return long.Parse(Value.ToString());
+    }
+
     private void ValidateQuantity(int quantity)
     {
         GuardCommon.AgainstNegativeOrZero(quantity, nameof(quantity));
     }
+
+
 }
 

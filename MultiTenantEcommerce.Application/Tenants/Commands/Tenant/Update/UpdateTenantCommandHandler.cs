@@ -1,13 +1,8 @@
 ﻿using MediatR;
+using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Application.Tenants.DTOs.Tenant;
 using MultiTenantEcommerce.Application.Tenants.Mappers;
-using MultiTenantEcommerce.Domain.Common.Interfaces;
 using MultiTenantEcommerce.Domain.Tenants.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Tenants.Commands.Tenant.Update;
 public class UpdateTenantCommandHandler : IRequestHandler<UpdateTenantCommand, TenantResponseDTO>
