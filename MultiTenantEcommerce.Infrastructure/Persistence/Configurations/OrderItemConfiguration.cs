@@ -29,6 +29,13 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
                 .HasForeignKey(x => new { x.TenantId, x.ProductId })
                 .OnDelete(DeleteBehavior.Restrict);
 
+        builder.OwnsOne(x => x.Quantity, qty =>
+        {
+            qty.Property(q => q.Value)
+               .HasColumnName("Quantity")
+               .IsRequired();
+        });
+
 
         builder.OwnsOne(u => u.UnitPrice, price =>
         {
@@ -37,15 +44,18 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
                 .IsRequired();
         });
 
+        builder.HasIndex(x => new { x.TenantId, x.OrderId, x.ProductId })
+            .IsUnique();
 
-        builder.HasIndex(oi => oi.TenantId)
-                .HasDatabaseName("IX_OrderItem_TenantId");
 
-        builder.HasIndex(oi => new { oi.TenantId, oi.OrderId })
-                .HasDatabaseName("IX_OrderItem_TenantId_OrderId");
+        //builder.HasIndex(oi => oi.TenantId)
+        //        .HasDatabaseName("IX_OrderItem_TenantId");
 
-        builder.HasIndex(oi => new { oi.TenantId, oi.ProductId })
-                .HasDatabaseName("IX_OrderItem_TenantId_ProductId");
+        //builder.HasIndex(oi => new { oi.TenantId, oi.OrderId })
+        //        .HasDatabaseName("IX_OrderItem_TenantId_OrderId");
+
+        //builder.HasIndex(oi => new { oi.TenantId, oi.ProductId })
+        //        .HasDatabaseName("IX_OrderItem_TenantId_ProductId");
 
         builder.HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
     }

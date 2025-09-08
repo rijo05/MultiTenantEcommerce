@@ -25,8 +25,8 @@ public class CategoryConfiguration : IEntityTypeConfiguration<Category>
                 .HasForeignKey(x => x.TenantId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasIndex(c => c.TenantId)
-                .HasDatabaseName("IX_Category_TenantId");
+        //builder.HasIndex(c => c.TenantId)
+        //        .HasDatabaseName("IX_Category_TenantId");
 
         builder.HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
     }

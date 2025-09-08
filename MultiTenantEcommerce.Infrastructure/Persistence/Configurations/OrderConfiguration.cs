@@ -30,6 +30,11 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
                 .HasForeignKey(x => new { x.TenantId, x.CustomerId })
                 .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasMany(o => o.Items)
+               .WithOne()
+               .HasForeignKey(oi => new { oi.TenantId, oi.OrderId })
+               .OnDelete(DeleteBehavior.Cascade);
+
 
         builder.OwnsOne(o => o.Address, address =>
         {
@@ -44,9 +49,6 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
             .HasConversion<string>()
             .IsRequired();
 
-        builder.Property(o => o.PaymentMethod)
-            .HasConversion<string>()
-            .IsRequired();
 
         builder.OwnsOne(u => u.Price, price =>
         {
@@ -55,11 +57,11 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
                 .IsRequired();
         });
 
-        builder.HasIndex(o => o.TenantId)
-                .HasDatabaseName("IX_Order_TenantId");
+        //builder.HasIndex(o => o.TenantId)
+        //        .HasDatabaseName("IX_Order_TenantId");
 
-        builder.HasIndex(o => new { o.TenantId, o.CustomerId })
-                .HasDatabaseName("IX_Order_TenantId_CustomerId");
+        //builder.HasIndex(o => new { o.TenantId, o.CustomerId })
+        //        .HasDatabaseName("IX_Order_TenantId_CustomerId");
 
         builder.HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
     }
