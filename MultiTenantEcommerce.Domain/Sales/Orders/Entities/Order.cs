@@ -1,52 +1,48 @@
-﻿using MultiTenantEcommerce.Domain.Common.Entities;
-using MultiTenantEcommerce.Domain.Common.Events;
+﻿using MultiTenantEcommerce.Domain.Catalog.Entities;
+using MultiTenantEcommerce.Domain.Common.Entities;
 using MultiTenantEcommerce.Domain.Common.Guard;
 using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
-namespace MultiTenantEcommerce.Domain.Sales.Entities;
+namespace MultiTenantEcommerce.Domain.Sales.Orders.Entities;
 public class Order : TenantBase
 {
     public Guid CustomerId { get; private set; }
     public OrderStatus OrderStatus { get; private set; }
-    public PaymentMethod PaymentMethod { get; private set; }
-    public DateTime? PayedAt { get; private set; }
     public Address Address { get; private set; }
-    public Money Price {  get; private set; }
+    public Money Price { get; private set; }
     public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
     private readonly List<OrderItem> _items = new();
 
-    private readonly List<IDomainEvent> _domainEvents = new();
-
     private Order() { }
-    public Order(Guid orderId, Guid tenantId, Guid customerId, Address address, IEnumerable<OrderItem> items, PaymentMethod paymentMethod) : base(tenantId)
+    public Order(Guid tenantId, Guid customerId, Address address)
+        : base(tenantId)
     {
-        //ver o q fazer em relacao ao id, criar os orderitems dentro da order #########
-        Id = orderId;
         CustomerId = customerId;
         OrderStatus = OrderStatus.PendingPayment;
         Address = address;
-        _items.AddRange(items);
-        PaymentMethod = paymentMethod;
         Price = new Money(_items.Sum(x => x.Total));
     }
 
-    #region CHANGE ORDER STATUS
 
-    public void ChangeStatus(OrderStatus newStatus)
+    public void ChangeStatus(string status)
     {
+        if (!Enum.TryParse<OrderStatus>(status, true, out var newStatus))
+            throw new Exception("Invalid order status");
+
         OrderStatusTransitionValidator.ValidateTransition(OrderStatus, newStatus);
         OrderStatus = newStatus;
+
         SetUpdatedAt();
 
         TriggerDomainEvents(newStatus);
     }
 
-    public void AddItem()
+    public void AddItem(Product product, PositiveQuantity quantity)
     {
-
+        var orderItem = new OrderItem(Id, TenantId, product, quantity);
+        _items.Add(orderItem);
     }
-    #endregion
 
     #region PRIVATES
     private void TriggerDomainEvents(OrderStatus newStatus)
