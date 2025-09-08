@@ -1,4 +1,6 @@
-﻿namespace MultiTenantEcommerce.Application.Catalog.Products.DTOs;
+﻿using MultiTenantEcommerce.Domain.Catalog.Entities;
+
+namespace MultiTenantEcommerce.Application.Catalog.Products.DTOs;
 
 public class ProductResponseDTO
 {
@@ -7,6 +9,7 @@ public class ProductResponseDTO
     public string? Description { get; init; }
     public decimal Price { get; init; }
     public Guid CategoryId { get; init; }
+    public Category Category { get; init; }
     public bool IsActive { get; init; }
     public Dictionary<string, object> Links { get; init; }
 }
