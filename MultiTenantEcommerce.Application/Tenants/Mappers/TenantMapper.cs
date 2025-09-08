@@ -1,4 +1,4 @@
-﻿using MultiTenantEcommerce.Application.Services;
+﻿using MultiTenantEcommerce.Application.Common.Helpers;
 using MultiTenantEcommerce.Application.Tenants.DTOs.Tenant;
 using MultiTenantEcommerce.Domain.Tenants.Entities;
 
@@ -20,11 +20,11 @@ public class TenantMapper
             CompanyName = tenant.Name,
             CreatedAt = tenant.CreatedAt,
             TenantId = tenant.Id,
-            UpdatedAt = tenant.UpdatedAt       
+            UpdatedAt = tenant.UpdatedAt
         };
     }
 
-    public List<TenantResponseDTO> ToTenantResponseDTOList(List<Tenant> tenants)
+    public List<TenantResponseDTO> ToTenantResponseDTOList(IEnumerable<Tenant> tenants)
     {
         return tenants.Select(x => ToTenantResponseDTO(x)).ToList();
     }

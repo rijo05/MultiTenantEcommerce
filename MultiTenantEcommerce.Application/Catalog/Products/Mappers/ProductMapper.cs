@@ -1,5 +1,5 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs;
-using MultiTenantEcommerce.Application.Services;
+using MultiTenantEcommerce.Application.Common.Helpers;
 using MultiTenantEcommerce.Domain.Catalog.Entities;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.Mappers;
@@ -22,12 +22,13 @@ public class ProductMapper
             Description = product.Description,
             Price = product.Price.Value,
             CategoryId = product.CategoryId,
+            Category = product.Category,
             IsActive = product.IsActive,
             //Links = GenerateLinks(product)
         };
     }
 
-    public List<ProductResponseDTO> ToProductResponseDTOList(List<Product> products)
+    public List<ProductResponseDTO> ToProductResponseDTOList(IEnumerable<Product> products)
     {
         return products.Select(x => ToProductResponseDTO(x)).ToList();
     }

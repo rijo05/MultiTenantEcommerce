@@ -1,4 +1,4 @@
-﻿using MultiTenantEcommerce.Application.Common.Mappers;
+﻿using MultiTenantEcommerce.Application.Common.Helpers.Mappers;
 using MultiTenantEcommerce.Application.Users.Customers.DTOs;
 using MultiTenantEcommerce.Domain.Users.Entities;
 
@@ -27,7 +27,7 @@ public class CustomerMapper
         };
     }
 
-    public List<CustomerResponseDTO> ToCustomerResponseDTOList(List<Customer> Customer)
+    public List<CustomerResponseDTO> ToCustomerResponseDTOList(IEnumerable<Customer> Customer)
     {
         return Customer.Select(x => ToCustomerResponseDTO(x)).ToList();
     }

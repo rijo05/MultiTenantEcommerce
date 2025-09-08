@@ -1,8 +1,8 @@
-﻿using MultiTenantEcommerce.Application.DTOs.OrderItems;
-using MultiTenantEcommerce.Application.Services;
-using MultiTenantEcommerce.Domain.Sales.Entities;
+﻿using MultiTenantEcommerce.Application.Common.Helpers;
+using MultiTenantEcommerce.Application.Sales.Orders.DTOs;
+using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
 
-namespace MultiTenantEcommerce.Application.Mappers;
+namespace MultiTenantEcommerce.Application.Sales.Orders.Mappers;
 
 public class OrderItemMapper
 {
@@ -18,14 +18,14 @@ public class OrderItemMapper
         return new OrderItemResponseDTO
         {
             OrderId = item.OrderId,
+            Name = item.ProductName,
             ProductId = item.ProductId,
-            Name = item.Name,
             UnitPrice = item.UnitPrice.Value,
-            Quantity = item.Quantity
+            Quantity = item.Quantity.Value
         };
     }
 
-    public List<OrderItemResponseDTO> ToOrderItemResponseDTOList(List<OrderItem> items)
+    public List<OrderItemResponseDTO> ToOrderItemResponseDTOList(IEnumerable<OrderItem> items)
     {
         return items.Select(x => ToOrderItemResponseDTO(x)).ToList();
     }
