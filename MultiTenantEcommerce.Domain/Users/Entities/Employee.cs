@@ -1,18 +1,31 @@
-﻿using MultiTenantEcommerce.Domain.Common.Guard;
+﻿using MultiTenantEcommerce.Domain.Users.Entities.Permissions;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Domain.Users.Entities;
 public class Employee : UserBase
 {
-    public Role Role { get; private set; }
-    public Password Password { get; private set; }
+    private readonly HashSet<EmployeeRole> _employeeRoles = new();
+    public IReadOnlyCollection<EmployeeRole> EmployeeRoles => _employeeRoles;
 
     private Employee() { }
-    public Employee(Guid tenantId, string name, Email email, Role role, Password password) 
-        : base(tenantId, name, email)
+    public Employee(Guid tenantId, string name, Email email, Password password)
+        : base(tenantId, name, password, email)
     {
-        Role = role;
-        Password = password;
+    }
+    public void AddRole(Role role)
+    {
+        if (_employeeRoles.Any(x => x.RoleId == role.Id))
+            return;
+
+        _employeeRoles.Add(new EmployeeRole(Id, role.Id));
+    }
+
+    public void RemoveRole(Role role)
+    {
+        var employeeRole = _employeeRoles.FirstOrDefault(x => x.RoleId == role.Id);
+
+        if (employeeRole != null)
+            _employeeRoles.Remove(employeeRole);
     }
 
     #region UPDATE DATA
@@ -39,12 +52,6 @@ public class Employee : UserBase
         if (!string.IsNullOrWhiteSpace(role))
             UpdateRole(role);
     }
-    public void UpdatePassword(string newPassword)
-    {
-        Password.UpdatePassword(newPassword);
-        SetUpdatedAt();
-    }
-
     public void UpdateRole(string role)
     {
         //TODO()
