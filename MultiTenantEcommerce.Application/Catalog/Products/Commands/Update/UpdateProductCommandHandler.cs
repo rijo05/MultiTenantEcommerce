@@ -1,16 +1,8 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs;
 using MultiTenantEcommerce.Application.Catalog.Products.Mappers;
-using MultiTenantEcommerce.Application.Common.Interfaces;
+using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
+using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
-using MultiTenantEcommerce.Domain.Common.Interfaces;
-using MultiTenantEcommerce.Domain.Inventory.Interfaces;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
-using MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.Commands.Update;
 public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand, ProductResponseDTO>
@@ -33,19 +25,19 @@ public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand,
 
     public async Task<ProductResponseDTO> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetByIdAsync(request.ProductId) 
+        var product = await _productRepository.GetByIdAsync(request.ProductId)
             ?? throw new Exception("Product doesnt exist.");
 
         if (request.CategoryId.HasValue)
         {
-            var categoria = await _categoryRepository.GetByIdAsync(request.CategoryId.Value) 
+            var categoria = await _categoryRepository.GetByIdAsync(request.CategoryId.Value)
                 ?? throw new Exception("Category doesnt exist");
         }
 
-        product.UpdateProduct(request.Name, 
-            request.Description, 
-            request.Price, 
-            request.IsActive, 
+        product.UpdateProduct(request.Name,
+            request.Description,
+            request.Price,
+            request.IsActive,
             request.CategoryId);
 
         await _unitOfWork.CommitAsync();
