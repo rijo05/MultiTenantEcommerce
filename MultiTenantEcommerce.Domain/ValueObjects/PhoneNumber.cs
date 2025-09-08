@@ -2,21 +2,21 @@
 public class PhoneNumber
 {
     public string CountryCode { get; private set; }
-    public string Number {  get; private set; }
+    public string Number { get; private set; }
 
     private PhoneNumber() { }
-    public PhoneNumber(string countryCode, string Number)
+    public PhoneNumber(string countryCode, string number)
     {
         ValidateCountryCode(countryCode);
-        ValidatePhoneNumber(Number);
+        ValidatePhoneNumber(number);
 
         CountryCode = countryCode.Replace(" ", "");
-        Number = Number.Replace(" ", "");
+        Number = number.Replace(" ", "");
     }
 
-    private void ValidatePhoneNumber(string Number)
+    private void ValidatePhoneNumber(string number)
     {
-        if (string.IsNullOrEmpty(Number)) throw new Exception("Phone number cannot be null or empty.");
+        if (string.IsNullOrEmpty(number)) throw new Exception("Phone number cannot be null or empty.");
     }
 
     public void ValidateCountryCode(string countryCode)
