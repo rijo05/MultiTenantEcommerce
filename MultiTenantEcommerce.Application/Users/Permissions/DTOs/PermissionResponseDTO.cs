@@ -1,0 +1,9 @@
+﻿namespace MultiTenantEcommerce.Application.Users.Permissions.DTOs;
+public class PermissionResponseDTO
+{
+    public Guid Id { get; set; }
+    public string Name { get; set; }
+    public string Description { get; set; }
+    public string Area { get; set; }
+    public string Action { get; set; }
+}
