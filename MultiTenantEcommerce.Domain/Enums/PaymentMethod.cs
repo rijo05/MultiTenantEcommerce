@@ -3,5 +3,6 @@ public enum PaymentMethod
 {
     MbWay,
     Card,
-    Paypal
+    Paypal,
+    Stripe
 }
