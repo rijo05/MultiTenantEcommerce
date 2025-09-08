@@ -1,105 +1,99 @@
 ﻿using MultiTenantEcommerce.Domain.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Common.Entities;
-using MultiTenantEcommerce.Domain.Common.Events;
 using MultiTenantEcommerce.Domain.Common.Guard;
+using MultiTenantEcommerce.Domain.ValueObjects;
 using System.ComponentModel.DataAnnotations;
 
 namespace MultiTenantEcommerce.Domain.Inventory.Entities;
 public class Stock : TenantBase
 {
     public Guid ProductId { get; private set; }
-    public int Quantity { get; private set; }
-    public int MinimumQuantity { get; private set; }
-    public int Reserved {  get; private set; }
-    public int StockAvailableAtMoment => Quantity - Reserved;
+    public NonNegativeQuantity Quantity { get; private set; }
+    public NonNegativeQuantity MinimumQuantity { get; private set; }
+    public NonNegativeQuantity Reserved { get; private set; }
+    public NonNegativeQuantity StockAvailableAtMoment => Quantity - Reserved;
 
     [Timestamp]
     public byte[] RowVersion { get; set; }
 
-    private readonly List<IDomainEvent> _domainEvents = new();
-
     private Stock() { }
-    public Stock(Product product, Guid tenantId, int quantity = 0, int minimumQuantity = 10) : base(tenantId)
+    public Stock(Product product, Guid tenantId, int? quantity = null, int? minimumQuantity = null)
+        : base(tenantId)
     {
-        GuardCommon.AgainstNegative(quantity, nameof(quantity));
-        GuardCommon.AgainstNegative(minimumQuantity, nameof(minimumQuantity));
-
         ProductId = product.Id;
-        Quantity = quantity;
-        MinimumQuantity = minimumQuantity;
-        Reserved = 0;
+        Quantity = new NonNegativeQuantity(quantity ?? 0);
+        MinimumQuantity = new NonNegativeQuantity(minimumQuantity ?? 10);
+        Reserved = new NonNegativeQuantity(0);
     }
 
 
     #region STOCK CHANGES
-    public void ChangeStock(int quantity)
+    public void AddStock(int quantity)
     {
-        if (quantity < 0)
-        {
-            var absQuantidade = Math.Abs(quantity);
-            if (absQuantidade > quantity)
-                throw new InvalidOperationException("Not enough stock");
-        }
+        GuardCommon.AgainstNegativeOrZero(quantity, nameof(quantity));
 
-        Quantity += quantity;
-        TriggerDomainEvents(Quantity);
+        Quantity = new NonNegativeQuantity(Quantity.Value + quantity);
+        SetUpdatedAt();
+    }
+
+    public void RemoveStock(int quantity)
+    {
+        GuardCommon.AgainstNegativeOrZero(quantity, nameof(quantity));
+
+        if (quantity > Quantity.Value)
+            throw new InvalidOperationException("Not enough stock available to remove.");
+
+        Quantity -= new NonNegativeQuantity(quantity);
         SetUpdatedAt();
     }
 
     public void SetStock(int quantity)
     {
-        GuardCommon.AgainstNegative(quantity, nameof(quantity));
-        Quantity = quantity;
-        TriggerDomainEvents(Quantity);
+        Quantity = new NonNegativeQuantity(quantity);
+        //TriggerDomainEvents(Quantity);
         SetUpdatedAt();
     }
 
     public void SetMinimumStockLevel(int quantity)
     {
-        GuardCommon.AgainstNegativeOrZero(quantity, nameof(quantity));
-        MinimumQuantity = quantity;
+        MinimumQuantity = new NonNegativeQuantity(quantity);
         SetUpdatedAt();
     }
 
     #endregion
 
     #region STOCK CONFLICTS
-    public void ReleaseStock(int quantity)
+    public void ReleaseReservedStock(int quantity)
     {
-        if (quantity <= 0 || quantity > Reserved)
+        var quantityToReserve = new NonNegativeQuantity(quantity);
+
+        if (quantityToReserve.Value > Reserved.Value)
             throw new Exception("Quantity not valid");
 
-        Reserved -= quantity;
+        Reserved -= quantityToReserve;
         SetUpdatedAt();
     }
     public void ReserveStock(int quantity)
     {
-        if (quantity <= 0 || quantity > Quantity - Reserved)
+        var quantityToReserve = new NonNegativeQuantity(quantity);
+
+        if (quantityToReserve.Value > StockAvailableAtMoment.Value)
             throw new Exception("Quantity not valid");
 
-        Reserved += quantity;
+        Reserved = new NonNegativeQuantity(Reserved.Value + quantityToReserve.Value);
         SetUpdatedAt();
     }
 
     public void CommitStock(int quantity)
     {
-        if (quantity <= 0 || quantity > Reserved)
-            throw new Exception("Quantity not valid");
-
-        Quantity -= quantity;
-        Reserved -= quantity;
+        RemoveStock(quantity);
+        ReleaseReservedStock(quantity);
         SetUpdatedAt();
     }
-    #endregion
 
-
-    #region PRIVATES
-    private void TriggerDomainEvents(int stock)
+    public bool CheckAvailability(int quantity)
     {
-        //if (stock == 0)
-        //    _domainEvents.Add(new ProductOutOfStockEvent(Id));
-        //else if (stock <= MinimumQuantity)
-        //    _domainEvents.Add(new ProductStockLowEvent(Id));
+        return StockAvailableAtMoment.Value - quantity >= 0;
     }
     #endregion
 }
