@@ -2,6 +2,7 @@
 using MultiTenantEcommerce.Domain.Inventory.Entities;
 using MultiTenantEcommerce.Domain.Inventory.Interfaces;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using System.Data.Entity;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 public class StockRepository : Repository<Stock>, IStockRepository
@@ -23,12 +24,9 @@ public class StockRepository : Repository<Stock>, IStockRepository
         return await _appDbContext.Stocks.Where(x => ids.Contains(x.ProductId)).ToListAsync();
     }
 
-    public async Task SaveAsync(Stock stock)
+    public void UpdateWithRow(Stock stock)
     {
-        // Verifica se o RowVersion foi alterado
         _appDbContext.Entry(stock).OriginalValues["RowVersion"] = stock.RowVersion;
-
-        // Salva as alterações no banco de dados
-        await _appDbContext.SaveChangesAsync();
+        _appDbContext.Stocks.Update(stock);
     }
 }
