@@ -14,7 +14,9 @@
   <ItemGroup>
     <Folder Include="Catalog\Events\" />
     <Folder Include="Inventory\Events\" />
-    <Folder Include="Tenancy\Events\" />
+    <Folder Include="Payment\Events\" />
+    <Folder Include="Sales\ShoppingCart\Events\" />
+    <Folder Include="Tenants\Events\" />
     <Folder Include="Users\Events\" />
   </ItemGroup>
 
