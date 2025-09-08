@@ -3,7 +3,7 @@
 namespace MultiTenantEcommerce.Domain.ValueObjects;
 public class Password
 {
-    public string Value { get; private set; }
+    private string Value;
     private const string Pattern = @"^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$";
 
     private Password() { }
@@ -16,8 +16,19 @@ public class Password
     public void UpdatePassword(string password)
     {
         ValidatePassword(password);
-        VerifySamePassword(password);
+
+        if (VerifySamePassword(password))
+            throw new Exception("Password cant be equal to previous one");
+
         Value = HashPassword(password);
+    }
+
+    public bool VerifySamePassword(string newPassword)
+    {
+        if (BCrypt.Net.BCrypt.Verify(newPassword, Value))
+            return true;
+
+        return false;
     }
 
     private void ValidatePassword(string password)
@@ -31,11 +42,5 @@ public class Password
     private string HashPassword(string password)
     {
         return BCrypt.Net.BCrypt.HashPassword(password);
-    }
-
-    private void VerifySamePassword(string newPassword)
-    {
-        if (BCrypt.Net.BCrypt.Verify(newPassword, Value))
-            throw new Exception("The new password cannot be the same as the current one.");
     }
 }
