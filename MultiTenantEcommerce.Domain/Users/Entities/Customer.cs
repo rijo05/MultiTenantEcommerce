@@ -1,20 +1,16 @@
-﻿using MediatR;
-using MultiTenantEcommerce.Domain.Users.Interfaces;
-using MultiTenantEcommerce.Domain.ValueObjects;
+﻿using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Domain.Users.Entities;
 public class Customer : UserBase
 {
     public Address Address { get; private set; }
-    public Password Password { get; private set; }
     public PhoneNumber PhoneNumber { get; private set; }
 
     private Customer() { }
-    public Customer(Guid tenantId, string name, Email email, Password password, Address address, PhoneNumber phoneNumber) 
-        : base(tenantId, name, email)
+    public Customer(Guid tenantId, string name, Email email, Password password, Address address, PhoneNumber phoneNumber)
+        : base(tenantId, name, password, email)
     {
         Address = address;
-        Password = password;
         PhoneNumber = phoneNumber;
     }
     public void UpdateCustomer(
@@ -41,13 +37,6 @@ public class Customer : UserBase
         //    UpdateAddress(address);
 
         //TODO() ver como atualizar address e phone number ##########
-    }
-
-
-    public void UpdatePassword(string? password)
-    {
-        Password.UpdatePassword(password);
-        SetUpdatedAt();
     }
 
     //private void UpdatePhoneNumber(PhoneNumber phoneNumber)
