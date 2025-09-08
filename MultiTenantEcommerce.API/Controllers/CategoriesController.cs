@@ -6,7 +6,6 @@ using MultiTenantEcommerce.Application.Catalog.Categories.Commands.Update;
 using MultiTenantEcommerce.Application.Catalog.Categories.DTOs;
 using MultiTenantEcommerce.Application.Catalog.Categories.Queries.GetById;
 using MultiTenantEcommerce.Application.Catalog.Categories.Queries.GetFiltered;
-using MultiTenantEcommerce.Application.Common.Interfaces;
 
 namespace MultiTenantEcommerce.API.Controllers;
 
@@ -60,9 +59,9 @@ public class CategoriesController : ControllerBase
         if (categoryDTO is null)
             return BadRequest("Category data must be provided.");
 
-        var command = new UpdateCategoryCommand(id, 
-            categoryDTO.Name, 
-            categoryDTO.Description, 
+        var command = new UpdateCategoryCommand(id,
+            categoryDTO.Name,
+            categoryDTO.Description,
             categoryDTO.IsActive);
 
         var category = await _mediator.Send(command);

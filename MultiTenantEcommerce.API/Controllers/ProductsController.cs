@@ -6,7 +6,6 @@ using MultiTenantEcommerce.Application.Catalog.Products.Commands.Update;
 using MultiTenantEcommerce.Application.Catalog.Products.DTOs;
 using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetById;
 using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetFiltered;
-using MultiTenantEcommerce.Application.Common.Interfaces;
 
 namespace MultiTenantEcommerce.API.Controllers;
 
@@ -61,11 +60,11 @@ public class ProductsController : ControllerBase
         if (productDTO is null)
             return BadRequest("Product data must be provided.");
 
-        var command = new UpdateProductCommand(id, 
-            productDTO.Name, 
-            productDTO.Description, 
-            productDTO.Price, 
-            productDTO.IsActive, 
+        var command = new UpdateProductCommand(id,
+            productDTO.Name,
+            productDTO.Description,
+            productDTO.Price,
+            productDTO.IsActive,
             productDTO.CategoryId);
 
         var product = await _mediator.Send(command);
