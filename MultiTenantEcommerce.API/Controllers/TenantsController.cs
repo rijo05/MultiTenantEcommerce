@@ -1,8 +1,5 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MultiTenantEcommerce.Application.Common.Interfaces;
-using MultiTenantEcommerce.Application.Services;
-using MultiTenantEcommerce.Application.Tenants.Commands.Tenant.Create;
 using MultiTenantEcommerce.Application.Tenants.Commands.Tenant.Delete;
 using MultiTenantEcommerce.Application.Tenants.Commands.Tenant.Update;
 using MultiTenantEcommerce.Application.Tenants.DTOs.Tenant;
@@ -37,21 +34,6 @@ public class TenantsController : ControllerBase
         var tenant = await _mediator.Send(query);
 
         return Ok(tenant);
-    }
-
-    [HttpPost]
-    public async Task<ActionResult<TenantResponseDTO>> Create([FromBody] CreateTenantCommand command)
-    {
-        if (command is null)
-            return BadRequest("Tenant data must be provided.");
-
-        var tenant = await _mediator.Send(command);
-
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = tenant.TenantId },
-            tenant
-            );
     }
 
     [HttpPatch("{id:guid}")]
