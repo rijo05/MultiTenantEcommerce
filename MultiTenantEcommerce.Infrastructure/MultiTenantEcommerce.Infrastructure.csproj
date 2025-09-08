@@ -16,9 +16,11 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="9.0.8" />
     <PackageReference Include="Npgsql" Version="9.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.4" />
+    <PackageReference Include="Stripe.net" Version="48.5.0" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MultiTenantEcommerce.Application\MultiTenantEcommerce.Application.csproj" />
     <ProjectReference Include="..\MultiTenantEcommerce.Domain\MultiTenantEcommerce.Domain.csproj" />
   </ItemGroup>
 
