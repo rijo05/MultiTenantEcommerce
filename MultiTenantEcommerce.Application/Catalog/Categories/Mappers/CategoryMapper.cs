@@ -1,5 +1,5 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Categories.DTOs;
-using MultiTenantEcommerce.Application.Services;
+using MultiTenantEcommerce.Application.Common.Helpers;
 using MultiTenantEcommerce.Domain.Catalog.Entities;
 
 namespace MultiTenantEcommerce.Application.Catalog.Categories.Mappers;
@@ -27,7 +27,7 @@ public class CategoryMapper
         };
     }
 
-    public List<CategoryResponseDTO> ToCategoryResponseDTOList(List<Category> categories)
+    public List<CategoryResponseDTO> ToCategoryResponseDTOList(IEnumerable<Category> categories)
     {
         return categories.Select(x => ToCategoryResponseDTO(x)).ToList();
     }
