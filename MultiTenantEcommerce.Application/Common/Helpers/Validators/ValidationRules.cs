@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
-using MultiTenantEcommerce.Domain.Enums;
 
-namespace MultiTenantEcommerce.Application.Common.Validators;
+namespace MultiTenantEcommerce.Application.Common.Helpers.Validators;
 
 public static class ValidationRules
 {
@@ -56,13 +55,13 @@ public static class ValidationRules
     }
 
     //Roles - check if it exists
-    public static IRuleBuilderOptions<T, string?> RoleRules<T>(this IRuleBuilder<T, string?> ruleBuilder)
-    {
-        return ruleBuilder
-                    .NotEmpty().WithMessage("Role is required.")
-                    .Must(role => Enum.TryParse<RoleType>(role, true, out _))
-                    .WithMessage("Invalid role.");
-    }
+    //public static IRuleBuilderOptions<T, string?> RoleRules<T>(this IRuleBuilder<T, string?> ruleBuilder)
+    //{
+    //    return ruleBuilder
+    //                .NotEmpty().WithMessage("Role is required.")
+    //                .Must(role => Enum.TryParse<RoleType>(role, true, out _))
+    //                .WithMessage("Invalid role.");
+    //}
 
     //Price - Greater then 0
     public static IRuleBuilderOptions<T, decimal?> PriceRules<T>(this IRuleBuilder<T, decimal?> ruleBuilder)
@@ -105,7 +104,7 @@ public static class ValidationRules
     //Stock Minimo
     public static IRuleBuilderOptions<T, int?> MinimumStockLevelRules<T>(this IRuleBuilder<T, int?> ruleBuilder)
     {
-        return ruleBuilder  
+        return ruleBuilder
                     .GreaterThanOrEqualTo(0).WithMessage("Minimum stock level must be greater or equal to zero");
     }
 

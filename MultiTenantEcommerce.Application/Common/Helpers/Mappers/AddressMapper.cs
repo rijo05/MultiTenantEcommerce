@@ -1,7 +1,7 @@
 ﻿using MultiTenantEcommerce.Application.Common.DTOs.Address;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
-namespace MultiTenantEcommerce.Application.Common.Mappers;
+namespace MultiTenantEcommerce.Application.Common.Helpers.Mappers;
 public class AddressMapper
 {
     public AddressResponseDTO ToAddressResponseFromDTO(Address address)
@@ -15,5 +15,5 @@ public class AddressMapper
             PostalCode = address.PostalCode
         };
     }
-    
+
 }
