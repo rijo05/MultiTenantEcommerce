@@ -5,9 +5,12 @@ using MultiTenantEcommerce.Domain.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Common.Entities;
 using MultiTenantEcommerce.Domain.Common.Events;
 using MultiTenantEcommerce.Domain.Inventory.Entities;
-using MultiTenantEcommerce.Domain.Sales.Entities;
-using MultiTenantEcommerce.Domain.Tenancy.Entities;
+using MultiTenantEcommerce.Domain.Payment.Entities;
+using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
+using MultiTenantEcommerce.Domain.Sales.ShoppingCart.Entities;
+using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Domain.Users.Entities;
+using MultiTenantEcommerce.Domain.Users.Entities.Permissions;
 using MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Context;
@@ -25,28 +28,46 @@ public class AppDbContext : DbContext
     }
 
     public virtual DbSet<Category> Categories { get; set; }
+    public virtual DbSet<Product> Products { get; set; }
     public virtual DbSet<Customer> Customers { get; set; }
     public virtual DbSet<Employee> Employees { get; set; }
-    public virtual DbSet<Order> Orders { get; set; }
-    public virtual DbSet<OrderItem> OrderItems { get; set; }
-    public virtual DbSet<Product> Products { get; set; }
     public virtual DbSet<Stock> Stocks { get; set; }
     public virtual DbSet<StockMovement> StockMovements { get; set; }
+    public virtual DbSet<Order> Orders { get; set; }
+    public virtual DbSet<OrderItem> OrderItems { get; set; }
+    public virtual DbSet<Cart> Carts { get; set; }
+    public virtual DbSet<CartItem> CartItems { get; set; }
+    public virtual DbSet<Payment> Payments { get; set; }
     public virtual DbSet<Tenant> Tenants { get; set; }
+    public virtual DbSet<Role> Roles { get; set; }
+    public virtual DbSet<Permission> Permissions { get; set; }
+    public virtual DbSet<EmployeeRole> EmployeeRoles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.ApplyConfiguration(new CategoryConfiguration(_tenantContext));
+        modelBuilder.ApplyConfiguration(new ProductConfiguration(_tenantContext));
+
         modelBuilder.ApplyConfiguration(new CustomerConfiguration(_tenantContext));
         modelBuilder.ApplyConfiguration(new EmployeeConfiguration(_tenantContext));
+
         modelBuilder.ApplyConfiguration(new OrderConfiguration(_tenantContext));
         modelBuilder.ApplyConfiguration(new OrderItemConfiguration(_tenantContext));
-        modelBuilder.ApplyConfiguration(new ProductConfiguration(_tenantContext));
+        modelBuilder.ApplyConfiguration(new CartConfiguration(_tenantContext));
+        modelBuilder.ApplyConfiguration(new CartItemConfiguration(_tenantContext));
+
         modelBuilder.ApplyConfiguration(new StockConfiguration(_tenantContext));
         modelBuilder.ApplyConfiguration(new StockMovementConfiguration(_tenantContext));
+
+        modelBuilder.ApplyConfiguration(new PaymentConfiguration(_tenantContext));
+
         modelBuilder.ApplyConfiguration(new TenantConfiguration());
+
+        modelBuilder.ApplyConfiguration(new RoleConfiguration(_tenantContext));
+        modelBuilder.ApplyConfiguration(new PermissionConfiguration());
+        modelBuilder.ApplyConfiguration(new EmployeeRoleConfiguration(_tenantContext));
     }
 
     public override int SaveChanges()
