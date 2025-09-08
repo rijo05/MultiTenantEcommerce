@@ -1,7 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MultiTenantEcommerce.Application.DTOs.Order;
-using MultiTenantEcommerce.Application.DTOs.OrderItems;
-using MultiTenantEcommerce.Application.Interfaces;
+﻿using MediatR;
+using Microsoft.AspNetCore.Mvc;
+using MultiTenantEcommerce.Application.Sales.Orders.Commands.ChangeStatus;
+using MultiTenantEcommerce.Application.Sales.Orders.DTOs;
+using MultiTenantEcommerce.Application.Sales.Orders.Queries.GetByCustomerId;
+using MultiTenantEcommerce.Application.Sales.Orders.Queries.GetById;
+using MultiTenantEcommerce.Application.Sales.Orders.Queries.GetFiltered;
 
 namespace MultiTenantEcommerce.API.Controllers;
 
@@ -9,28 +12,28 @@ namespace MultiTenantEcommerce.API.Controllers;
 [Route("api/[controller]")]
 public class OrdersController : ControllerBase
 {
-    private readonly IOrderService _orderService;
+    private readonly IMediator _mediator;
 
-    public OrdersController(IOrderService orderService)
+    public OrdersController(IMediator mediator)
     {
-        _orderService = orderService;
+        _mediator = mediator;
     }
 
 
     [HttpGet]
-    public async Task<ActionResult<List<OrderResponseDTO>>> GetOrders([FromQuery] OrderFilterDTO filter)
+    public async Task<ActionResult<List<OrderResponseDTO>>> GetOrders([FromQuery] GetFilteredOrdersQuery filter)
     {
-        var orders = await _orderService.GetFilteredOrdersAsync(filter);
+        var orders = await _mediator.Send(filter);
+
         return Ok(orders);
     }
 
-    [HttpGet("{id:Guid}")]
-    public async Task<ActionResult<OrderResponseDTO>> GetById(Guid id)
+    [HttpGet("{id:guid}")]
+    public async Task<ActionResult<OrderResponseWithPayment>> GetById(Guid id)
     {
-        var order = await _orderService.GetOrderByIdAsync(id);
+        var query = new GetOrderByIdQuery(id);
 
-        if (order is null)
-            return NotFound($"Order with ID '{id}' not found.");
+        var order = await _mediator.Send(query);
 
         return Ok(order);
     }
@@ -39,24 +42,21 @@ public class OrdersController : ControllerBase
     [HttpPatch("{id:guid}/status")]
     public async Task<ActionResult<OrderResponseDTO>> ChangeOrderStatus(Guid id, [FromBody] ChangeOrderStatusDTO statusDTO)
     {
-        var order = await _orderService.ChangeOrderStatus(id, statusDTO);
+        var command = new ChangeOrderStatusCommand(id, statusDTO.Status);
+
+        var order = await _mediator.Send(command);
 
         return Ok(order);
     }
 
 
-    [HttpPost]
-    public async Task<ActionResult<OrderResponseDTO>> CreateOrder([FromBody] CreateOrderDTO orderDTO)
+    [HttpGet("customer")]
+    public async Task<ActionResult<List<OrderResponseDTO>>> GetByCustomerId(Guid id)
     {
-        if (orderDTO is null)
-            return BadRequest("Order data must be provided.");
+        var command = new GetOrderByCustomerIdQuery(id);
 
-        var order = await _orderService.CreateOrderAsync(orderDTO);
+        var orders = await _mediator.Send(command);
 
-        return CreatedAtAction(
-            nameof(GetById),
-            new { id = order.Id },
-            order
-            );
+        return Ok(orders);
     }
 }
