@@ -34,27 +34,22 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
 
         builder.OwnsOne(u => u.Password, password =>
         {
-            password.Property(e => e.Value)
+            password.Property<string>("Value")
                 .HasColumnName("Password")
                 .IsRequired();
         });
 
-        builder.OwnsOne(u => u.Role, role =>
-        {
-            role.Property(r => r.roleName)
-                .HasConversion<string>()
-                .HasColumnName("Role")
-                .IsRequired();
-        });
+        builder.HasMany(e => e.EmployeeRoles)
+                .WithOne(er => er.Employee)
+                .HasForeignKey(er => new { er.TenantId, er.EmployeeId })
+                .OnDelete(DeleteBehavior.Cascade);
 
 
+        //builder.HasIndex(e => e.TenantId)
+        //        .HasDatabaseName("IX_Employee_TenantId");
 
-
-        builder.HasIndex(e => e.TenantId)
-                .HasDatabaseName("IX_Employee_TenantId");
-
-        builder.HasIndex("TenantId", "Email")
-            .IsUnique();
+        //builder.HasIndex("TenantId", "Email")
+        //    .IsUnique();
 
         //builder.HasIndex(e => new { e.TenantId, e.Email.Value })
         //        .HasDatabaseName("IX_Employee_TenantId_Email");
