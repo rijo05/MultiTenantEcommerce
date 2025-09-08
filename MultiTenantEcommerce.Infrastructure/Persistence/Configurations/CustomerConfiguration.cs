@@ -44,7 +44,7 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
         builder.OwnsOne(u => u.Password, password =>
         {
-            password.Property(e => e.Value)
+            password.Property<string>("Value")
                 .HasColumnName("Password")
                 .IsRequired();
         });
@@ -61,14 +61,16 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         });
 
 
-        builder.HasIndex(c => c.TenantId)
-                .HasDatabaseName("IX_Customer_TenantId");
+        //builder.HasIndex(c => c.TenantId)
+        //        .HasDatabaseName("IX_Customer_TenantId");
 
-        builder.HasIndex("TenantId", "Email")
-            .IsUnique();
+        //builder.HasIndex(c => new { c.TenantId, c.Email.Value })
+        //       .IsUnique()
+        //       .HasDatabaseName("IX_Customer_TenantId_Email");
 
-        builder.HasIndex("TenantId", "PhoneNumber_CountryCode", "PhoneNumber_Number")
-               .IsUnique();
+        //builder.HasIndex(c => new { c.TenantId, c.PhoneNumber.CountryCode, c.PhoneNumber.Number })
+        //       .IsUnique()
+        //       .HasDatabaseName("IX_Customer_TenantId_PhoneNumber");
 
         //builder.HasIndex(c => new { c.TenantId, c.Email.Value })
         //        .HasDatabaseName("IX_Customer_TenantId_Email");
