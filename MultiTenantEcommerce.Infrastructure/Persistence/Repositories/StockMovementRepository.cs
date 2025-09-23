@@ -11,13 +11,14 @@ public class StockMovementRepository : Repository<StockMovement>, IStockMovement
     public StockMovementRepository(AppDbContext appDbContext, TenantContext tenantContext) : base(appDbContext, tenantContext) { }
 
     public async Task<List<StockMovement>> GetFilteredAsync(
-    Guid? productId = null, 
-    int? quantity = null, 
-    DateTime? minDate = null, 
-    DateTime? maxDate = null, 
-    string? reason = null, 
-    int page = 1, 
-    int pageSize = 20, 
+    Guid? productId = null,
+    int? minQuantity = null,
+    int? maxQuantity = null,
+    string? reason = null,
+    DateTime? minDate = null,
+    DateTime? maxDate = null,
+    int page = 1,
+    int pageSize = 20,
     SortOptions sort = SortOptions.TimeDesc)
     {
         var query = _appDbContext.StockMovements.AsQueryable();
@@ -25,8 +26,11 @@ public class StockMovementRepository : Repository<StockMovement>, IStockMovement
         if (productId.HasValue)
             query = query.Where(p => p.ProductId == productId);
 
-        if (quantity.HasValue)
-            query = query.Where(p => p.Quantity == quantity);
+        if (minQuantity.HasValue)
+            query = query.Where(p => p.Quantity >= minQuantity);
+
+        if (maxQuantity.HasValue)
+            query = query.Where(p => p.Quantity <= maxQuantity);
 
         if (minDate.HasValue)
             query = query.Where(p => p.CreatedAt >= minDate);
