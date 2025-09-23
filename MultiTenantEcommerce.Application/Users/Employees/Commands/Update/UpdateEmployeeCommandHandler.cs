@@ -5,7 +5,7 @@ using MultiTenantEcommerce.Application.Users.Employees.Mappers;
 using MultiTenantEcommerce.Domain.Users.Interfaces;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
-namespace MultiTenantEcommerce.Application.Users.Employees.Commands.Delete;
+namespace MultiTenantEcommerce.Application.Users.Employees.Commands.Update;
 public class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmployeeCommand, EmployeeResponseDTO>
 {
     private readonly IEmployeeRepository _employeeRepository;
@@ -38,7 +38,6 @@ public class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmployeeComman
             request.Name,
             request.Email,
             request.Password,
-            request.Role,
             request.IsActive);
 
 

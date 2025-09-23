@@ -3,7 +3,7 @@ using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Users.Interfaces;
 
-namespace MultiTenantEcommerce.Application.Users.Employees.Commands.Update;
+namespace MultiTenantEcommerce.Application.Users.Employees.Commands.Delete;
 public class DeleteEmployeeCommandHandler : ICommandHandler<DeleteEmployeeCommand, Unit>
 {
     private readonly IEmployeeRepository _employeeRepository;

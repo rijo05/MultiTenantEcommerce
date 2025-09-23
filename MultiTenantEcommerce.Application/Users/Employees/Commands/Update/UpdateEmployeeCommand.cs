@@ -1,7 +1,7 @@
 ﻿using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Users.Employees.DTOs;
 
-namespace MultiTenantEcommerce.Application.Users.Employees.Commands.Delete;
+namespace MultiTenantEcommerce.Application.Users.Employees.Commands.Update;
 public record UpdateEmployeeCommand(
     Guid Id,
     string? Name,
