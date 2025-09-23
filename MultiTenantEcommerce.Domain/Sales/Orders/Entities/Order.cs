@@ -2,6 +2,8 @@
 using MultiTenantEcommerce.Domain.Common.Entities;
 using MultiTenantEcommerce.Domain.Common.Guard;
 using MultiTenantEcommerce.Domain.Enums;
+using MultiTenantEcommerce.Domain.Payment.Entities;
+using MultiTenantEcommerce.Domain.Sales.Orders.Events;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Domain.Sales.Orders.Entities;
@@ -11,6 +13,7 @@ public class Order : TenantBase
     public OrderStatus OrderStatus { get; private set; }
     public Address Address { get; private set; }
     public Money Price { get; private set; }
+    public OrderPayment OrderPayment { get; private set; }
     public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
     private readonly List<OrderItem> _items = new();
 
@@ -25,17 +28,22 @@ public class Order : TenantBase
     }
 
 
-    public void ChangeStatus(string status)
+    public void ChangeStatus(OrderStatus newStatus)
     {
-        if (!Enum.TryParse<OrderStatus>(status, true, out var newStatus))
-            throw new Exception("Invalid order status");
-
         OrderStatusTransitionValidator.ValidateTransition(OrderStatus, newStatus);
         OrderStatus = newStatus;
-
         SetUpdatedAt();
-
         TriggerDomainEvents(newStatus);
+    }
+
+    public void MarkAsPaid()
+    {
+        ChangeStatus(OrderStatus.Processing);
+    }
+
+    public void MarkAsFailed()
+    {
+        ChangeStatus(OrderStatus.Failed);
     }
 
     public void AddItem(Product product, PositiveQuantity quantity)
@@ -44,25 +52,32 @@ public class Order : TenantBase
         _items.Add(orderItem);
     }
 
+    public void AttachPayment(OrderPayment payment)
+    {
+        OrderPayment = payment;
+    }
+
     #region PRIVATES
     private void TriggerDomainEvents(OrderStatus newStatus)
     {
         switch (newStatus)
         {
             case OrderStatus.Processing:
-                //_domainEvents.Add(new OrderShippedEvent(this.Id));
+                AddDomainEvent(new OrderPaidEvent(this.TenantId, this.Id));
                 break;
             case OrderStatus.Shipped:
-                //_domainEvents.Add(new OrderShippedEvent(this.Id));
+                AddDomainEvent(new OrderShippedEvent(this.TenantId, this.Id));
                 break;
             case OrderStatus.Delivered:
-                //_domainEvents.Add(new OrderDeliveredEvent(this.Id));
+                AddDomainEvent(new OrderDeliveredEvent(this.TenantId, this.Id));
                 break;
             case OrderStatus.Invoiced:
+            //_domainEvents.Add(new OrderShippedEvent(this.Id));
+            case OrderStatus.Cancelled:
                 //_domainEvents.Add(new OrderShippedEvent(this.Id));
                 break;
-            case OrderStatus.Cancelled:
-                //_domainEvents.Add(new OrderCancelledEvent(this.Id));
+            case OrderStatus.Failed:
+                AddDomainEvent(new OrderPaymentFailedEvent(this.TenantId, this.Id));
                 break;
         }
     }
