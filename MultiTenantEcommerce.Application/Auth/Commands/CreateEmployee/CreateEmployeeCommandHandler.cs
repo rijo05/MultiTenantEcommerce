@@ -1,10 +1,10 @@
 ﻿using MultiTenantEcommerce.Application.Auth.DTOs;
-using MultiTenantEcommerce.Application.Common.Helpers;
-using MultiTenantEcommerce.Application.Common.Interfaces;
+using MultiTenantEcommerce.Application.Common.Helpers.Services;
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Application.Common.Interfaces.Services;
 using MultiTenantEcommerce.Application.Users.Employees.Mappers;
+using MultiTenantEcommerce.Domain.Users.Entities;
 using MultiTenantEcommerce.Domain.Users.Interfaces;
 using MultiTenantEcommerce.Domain.Users.Interfaces.Permissions;
 using MultiTenantEcommerce.Domain.ValueObjects;
@@ -47,16 +47,12 @@ public class CreateEmployeeCommandHandler : ICommandHandler<CreateEmployeeComman
 
         var randomPassword = _passwordGenerator.GenerateRandomPassword();
 
-        var employee = new Domain.Users.Entities.Employee(
+        var employee = new Employee(
             _tenantContext.TenantId,
             request.Name,
             new Email(request.Email),
-            new Password(randomPassword));
-
-        foreach (var role in roles)
-        {
-            employee.AddRole(role);
-        }
+            new Password(randomPassword),
+            roles);
 
         await _employeeRepository.AddAsync(employee);
         await _unitOfWork.CommitAsync();
@@ -66,8 +62,8 @@ public class CreateEmployeeCommandHandler : ICommandHandler<CreateEmployeeComman
             Id = employee.Id,
             Email = employee.Email.Value,
             Name = employee.Name,
-            Roles = roles.Select(x => x.Name).ToList(),
-            Permissions = roles.SelectMany(x => x.Permissions.Select(x => x.Name)).Distinct().ToList(),
+            Permissions = employee.EmployeeRoles.SelectMany(x => x.Role.Permissions.Select(x => x.Name)).ToList(),
+            Roles = employee.EmployeeRoles.Select(x => x.Role.Name).ToList(),
             Token = _tokenService.CreateToken(employee)
         };
     }
