@@ -1,6 +1,6 @@
-﻿using MultiTenantEcommerce.Application.Common.Helpers;
-using MultiTenantEcommerce.Application.Common.Helpers.Mappers;
-using MultiTenantEcommerce.Application.Payment.Mappers;
+﻿using MultiTenantEcommerce.Application.Common.Helpers.Mappers;
+using MultiTenantEcommerce.Application.Common.Helpers.Services;
+using MultiTenantEcommerce.Application.Payment.OrderPayment.Mappers;
 using MultiTenantEcommerce.Application.Sales.Orders.DTOs;
 using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
 
@@ -11,12 +11,12 @@ public class OrderMapper
     private readonly HateoasLinkService _hateoasLinkService;
     private readonly OrderItemMapper _orderItemMapper;
     private readonly AddressMapper _addressMapper;
-    private readonly PaymentMapper _paymentMapper;
+    private readonly OrderPaymentMapper _paymentMapper;
 
     public OrderMapper(HateoasLinkService hateoasLinkService,
         OrderItemMapper orderItemMapper,
         AddressMapper addressMapper,
-        PaymentMapper paymentMapper)
+        OrderPaymentMapper paymentMapper)
     {
         _hateoasLinkService = hateoasLinkService;
         _orderItemMapper = orderItemMapper;
@@ -44,13 +44,18 @@ public class OrderMapper
         return orders.Select(x => ToOrderResponseDTO(x)).ToList();
     }
 
-    public OrderResponseWithPayment ToOrderResponseWithPaymentDTO(Order order, Domain.Payment.Entities.Payment payment)
+    public OrderResponseWithPayment ToOrderResponseWithPaymentDTO(Order order)
     {
         return new OrderResponseWithPayment()
         {
             Order = ToOrderResponseDTO(order),
-            Payment = _paymentMapper.ToPaymentResponseDTO(payment)
+            Payment = _paymentMapper.ToOrderPaymentResponseDTO(order.OrderPayment)
         };
+    }
+
+    public List<OrderResponseWithPayment> ToOrderResponseWithPaymentDTOList(IEnumerable<Order> orders)
+    {
+        return orders.Select(x => ToOrderResponseWithPaymentDTO(x)).ToList();
     }
 
 
