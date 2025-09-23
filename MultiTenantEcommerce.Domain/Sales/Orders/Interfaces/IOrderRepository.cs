@@ -8,7 +8,11 @@ public interface IOrderRepository : IRepository<Order>
 {
     public Task<Order?> GetByIdWithItemsAsync(Guid orderId);
 
-    public Task<List<Order>> GetByCustomerIdWithItems(Guid customerId);
+    public Task<List<Order>> GetByCustomerIdWithItems(
+        Guid customerId,
+        int page = 1,
+        int pageSize = 20,
+        SortOptions sort = SortOptions.TimeDesc);
 
     public Task<List<Order>> GetFilteredAsync(
         Guid? customerId = null,

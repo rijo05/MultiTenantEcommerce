@@ -14,14 +14,22 @@ public class OrderRepository : Repository<Order>, IOrderRepository
     {
         return await _appDbContext.Orders
             .Include(o => o.Items)
+            .Include(x => x.OrderPayment)
             .FirstOrDefaultAsync(o => o.Id == orderId);
     }
 
-    public async Task<List<Order>> GetByCustomerIdWithItems(Guid customerId)
+    public async Task<List<Order>> GetByCustomerIdWithItems(
+        Guid customerId,
+        int page = 1,
+        int pageSize = 20,
+        SortOptions sort = SortOptions.TimeDesc)
     {
-        return await _appDbContext.Orders
+        var query = _appDbContext.Orders
             .Include(x => x.Items)
-            .Where(x => x.CustomerId == customerId).ToListAsync();
+            .Include(x => x.OrderPayment)
+            .Where(x => x.CustomerId == customerId);
+
+        return await SortAndPageAsync(query, sort, page, pageSize);
     }
 
     public async Task<List<Order>> GetFilteredAsync(
