@@ -38,10 +38,11 @@ public class Product : TenantBase
     string? Description,
     decimal? Price,
     bool? IsActive,
-    Guid? CategoryId)
+    Guid? CategoryId,
+    Category? category)
     {
         if (CategoryId.HasValue)
-            UpdateCategory(CategoryId.Value);
+            UpdateCategory(CategoryId.Value, category);
 
 
         if (!string.IsNullOrEmpty(Name))
@@ -82,10 +83,11 @@ public class Product : TenantBase
         SetUpdatedAt();
     }
 
-    public void UpdateCategory(Guid newCategoryId)
+    public void UpdateCategory(Guid newCategoryId, Category category)
     {
         GuardCommon.AgainstEmptyGuid(newCategoryId, nameof(newCategoryId));
         CategoryId = newCategoryId;
+        Category = category;
         SetUpdatedAt();
     }
 
