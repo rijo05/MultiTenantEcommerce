@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 using MultiTenantEcommerce.Application.Common.Helpers.Validators;
-using MultiTenantEcommerce.Application.Users.Employees.Commands.Delete;
+using MultiTenantEcommerce.Application.Users.Employees.Commands.Update;
 
 namespace MultiTenantEcommerce.Application.Users.Employees.Validators;
 
