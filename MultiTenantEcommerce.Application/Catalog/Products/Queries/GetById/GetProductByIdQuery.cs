@@ -3,4 +3,5 @@ using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.Queries.GetById;
 public record GetProductByIdQuery(
-    Guid ProductId) : IQuery<ProductResponseDTO>;
+    Guid ProductId,
+    bool IsAdmin) : IQuery<IProductDTO>;

@@ -9,4 +9,4 @@ public record CreateProductCommand(
     Guid CategoryId,
     bool? IsActive,
     int? Quantity,
-    int? MinimumQuantity) : ICommand<ProductResponseDTO>;
+    int? MinimumQuantity) : ICommand<ProductResponseAdminDTO>;

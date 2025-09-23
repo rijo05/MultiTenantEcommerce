@@ -10,6 +10,7 @@ public record GetFilteredProductsQuery(
     decimal? MinPrice,
     decimal? MaxPrice,
     bool? IsActive,
+    bool IsAdmin,
     int Page = 1,
     int PageSize = 20,
-    SortOptions Sort = SortOptions.TimeDesc) : IQuery<List<ProductResponseDTO>>;
+    SortOptions Sort = SortOptions.TimeDesc) : IQuery<List<IProductDTO>>;

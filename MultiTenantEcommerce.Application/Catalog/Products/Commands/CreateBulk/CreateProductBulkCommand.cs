@@ -4,4 +4,4 @@ using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.Commands.CreateBulk;
 public record CreateProductBulkCommand(
-    IEnumerable<CreateProductCommand> Products) : ICommand<List<ProductResponseDTO>>;
+    IEnumerable<CreateProductCommand> Products) : ICommand<List<ProductResponseAdminDTO>>;

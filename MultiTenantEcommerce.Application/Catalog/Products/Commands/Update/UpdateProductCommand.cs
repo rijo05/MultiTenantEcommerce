@@ -8,4 +8,4 @@ public record UpdateProductCommand(
     string? Description,
     decimal? Price,
     bool? IsActive,
-    Guid? CategoryId) : ICommand<ProductResponseDTO>;
+    Guid? CategoryId) : ICommand<ProductResponseWithoutStockAdminDTO>;

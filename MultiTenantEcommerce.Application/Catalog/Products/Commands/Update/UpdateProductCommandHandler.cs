@@ -2,10 +2,11 @@
 using MultiTenantEcommerce.Application.Catalog.Products.Mappers;
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
+using MultiTenantEcommerce.Domain.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.Commands.Update;
-public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand, ProductResponseDTO>
+public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand, ProductResponseWithoutStockAdminDTO>
 {
     private readonly IProductRepository _productRepository;
     private readonly ICategoryRepository _categoryRepository;
@@ -23,14 +24,16 @@ public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand,
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<ProductResponseDTO> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
+    public async Task<ProductResponseWithoutStockAdminDTO> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
         var product = await _productRepository.GetByIdAsync(request.ProductId)
             ?? throw new Exception("Product doesnt exist.");
 
+        Category? category = null;
+
         if (request.CategoryId.HasValue)
         {
-            var categoria = await _categoryRepository.GetByIdAsync(request.CategoryId.Value)
+            category = await _categoryRepository.GetByIdAsync(request.CategoryId.Value)
                 ?? throw new Exception("Category doesnt exist");
         }
 
@@ -38,9 +41,10 @@ public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand,
             request.Description,
             request.Price,
             request.IsActive,
-            request.CategoryId);
+            request.CategoryId,
+            category);
 
         await _unitOfWork.CommitAsync();
-        return _productMapper.ToProductResponseDTO(product);
+        return _productMapper.ToProductResponseWithoutStockDTO(product);
     }
 }

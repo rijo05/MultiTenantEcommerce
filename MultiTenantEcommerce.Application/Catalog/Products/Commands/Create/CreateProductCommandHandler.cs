@@ -1,6 +1,5 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs;
 using MultiTenantEcommerce.Application.Catalog.Products.Mappers;
-using MultiTenantEcommerce.Application.Common.Interfaces;
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Catalog.Entities;
@@ -10,7 +9,7 @@ using MultiTenantEcommerce.Domain.Inventory.Interfaces;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.Commands.Create;
-public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, ProductResponseDTO>
+public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand, ProductResponseAdminDTO>
 {
     private readonly ICategoryRepository _categoryRepository;
     private readonly IProductRepository _productRepository;
@@ -34,7 +33,7 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<ProductResponseDTO> Handle(CreateProductCommand request, CancellationToken cancellationToken)
+    public async Task<ProductResponseAdminDTO> Handle(CreateProductCommand request, CancellationToken cancellationToken)
     {
         var category = await _categoryRepository.GetByIdAsync(request.CategoryId)
             ?? throw new Exception("Category doesnt exist");
@@ -55,12 +54,10 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
             request.MinimumQuantity
             );
 
-        //talvez criar evento para criar um stock ##########
-
         await _productRepository.AddAsync(product);
         await _stockRepository.AddAsync(stock);
 
         await _unitOfWork.CommitAsync();
-        return _productMapper.ToProductResponseDTO(product);
+        return _productMapper.ToProductResponseAdminDTO(product, stock);
     }
 }
