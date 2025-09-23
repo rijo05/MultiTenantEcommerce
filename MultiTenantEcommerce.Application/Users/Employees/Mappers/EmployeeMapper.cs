@@ -1,4 +1,4 @@
-﻿using MultiTenantEcommerce.Application.Common.Helpers;
+﻿using MultiTenantEcommerce.Application.Common.Helpers.Services;
 using MultiTenantEcommerce.Application.Users.Employees.DTOs;
 using MultiTenantEcommerce.Application.Users.Permissions.Mappers;
 using MultiTenantEcommerce.Domain.Users.Entities;
