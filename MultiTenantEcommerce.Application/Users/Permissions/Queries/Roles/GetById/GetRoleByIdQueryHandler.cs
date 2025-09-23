@@ -3,7 +3,7 @@ using MultiTenantEcommerce.Application.Users.Permissions.DTOs;
 using MultiTenantEcommerce.Application.Users.Permissions.Mappers;
 using MultiTenantEcommerce.Domain.Users.Interfaces.Permissions;
 
-namespace MultiTenantEcommerce.Application.Users.Permissions.Queries.GetById;
+namespace MultiTenantEcommerce.Application.Users.Permissions.Queries.Roles.GetById;
 public class GetRoleByIdQueryHandler : IQueryHandler<GetRoleByIdQuery, RoleResponseDTO>
 {
     private readonly IRoleRepository _roleRepository;

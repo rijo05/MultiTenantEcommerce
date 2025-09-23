@@ -4,7 +4,6 @@ using MultiTenantEcommerce.Domain.Users.Entities.Permissions;
 namespace MultiTenantEcommerce.Application.Users.Permissions.Mappers;
 public class RolesMapper
 {
-
     public RoleResponseDTO ToRoleResponseDTO(Role role)
     {
         return new RoleResponseDTO()
@@ -12,7 +11,8 @@ public class RolesMapper
             Id = role.Id,
             Name = role.Name,
             Description = role.Description,
-            Permissions = ToPermissionResponseDTOList(role.Permissions.ToList()),
+            IsSystemRole = role.IsSystemRole,
+            Permissions = ToPermissionResponseDTOList(role.Permissions),
             CreatedAt = role.CreatedAt,
             UpdatedAt = role.UpdatedAt,
         };

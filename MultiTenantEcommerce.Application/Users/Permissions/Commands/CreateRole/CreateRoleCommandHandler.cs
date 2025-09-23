@@ -10,16 +10,19 @@ public class CreateRoleCommandHandler : ICommandHandler<CreateRoleCommand, RoleR
 {
     private readonly IRoleRepository _roleRepository;
     private readonly IPermissionRepository _permissionRepository;
+    private readonly ITenantContext _tenantContext;
     private readonly RolesMapper _rolesMapper;
     private readonly IUnitOfWork _unitOfWork;
 
     public CreateRoleCommandHandler(IRoleRepository roleRepository,
         IPermissionRepository permissionRepository,
+        ITenantContext tenantContext,
         RolesMapper rolesMapper,
         IUnitOfWork unitOfWork)
     {
         _roleRepository = roleRepository;
         _permissionRepository = permissionRepository;
+        _tenantContext = tenantContext;
         _rolesMapper = rolesMapper;
         _unitOfWork = unitOfWork;
     }
@@ -34,7 +37,7 @@ public class CreateRoleCommandHandler : ICommandHandler<CreateRoleCommand, RoleR
         if (permissions.Count != request.permissions.Distinct().Count())
             throw new Exception("Some ids are not valid");
 
-        var role = new Role(request.Name, request.Description);
+        var role = new Role(request.Name, request.Description, _tenantContext.TenantId);
 
         foreach (var item in permissions)
         {
