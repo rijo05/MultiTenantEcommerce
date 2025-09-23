@@ -9,11 +9,11 @@ public class GetOrderByIdQueryHandler : IQueryHandler<GetOrderByIdQuery, OrderRe
 {
     private readonly IOrderRepository _orderRepository;
     private readonly OrderMapper _orderMapper;
-    private readonly IPaymentRepository _paymentRepository;
+    private readonly IOrderPaymentRepository _paymentRepository;
 
     public GetOrderByIdQueryHandler(IOrderRepository orderRepository,
         OrderMapper orderMapper,
-        IPaymentRepository paymentRepository)
+        IOrderPaymentRepository paymentRepository)
     {
         _orderRepository = orderRepository;
         _orderMapper = orderMapper;
@@ -28,6 +28,9 @@ public class GetOrderByIdQueryHandler : IQueryHandler<GetOrderByIdQuery, OrderRe
         var payment = await _paymentRepository.GetByOrderId(request.OrderId)
             ?? throw new Exception("Payment couldnt be found");
 
-        return _orderMapper.ToOrderResponseWithPaymentDTO(order, payment);
+        if (request.customerId != null && order.CustomerId != request.customerId)
+            throw new Exception("This order doesnt belong to you");
+
+        return _orderMapper.ToOrderResponseWithPaymentDTO(order);
     }
 }
