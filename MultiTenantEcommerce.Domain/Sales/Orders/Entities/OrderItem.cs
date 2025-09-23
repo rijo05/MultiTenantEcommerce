@@ -15,7 +15,6 @@ public class OrderItem : TenantBase
     private OrderItem() { }
     internal OrderItem(Guid orderId, Guid tenantId, Product product, PositiveQuantity quantity)
     {
-        //primarykey deve mudar por causa do id de baseentity ##########
         OrderId = orderId;
         ProductId = product.Id;
         ProductName = product.Name;
