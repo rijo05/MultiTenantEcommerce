@@ -1,11 +1,9 @@
-﻿namespace MultiTenantEcommerce.Application.Payment.DTOs;
-public class PaymentResponseDTO
+﻿namespace MultiTenantEcommerce.Application.Payment.OrderPayment.DTOs;
+public class OrderPaymentResponseDTO
 {
     public Guid PaymentId { get; init; }
-    public Guid PayerId { get; init; }
-    public Guid PayeeId { get; init; }
-    public string Reason { get; init; }
-    public Guid ReasonId { get; init; }
+    public Guid CustomerId { get; init; }
+    public Guid OrderId { get; init; }
     public decimal Amount { get; init; }
     public string Status { get; init; }
     public string PaymentMethod { get; init; }
@@ -13,4 +11,6 @@ public class PaymentResponseDTO
     public DateTime? CompletedAt { get; init; }
     public DateTime? CancelledAt { get; init; }
     public string? Metadata { get; init; }
+
+    //talvez tirar algumas coisas se for para devolver ao customer ##########
 }

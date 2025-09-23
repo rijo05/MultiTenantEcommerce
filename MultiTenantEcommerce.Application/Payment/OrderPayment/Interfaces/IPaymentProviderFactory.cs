@@ -1,6 +1,6 @@
 ﻿using MultiTenantEcommerce.Domain.Enums;
 
-namespace MultiTenantEcommerce.Application.Payment.Interfaces;
+namespace MultiTenantEcommerce.Application.Payment.OrderPayment.Interfaces;
 public interface IPaymentProviderFactory
 {
     IPaymentProvider GetProvider(PaymentMethod method);

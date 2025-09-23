@@ -1,7 +1,7 @@
 ﻿using MediatR;
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 
-namespace MultiTenantEcommerce.Application.Payment.Commands.StripeFailed;
+namespace MultiTenantEcommerce.Application.Payment.OrderPayment.Commands.Failed;
 public record MarkPaymentAsFailedCommand(
     Guid PaymentId,
     string? FailureReason) : ICommand<Unit>;
