@@ -2,7 +2,6 @@
 using MultiTenantEcommerce.Domain.Inventory.Entities;
 using MultiTenantEcommerce.Domain.Inventory.Interfaces;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
-using System.Data.Entity;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 public class StockRepository : Repository<Stock>, IStockRepository
@@ -19,7 +18,7 @@ public class StockRepository : Repository<Stock>, IStockRepository
         await _appDbContext.Stocks.AddRangeAsync(items);
     }
 
-    public async Task<List<Stock>> GetBulkByIdsAsync(List<Guid> ids)
+    public async Task<List<Stock>> GetBulkByIdsAsync(IEnumerable<Guid> ids)
     {
         return await _appDbContext.Stocks.Where(x => ids.Contains(x.ProductId)).ToListAsync();
     }

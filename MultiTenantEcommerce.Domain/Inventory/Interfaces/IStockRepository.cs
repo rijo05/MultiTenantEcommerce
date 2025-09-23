@@ -6,6 +6,6 @@ public interface IStockRepository : IRepository<Stock>
 {
     public Task<Stock?> GetByProductIdAsync(Guid productId);
     public Task AddBulkAsync(List<Stock> items);
-    public Task<List<Stock>> GetBulkByIdsAsync(List<Guid> ids);
+    public Task<List<Stock>> GetBulkByIdsAsync(IEnumerable<Guid> ids);
     public void UpdateWithRow(Stock stock);
 }
