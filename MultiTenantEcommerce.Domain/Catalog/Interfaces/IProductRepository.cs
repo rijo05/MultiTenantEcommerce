@@ -6,11 +6,9 @@ namespace MultiTenantEcommerce.Domain.Catalog.Interfaces;
 
 public interface IProductRepository : IRepository<Product>
 {
-    public Task<List<Product>> GetByCategoryIdAsync(Guid categoryId);
-
-    public Task<Product?> GetBySKUAsync(string sku);
-
-    public Task<List<Product>> GetFilteredAsync(
+    public Task<bool> HasProductsInCategoryAsync(Guid categoryId);
+    public Task<Product?> GetByIdWithCategoryAsync(Guid productId);
+    public Task<IEnumerable<Product>> GetFilteredAsync(
         Guid? categoryId = null,
         string? name = null,
         decimal? minPrice = null,
@@ -18,7 +16,7 @@ public interface IProductRepository : IRepository<Product>
         bool? isActive = null,
         int page = 1,
         int pageSize = 20,
-        SortOptions? sort = null);
+        SortOptions sort = SortOptions.TimeDesc);
 
-    public Task AddBulkAsync(List<Product> products);
+    public Task AddBulkAsync(IEnumerable<Product> products);
 }

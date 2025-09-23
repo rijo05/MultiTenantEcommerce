@@ -11,13 +11,9 @@ public class ProductRepository : Repository<Product>, IProductRepository
     public ProductRepository(AppDbContext appDbContext, TenantContext tenantContext)
     : base(appDbContext, tenantContext) { }
 
-    public async Task<List<Product>> GetByCategoryIdAsync(Guid categoryId)
+    public async Task<bool> HasProductsInCategoryAsync(Guid categoryId)
     {
-        return await _appDbContext.Products
-                        .Where(p => p.CategoryId == categoryId)
-                        .ToListAsync();
-
-        //MUDAR PARA RECEBER APENAS UM BOOL A DIZER SE EXISTE OU NAO ########## TODO()
+        return await _appDbContext.Products.AnyAsync(x => x.CategoryId == categoryId);
     }
 
     public async Task<Product?> GetByIdWithCategoryAsync(Guid productId)
@@ -27,7 +23,7 @@ public class ProductRepository : Repository<Product>, IProductRepository
             .FirstOrDefaultAsync(p => p.Id == productId);
     }
 
-    public async Task<List<Product>> GetFilteredAsync(
+    public async Task<IEnumerable<Product>> GetFilteredAsync(
     Guid? categoryId = null,
     string? name = null,
     decimal? minPrice = null,
@@ -60,7 +56,7 @@ public class ProductRepository : Repository<Product>, IProductRepository
         return await SortAndPageAsync(query, sort, page, pageSize);
     }
 
-    public async Task AddBulkAsync(List<Product> products)
+    public async Task AddBulkAsync(IEnumerable<Product> products)
     {
         await _appDbContext.Products.AddRangeAsync(products);
     }
