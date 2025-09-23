@@ -3,13 +3,10 @@ using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Domain.Payment.Entities;
-public class Payment : TenantBase
+public class OrderPayment : TenantBase
 {
-    public Guid PayerId { get; private set; }
-    public Guid PayeeId { get; private set; }
-
-    public PaymentReason Reason { get; private set; }
-    public Guid ReasonId { get; private set; }  //id da order, id da compra...
+    public Guid CustomerId { get; private set; }
+    public Guid OrderId { get; private set; }
 
     public Money Amount { get; private set; }
 
@@ -23,24 +20,19 @@ public class Payment : TenantBase
 
     public string? Metadata { get; private set; }
 
-    private Payment() { }
-    public Payment(
-        Guid payerId,
-        Guid payeeId,
-        PaymentReason reason,
-        Guid reasonId,
+    private OrderPayment() { }
+    public OrderPayment(
+        Guid customerId,
+        Guid orderId,
+        Guid tenantId,
         Money amount,
-        PaymentMethod method,
-        string? metadata = null)
+        PaymentMethod method) : base(tenantId)
     {
-        PayerId = payerId;
-        PayeeId = payeeId;
-        Reason = reason;
-        ReasonId = reasonId;
+        CustomerId = customerId;
+        OrderId = orderId;
+        Status = PaymentStatus.AwaitingPayment;
         Amount = amount;
         PaymentMethod = method;
-        Metadata = metadata;
-        Status = PaymentStatus.AwaitingPayment;
     }
 
     public void MarkAsCompleted(string transactionId)
