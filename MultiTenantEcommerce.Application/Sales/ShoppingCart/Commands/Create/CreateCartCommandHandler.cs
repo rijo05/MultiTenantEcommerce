@@ -1,5 +1,4 @@
-﻿using MultiTenantEcommerce.Application.Common.Interfaces;
-using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
+﻿using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Application.Sales.ShoppingCart.DTOs;
 using MultiTenantEcommerce.Application.Sales.ShoppingCart.Mappers;

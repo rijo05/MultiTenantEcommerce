@@ -26,7 +26,7 @@ public class DecreaseCartItemCommandHandler : ICommandHandler<DecreaseCartItemCo
         var cart = await _cartRepository.GetByCustomerIdAsync(request.CustomerId)
             ?? throw new Exception("Cart doesnt exist");
 
-        cart.DecreaseItem(request.ProductId, new PositiveQuantity(request.quantity));
+        cart.DecreaseItem(request.ProductId, new PositiveQuantity(request.Quantity));
 
         await _unitOfWork.CommitAsync();
 

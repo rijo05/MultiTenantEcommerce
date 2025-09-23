@@ -5,4 +5,4 @@ namespace MultiTenantEcommerce.Application.Sales.ShoppingCart.Commands.RemoveIte
 public record DecreaseCartItemCommand(
     Guid CustomerId,
     Guid ProductId,
-    int quantity) : ICommand<CartResponseDTO>;
+    int Quantity) : ICommand<CartResponseDTO>;
