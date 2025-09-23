@@ -1,4 +1,5 @@
 ﻿using MultiTenantEcommerce.Domain.Users.Entities.Permissions;
+using MultiTenantEcommerce.Domain.Users.Events;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Domain.Users.Entities;
@@ -8,9 +9,12 @@ public class Employee : UserBase
     public IReadOnlyCollection<EmployeeRole> EmployeeRoles => _employeeRoles;
 
     private Employee() { }
-    public Employee(Guid tenantId, string name, Email email, Password password)
+    public Employee(Guid tenantId, string name, Email email, Password password, List<Role>? roles)
         : base(tenantId, name, password, email)
     {
+        roles?.ForEach(x => AddRole(x));
+
+        AddDomainEvent(new EmployeeRegisteredEvent(this.TenantId, this.Id));
     }
     public void AddRole(Role role)
     {
@@ -34,7 +38,6 @@ public class Employee : UserBase
         string? name,
         string? email,
         string? password,
-        string? role,
         bool? isActive)
     {
         if (!string.IsNullOrWhiteSpace(name))
@@ -48,14 +51,6 @@ public class Employee : UserBase
 
         if (isActive.HasValue)
             SetActive(isActive.Value);
-
-        if (!string.IsNullOrWhiteSpace(role))
-            UpdateRole(role);
-    }
-    public void UpdateRole(string role)
-    {
-        //TODO()
-        SetUpdatedAt();
     }
     #endregion
 }
