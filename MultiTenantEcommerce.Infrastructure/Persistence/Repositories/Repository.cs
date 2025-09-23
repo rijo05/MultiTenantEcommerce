@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Common.Interfaces;
 using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Tenants.Entities;
@@ -9,9 +10,9 @@ namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 public class Repository<T> : IRepository<T> where T : class
 {
     protected readonly AppDbContext _appDbContext;
-    private readonly TenantContext _tenantContext;
+    private readonly ITenantContext _tenantContext;
 
-    public Repository(AppDbContext appDbContext, TenantContext tenantContext)
+    public Repository(AppDbContext appDbContext, ITenantContext tenantContext)
     {
         _appDbContext = appDbContext;
         _tenantContext = tenantContext;
@@ -39,7 +40,7 @@ public class Repository<T> : IRepository<T> where T : class
     }
     public async Task UpdateAsync(T entity)
     {
-         _appDbContext.Set<T>().Update(entity);
+        _appDbContext.Set<T>().Update(entity);
     }
 
     public async Task<bool> ExistsAsync(Guid id)
@@ -50,6 +51,11 @@ public class Repository<T> : IRepository<T> where T : class
     public async Task<List<T>> GetByIdsAsync(IEnumerable<Guid> ids)
     {
         return await _appDbContext.Set<T>().Where(x => ids.Contains(EF.Property<Guid>(x, "Id"))).ToListAsync();
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await _appDbContext.SaveChangesAsync();
     }
 
     protected async Task<List<T>> SortAndPageAsync(IQueryable<T> query, SortOptions sort, int page, int pageSize)
@@ -81,7 +87,7 @@ public class Repository<T> : IRepository<T> where T : class
         }
 
 
-            var pageNumber = Math.Max(page, 1);
+        var pageNumber = Math.Max(page, 1);
         var pageSizeClamped = Math.Clamp(pageSize, 1, 100);
 
         return await query
@@ -96,7 +102,7 @@ public class Repository<T> : IRepository<T> where T : class
 
     private object[] CheckIfItsValid(params object[] keyValues)
     {
-        if(keyValues == null || keyValues.Length == 0)
+        if (keyValues == null || keyValues.Length == 0)
             throw new ArgumentException("At least one key must be provided.");
 
         if (typeof(T) != typeof(Tenant))

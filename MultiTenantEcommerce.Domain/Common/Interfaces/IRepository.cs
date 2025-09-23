@@ -1,6 +1,4 @@
-﻿using MultiTenantEcommerce.Domain.Enums;
-
-namespace MultiTenantEcommerce.Domain.Common.Interfaces;
+﻿namespace MultiTenantEcommerce.Domain.Common.Interfaces;
 
 public interface IRepository<T> where T : class
 {
@@ -11,4 +9,5 @@ public interface IRepository<T> where T : class
     public Task DeleteAsync(T entity);
     public Task UpdateAsync(T entity);
     public Task<bool> ExistsAsync(Guid id);
+    public Task SaveChangesAsync();
 }
