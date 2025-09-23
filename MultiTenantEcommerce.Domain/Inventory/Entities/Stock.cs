@@ -1,6 +1,8 @@
 ﻿using MultiTenantEcommerce.Domain.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Common.Entities;
 using MultiTenantEcommerce.Domain.Common.Guard;
+using MultiTenantEcommerce.Domain.Enums;
+using MultiTenantEcommerce.Domain.Inventory.Events;
 using MultiTenantEcommerce.Domain.ValueObjects;
 using System.ComponentModel.DataAnnotations;
 
@@ -24,19 +26,24 @@ public class Stock : TenantBase
         Quantity = new NonNegativeQuantity(quantity ?? 0);
         MinimumQuantity = new NonNegativeQuantity(minimumQuantity ?? 10);
         Reserved = new NonNegativeQuantity(0);
+
+        RowVersion = BitConverter.GetBytes(DateTime.UtcNow.Ticks);
     }
 
 
     #region STOCK CHANGES
-    public void AddStock(int quantity)
+    public void IncrementStock(int quantity)
     {
         GuardCommon.AgainstNegativeOrZero(quantity, nameof(quantity));
 
         Quantity = new NonNegativeQuantity(Quantity.Value + quantity);
         SetUpdatedAt();
+
+        TriggerStockMovementEvent(quantity, StockMovementReason.Purchase);
+        TriggerStockEvents();
     }
 
-    public void RemoveStock(int quantity)
+    public void DecrementStock(int quantity, StockMovementReason movementReason)
     {
         GuardCommon.AgainstNegativeOrZero(quantity, nameof(quantity));
 
@@ -45,13 +52,17 @@ public class Stock : TenantBase
 
         Quantity -= new NonNegativeQuantity(quantity);
         SetUpdatedAt();
+
+        TriggerStockMovementEvent(-quantity, movementReason);
+        TriggerStockEvents();
     }
 
     public void SetStock(int quantity)
     {
         Quantity = new NonNegativeQuantity(quantity);
-        //TriggerDomainEvents(Quantity);
         SetUpdatedAt();
+
+        TriggerStockMovementEvent(quantity, StockMovementReason.Adjustment);
     }
 
     public void SetMinimumStockLevel(int quantity)
@@ -72,6 +83,7 @@ public class Stock : TenantBase
 
         Reserved -= quantityToReserve;
         SetUpdatedAt();
+
     }
     public void ReserveStock(int quantity)
     {
@@ -83,17 +95,32 @@ public class Stock : TenantBase
         Reserved = new NonNegativeQuantity(Reserved.Value + quantityToReserve.Value);
         SetUpdatedAt();
     }
-
     public void CommitStock(int quantity)
     {
-        RemoveStock(quantity);
+        DecrementStock(quantity, StockMovementReason.Sale);
         ReleaseReservedStock(quantity);
-        SetUpdatedAt();
     }
 
     public bool CheckAvailability(int quantity)
     {
         return StockAvailableAtMoment.Value - quantity >= 0;
     }
+    #endregion
+
+    #region Private
+    private void TriggerStockMovementEvent(int quantityChange, StockMovementReason reason)
+    {
+        AddDomainEvent(new StockMovementEvent(this.TenantId, this.ProductId, quantityChange, reason));
+    }
+
+    private void TriggerStockEvents()
+    {
+        if (Quantity.Value < MinimumQuantity.Value)
+            AddDomainEvent(new LowStockEvent(this.TenantId, this.ProductId, Quantity.Value, MinimumQuantity.Value));
+
+        if (Quantity.Value == 0)
+            AddDomainEvent(new OutOfStockEvent(this.TenantId, this.ProductId));
+    }
+
     #endregion
 }
