@@ -2,6 +2,7 @@
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Application.Sales.Orders.DTOs;
 using MultiTenantEcommerce.Application.Sales.Orders.Mappers;
+using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Sales.Orders.Interfaces;
 
 namespace MultiTenantEcommerce.Application.Sales.Orders.Commands.ChangeStatus;
@@ -25,7 +26,10 @@ public class ChangeOrderStatusCommandHandler : ICommandHandler<ChangeOrderStatus
         var order = await _orderRepository.GetByIdAsync(request.orderId)
             ?? throw new Exception("Order doesnt exist");
 
-        order.ChangeStatus(request.Status);
+        if (!Enum.TryParse<OrderStatus>(request.Status, true, out var parsedStatus))
+            throw new ArgumentException($"Invalid StockMovementReason: {request.Status}");
+
+        order.ChangeStatus(parsedStatus);
 
         await _unitOfWork.CommitAsync();
 
