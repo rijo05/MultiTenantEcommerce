@@ -17,7 +17,11 @@ public class GetEmployeesByRolesQueryHandler : IQueryHandler<GetEmployeesByRoles
 
     public async Task<List<EmployeeResponseDTO>> Handle(GetEmployeesByRolesQuery request, CancellationToken cancellationToken)
     {
-        var employees = await _employeeRepository.GetEmployeesByRole(request.roleId);
+        var employees = await _employeeRepository.GetEmployeesByRole(
+            request.roleId,
+            request.Page,
+            request.PageSize,
+            request.Sort);
 
         return _employeeMapper.ToEmployeeResponseDTOList(employees);
     }
