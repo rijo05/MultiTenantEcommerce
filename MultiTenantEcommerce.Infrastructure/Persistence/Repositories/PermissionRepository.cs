@@ -1,7 +1,7 @@
-﻿using MultiTenantEcommerce.Domain.Users.Entities.Permissions;
+﻿using Microsoft.EntityFrameworkCore;
+using MultiTenantEcommerce.Domain.Users.Entities.Permissions;
 using MultiTenantEcommerce.Domain.Users.Interfaces.Permissions;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
-using System.Data.Entity;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 public class PermissionRepository : Repository<Permission>, IPermissionRepository
@@ -10,18 +10,15 @@ public class PermissionRepository : Repository<Permission>, IPermissionRepositor
     {
     }
 
-    public async Task<Permission?> GetByNameAsync(string name)
-    {
-        return await _appDbContext.Permissions.FirstOrDefaultAsync(x => x.Name == name);
-    }
-
     public async Task<List<Permission>> GetByAction(string action)
     {
-        return await _appDbContext.Permissions.Where(x => x.Action == action).ToListAsync();
+        return await _appDbContext.Permissions
+            .Where(x => x.Action.ToLower() == action.ToLower()).ToListAsync();
     }
 
     public async Task<List<Permission>> GetByArea(string area)
     {
-        return await _appDbContext.Permissions.Where(x => x.Area == area).ToListAsync();
+        return await _appDbContext.Permissions
+            .Where(x => x.Area.ToLower() == area.ToLower()).ToListAsync();
     }
 }
