@@ -1,6 +1,8 @@
 ﻿using MultiTenantEcommerce.Application.Common.Exceptions;
 using MultiTenantEcommerce.Application.Common.Interfaces.Services;
+using MultiTenantEcommerce.Domain.Inventory.Entities;
 using MultiTenantEcommerce.Domain.Inventory.Interfaces;
+using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
 using MultiTenantEcommerce.Domain.Sales.ShoppingCart.Entities;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
@@ -75,6 +77,31 @@ public class StockService : IStockService
         }
 
         return false;
+    }
+
+    public async Task CommitStock(Order order)
+    {
+        await ApplyStockAction(order, (stock, qty) => stock.CommitStock(qty));
+    }
+
+    public async Task ReleaseReservedStock(Order order)
+    {
+        await ApplyStockAction(order, (stock, qty) => stock.ReleaseReservedStock(qty));
+    }
+
+    private async Task ApplyStockAction(Order order, Action<Stock, int> action)
+    {
+        var stocks = await _stockRepository.GetBulkByIdsAsync(order.Items.Select(x => x.ProductId).ToList());
+
+        var stockDict = stocks.ToDictionary(s => s.ProductId);
+
+        foreach (var item in order.Items)
+        {
+            if (!stockDict.TryGetValue(item.ProductId, out var stock))
+                throw new Exception($"Stock not found for ProductId {item.ProductId}");
+
+            action(stock, item.Quantity.Value);
+        }
     }
 
 }
