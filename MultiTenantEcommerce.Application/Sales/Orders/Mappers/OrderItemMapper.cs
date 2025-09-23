@@ -1,4 +1,4 @@
-﻿using MultiTenantEcommerce.Application.Common.Helpers;
+﻿using MultiTenantEcommerce.Application.Common.Helpers.Services;
 using MultiTenantEcommerce.Application.Sales.Orders.DTOs;
 using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
 
