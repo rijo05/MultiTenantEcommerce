@@ -12,7 +12,8 @@ public class Role : TenantBase
 
     private Role() { }
 
-    public Role(string name, string description)
+    public Role(string name, string description, Guid tenantId)
+        : base(tenantId)
     {
         Name = name;
         Description = description;
@@ -21,24 +22,32 @@ public class Role : TenantBase
 
     public void AddPermission(Permission permission)
     {
-        if (IsSystemRole)
-            throw new InvalidOperationException("Cannot modify permissions of a system role.");
+        CanItBeModifiedOrDeleted();
 
         _permissions.Add(permission);
     }
 
     public void RemovePermission(Permission permission)
     {
-        if (IsSystemRole)
-            throw new InvalidOperationException("Cannot modify permissions of a system role.");
+        CanItBeModifiedOrDeleted();
 
         _permissions.Remove(permission);
     }
 
-    public void UpdateRole(string? name, string? description)
+    public void CanItBeModifiedOrDeleted()
     {
         if (IsSystemRole)
-            throw new InvalidOperationException("System roles cannot be updated.");
+            throw new Exception("This is a system role. Unable to make any changes to it");
+    }
+
+    public void MarkRoleAsSystemRole()
+    {
+        IsSystemRole = true;
+    }
+
+    public void UpdateRole(string? name, string? description)
+    {
+        CanItBeModifiedOrDeleted();
 
         if (!string.IsNullOrEmpty(name))
             UpdateName(name);
