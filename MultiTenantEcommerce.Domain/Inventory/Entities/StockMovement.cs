@@ -1,5 +1,4 @@
 ﻿using MultiTenantEcommerce.Domain.Common.Entities;
-using MultiTenantEcommerce.Domain.Common.Events;
 using MultiTenantEcommerce.Domain.Common.Guard;
 using MultiTenantEcommerce.Domain.Enums;
 
@@ -8,11 +7,11 @@ public class StockMovement : TenantBase
 {
     public Guid ProductId { get; private set; }
     public int Quantity { get; private set; }
-    public StockMovementReason Reason {  get; private set; }
+    public StockMovementReason Reason { get; private set; }
     public string? OtherReason { get; private set; }
 
     private StockMovement() { }
-    internal StockMovement(Guid productId, Guid tenantId, int quantity, DateTime date, StockMovementReason reason, string? otherReason = null) : base(tenantId)
+    public StockMovement(Guid tenantId, Guid productId, int quantity, StockMovementReason reason, string? otherReason = null) : base(tenantId)
     {
         GuardCommon.AgainstNegativeOrZero(quantity, nameof(quantity));
         GuardCommon.AgainstEmptyGuid(productId, nameof(productId));
