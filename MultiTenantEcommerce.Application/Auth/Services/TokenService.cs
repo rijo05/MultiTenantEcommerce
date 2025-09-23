@@ -17,18 +17,38 @@ public class TokenService : ITokenService
         _config = config;
     }
 
-    //################
     public string CreateToken(UserBase user)
     {
         var claims = new List<Claim>
         {
             new Claim(JwtClaimNames.Name, user.Name),
             new Claim(JwtClaimNames.Email, user.Email.Value),
-            new Claim(JwtClaimNames.Sub, user.Id.ToString()),
+            new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new Claim("tenantId", user.TenantId.ToString()),
-            //new Claim(ClaimTypes.Role, user is Employee e ? e.Role.ToString() : "Customer"),
             new Claim(JwtClaimNames.Jti, Guid.NewGuid().ToString())
         };
+
+        if (user is Employee)
+        {
+            var employee = user as Employee;
+
+            var roles = employee.EmployeeRoles.Select(x => x.Role.Name).Distinct();
+            var permissions = employee.EmployeeRoles.SelectMany(x => x.Role.Permissions.Select(x => x.Name)).Distinct();
+
+            foreach (var roleName in roles)
+            {
+                claims.Add(new Claim("Role", roleName));
+            }
+
+            foreach (var permissionName in permissions)
+            {
+                claims.Add(new Claim("Permission", permissionName));
+            }
+
+            claims.Add(new Claim("isEmployee", "true", ClaimValueTypes.Boolean));
+        }
+        else
+            claims.Add(new Claim("isEmployee", "false", ClaimValueTypes.Boolean));
 
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
 
