@@ -1,10 +1,9 @@
-﻿using MediatR;
+﻿namespace MultiTenantEcommerce.Domain.Common.Events;
 
-namespace MultiTenantEcommerce.Domain.Common.Events;
-
-//Interface para os eventos, herda o INotification do MediatR
-
-public interface IDomainEvent : INotification
+public interface IDomainEvent
 {
+    Guid EventId { get; }
+    Guid TenantId { get; }
     DateTime OccurredOn { get; }
 }
+
