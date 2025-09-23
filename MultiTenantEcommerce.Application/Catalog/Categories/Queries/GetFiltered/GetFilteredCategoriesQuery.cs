@@ -7,6 +7,7 @@ public record GetFilteredCategoriesQuery(
     string? Name,
     string? Description,
     bool? IsActive,
+    bool IsAdmin,
     int Page = 1,
     int PageSize = 20,
-    SortOptions Sort = SortOptions.TimeDesc) : IQuery<List<CategoryResponseDTO>>;
+    SortOptions Sort = SortOptions.TimeDesc) : IQuery<List<ICategoryDTO>>;

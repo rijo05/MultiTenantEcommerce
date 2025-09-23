@@ -1,5 +1,5 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Categories.DTOs;
-using MultiTenantEcommerce.Application.Common.Helpers;
+using MultiTenantEcommerce.Application.Common.Helpers.Services;
 using MultiTenantEcommerce.Domain.Catalog.Entities;
 
 namespace MultiTenantEcommerce.Application.Catalog.Categories.Mappers;
@@ -20,10 +20,6 @@ public class CategoryMapper
             Id = category.Id,
             Name = category.Name,
             Description = category.Description,
-            IsActive = category.IsActive,
-            CreatedAt = category.CreatedAt,
-            UpdatedAt = category.UpdatedAt,
-            //Links = GenerateLinks(category)
         };
     }
 
@@ -33,14 +29,22 @@ public class CategoryMapper
     }
 
 
-    //private Dictionary<string, object> GenerateLinks(Category category)
-    //{
-    //    return _hateoasLinkService.GenerateLinksCRUD(
-    //                category.Id,
-    //                "categories",
-    //                "GetById",
-    //                "Update",
-    //                "Delete"
-    //    );
-    //}
+
+    public CategoryResponseAdminDTO ToCategoryResponseAdminDTO(Category category)
+    {
+        return new CategoryResponseAdminDTO
+        {
+            Id = category.Id,
+            Name = category.Name,
+            Description = category.Description,
+            IsActive = category.IsActive,
+            CreatedAt = category.CreatedAt,
+            UpdatedAt = category.UpdatedAt,
+        };
+    }
+
+    public List<CategoryResponseAdminDTO> ToCategoryResponseAdminDTOList(IEnumerable<Category> categories)
+    {
+        return categories.Select(x => ToCategoryResponseAdminDTO(x)).ToList();
+    }
 }

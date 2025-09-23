@@ -4,7 +4,7 @@ using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
 
 namespace MultiTenantEcommerce.Application.Catalog.Categories.Queries.GetById;
-public class GetCategoryByIdQueryHandler : IQueryHandler<GetCategoryByIdQuery, CategoryResponseDTO>
+public class GetCategoryByIdQueryHandler : IQueryHandler<GetCategoryByIdQuery, ICategoryDTO>
 {
     private readonly ICategoryRepository _categoryRepository;
     private readonly CategoryMapper _categoryMapper;
@@ -17,11 +17,13 @@ public class GetCategoryByIdQueryHandler : IQueryHandler<GetCategoryByIdQuery, C
         _categoryMapper = categoryMapper;
     }
 
-    public async Task<CategoryResponseDTO> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken)
+    public async Task<ICategoryDTO> Handle(GetCategoryByIdQuery request, CancellationToken cancellationToken)
     {
         var category = await _categoryRepository.GetByIdAsync(request.CategoryId)
             ?? throw new Exception("Category doesnt exist.");
 
-        return _categoryMapper.ToCategoryResponseDTO(category);
+        return request.IsAdmin
+            ? _categoryMapper.ToCategoryResponseAdminDTO(category)
+            : _categoryMapper.ToCategoryResponseDTO(category);
     }
 }

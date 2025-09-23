@@ -5,7 +5,7 @@ using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
 
 namespace MultiTenantEcommerce.Application.Catalog.Categories.Commands.Update;
-public class UpdateCategoryCommandHandler : ICommandHandler<UpdateCategoryCommand, CategoryResponseDTO>
+public class UpdateCategoryCommandHandler : ICommandHandler<UpdateCategoryCommand, CategoryResponseAdminDTO>
 {
     private readonly ICategoryRepository _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -21,7 +21,7 @@ public class UpdateCategoryCommandHandler : ICommandHandler<UpdateCategoryComman
         _categoryMapper = categoryMapper;
     }
 
-    public async Task<CategoryResponseDTO> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<CategoryResponseAdminDTO> Handle(UpdateCategoryCommand request, CancellationToken cancellationToken)
     {
         var category = await _categoryRepository.GetByIdAsync(request.CategoryId) ?? throw new Exception("Category doesnt exist.");
 
@@ -34,6 +34,6 @@ public class UpdateCategoryCommandHandler : ICommandHandler<UpdateCategoryComman
         category.UpdateCategory(request.Name, request.Description, request.IsActive);
 
         await _unitOfWork.CommitAsync();
-        return _categoryMapper.ToCategoryResponseDTO(category);
+        return _categoryMapper.ToCategoryResponseAdminDTO(category);
     }
 }

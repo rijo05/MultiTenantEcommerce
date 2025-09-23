@@ -4,7 +4,7 @@ using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
 
 namespace MultiTenantEcommerce.Application.Catalog.Categories.Queries.GetFiltered;
-public class GetFilteredCategoriesQueryHandler : IQueryHandler<GetFilteredCategoriesQuery, List<CategoryResponseDTO>>
+public class GetFilteredCategoriesQueryHandler : IQueryHandler<GetFilteredCategoriesQuery, List<ICategoryDTO>>
 {
     private readonly ICategoryRepository _categoryRepository;
     private readonly CategoryMapper _categoryMapper;
@@ -17,7 +17,7 @@ public class GetFilteredCategoriesQueryHandler : IQueryHandler<GetFilteredCatego
         _categoryMapper = categoryMapper;
     }
 
-    public async Task<List<CategoryResponseDTO>> Handle(GetFilteredCategoriesQuery request, CancellationToken cancellationToken)
+    public async Task<List<ICategoryDTO>> Handle(GetFilteredCategoriesQuery request, CancellationToken cancellationToken)
     {
         var categories = await _categoryRepository.GetFilteredAsync(
             request.Name,
@@ -27,6 +27,8 @@ public class GetFilteredCategoriesQueryHandler : IQueryHandler<GetFilteredCatego
             request.PageSize,
             request.Sort);
 
-        return _categoryMapper.ToCategoryResponseDTOList(categories);
+        return request.IsAdmin
+            ? _categoryMapper.ToCategoryResponseAdminDTOList(categories).Cast<ICategoryDTO>().ToList()
+            : _categoryMapper.ToCategoryResponseDTOList(categories).Cast<ICategoryDTO>().ToList();
     }
 }

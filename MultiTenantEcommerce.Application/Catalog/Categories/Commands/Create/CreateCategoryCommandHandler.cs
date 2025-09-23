@@ -1,13 +1,12 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Categories.DTOs;
 using MultiTenantEcommerce.Application.Catalog.Categories.Mappers;
-using MultiTenantEcommerce.Application.Common.Interfaces;
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
 
 namespace MultiTenantEcommerce.Application.Catalog.Categories.Commands.Create;
-public class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryCommand, CategoryResponseDTO>
+public class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryCommand, CategoryResponseAdminDTO>
 {
     private readonly ICategoryRepository _categoryRepository;
     private readonly IUnitOfWork _unitOfWork;
@@ -26,7 +25,7 @@ public class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryComman
         _tenantContext = tenantContext;
     }
 
-    public async Task<CategoryResponseDTO> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
+    public async Task<CategoryResponseAdminDTO> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(request.Name))
             throw new Exception("Category name must be provided.");
@@ -43,6 +42,6 @@ public class CreateCategoryCommandHandler : ICommandHandler<CreateCategoryComman
         await _categoryRepository.AddAsync(category);
         await _unitOfWork.CommitAsync();
 
-        return _categoryMapper.ToCategoryResponseDTO(category);
+        return _categoryMapper.ToCategoryResponseAdminDTO(category);
     }
 }
