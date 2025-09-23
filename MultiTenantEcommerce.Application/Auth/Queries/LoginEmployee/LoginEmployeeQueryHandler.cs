@@ -19,7 +19,7 @@ public class LoginEmployeeQueryHandler : IQueryHandler<LoginEmployeeQuery, AuthE
 
     public async Task<AuthEmployeeResponseDTO> Handle(LoginEmployeeQuery request, CancellationToken cancellationToken)
     {
-        var employee = await _employeeRepository.GetByEmailAsync(new Email(request.Email));
+        var employee = await _employeeRepository.GetByEmailWithRolesAsync(new Email(request.Email));
 
         if (employee is null || !employee.Password.VerifySamePassword(request.Password))
             throw new Exception("Email or password are wrong");
@@ -30,6 +30,8 @@ public class LoginEmployeeQueryHandler : IQueryHandler<LoginEmployeeQuery, AuthE
             Email = request.Email,
             Id = employee.Id,
             Name = employee.Name,
+            Permissions = employee.EmployeeRoles.SelectMany(x => x.Role.Permissions.Select(x => x.Name)).ToList(),
+            Roles = employee.EmployeeRoles.Select(x => x.Role.Name).ToList(),
             Token = _tokenService.CreateToken(employee)
         };
     }
