@@ -1,4 +1,5 @@
-﻿using MultiTenantEcommerce.Domain.ValueObjects;
+﻿using MultiTenantEcommerce.Domain.Users.Events;
+using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Domain.Users.Entities;
 public class Customer : UserBase
@@ -12,6 +13,8 @@ public class Customer : UserBase
     {
         Address = address;
         PhoneNumber = phoneNumber;
+
+        AddDomainEvent(new CustomerRegisteredEvent(this.TenantId, this.Id));
     }
     public void UpdateCustomer(
         string? name,
