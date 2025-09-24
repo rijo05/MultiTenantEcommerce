@@ -9,6 +9,7 @@ using MultiTenantEcommerce.Application.Sales.ShoppingCart.Commands.Clear;
 using MultiTenantEcommerce.Application.Sales.ShoppingCart.Commands.Create;
 using MultiTenantEcommerce.Application.Sales.ShoppingCart.Commands.RemoveItem;
 using MultiTenantEcommerce.Application.Sales.ShoppingCart.DTOs;
+using MultiTenantEcommerce.Application.Sales.ShoppingCart.Queries.GetByCustomerId;
 using MultiTenantEcommerce.Application.Sales.ShoppingCart.Queries.GetById;
 
 namespace MultiTenantEcommerce.API.Controllers.Customer;
@@ -39,7 +40,7 @@ public class CartsController : ControllerBase
     public async Task<ActionResult<CartResponseDTO>> GetMyCart()
     {
         var userId = User.GetUserId();
-        var query = new GetCartByIdQuery(userId);
+        var query = new GetCartByCustomerIdQuery(userId);
 
         var cart = await _mediator.Send(query);
 
