@@ -2,6 +2,7 @@
 public enum EmailStatus
 {
     Pending,
+    Processing,
     Sent,
     Failed
 }
