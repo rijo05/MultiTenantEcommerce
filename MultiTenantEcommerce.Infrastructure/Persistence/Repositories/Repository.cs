@@ -31,7 +31,7 @@ public class Repository<T> : IRepository<T> where T : class
     }
     public async Task AddAsync(T entity)
     {
-        await _appDbContext.Set<T>().AddAsync(entity); ;
+        await _appDbContext.Set<T>().AddAsync(entity);
     }
 
     public async Task DeleteAsync(T entity)
