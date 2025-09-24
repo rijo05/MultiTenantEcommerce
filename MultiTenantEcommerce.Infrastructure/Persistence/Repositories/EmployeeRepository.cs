@@ -65,18 +65,34 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
             .FirstOrDefaultAsync(x => x.Email.Value == email.Value);
     }
 
-    public async Task<List<Employee>> GetEmployeesByRole(Guid roleId)
+    public async Task<List<Employee>> GetEmployeesByRole(
+        Guid roleId,
+        int page = 1,
+        int pageSize = 20,
+        SortOptions sort = SortOptions.TimeDesc)
     {
-        return await _appDbContext.Employees
+        var query = _appDbContext.Employees
             .Include(x => x.EmployeeRoles)
                 .ThenInclude(x => x.Role)
                     .ThenInclude(x => x.Permissions)
-            .Where(x => x.EmployeeRoles.Any(x => x.RoleId == roleId))
-            .ToListAsync();
+            .Where(x => x.EmployeeRoles.Any(x => x.RoleId == roleId));
+
+        return await SortAndPageAsync(query, sort, page, pageSize);
     }
 
     public async Task<bool> HasEmployeesWithRole(Guid roleId)
     {
         return await _appDbContext.Employees.AnyAsync(e => e.EmployeeRoles.Any(er => er.RoleId == roleId));
+    }
+
+    public async Task<Employee?> GetOwnerOfTenant(Guid tenantId)
+    {
+        return await _appDbContext.Employees
+            .IgnoreQueryFilters()
+            .Include(e => e.EmployeeRoles)
+                .ThenInclude(er => er.Role)
+            .Where(e => e.TenantId == tenantId
+                        && e.EmployeeRoles.Any(er => er.Role.Name.ToLower() == "owner"))
+            .FirstOrDefaultAsync();
     }
 }

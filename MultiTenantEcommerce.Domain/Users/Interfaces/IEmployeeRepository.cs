@@ -11,7 +11,11 @@ public interface IEmployeeRepository : IRepository<Employee>
 
     public Task<Employee?> GetByIdWithRolesAsync(Guid employeeId);
     public Task<Employee?> GetByEmailWithRolesAsync(Email email);
-    public Task<List<Employee>> GetEmployeesByRole(Guid roleId);
+    public Task<List<Employee>> GetEmployeesByRole(
+        Guid roleId,
+        int page = 1,
+        int pageSize = 20,
+        SortOptions sort = SortOptions.TimeDesc);
     public Task<bool> HasEmployeesWithRole(Guid roleId);
 
     public Task<List<Employee>> GetFilteredAsync(
@@ -22,4 +26,6 @@ public interface IEmployeeRepository : IRepository<Employee>
         int page = 1,
         int pageSize = 20,
         SortOptions sort = SortOptions.TimeDesc);
+
+    public Task<Employee?> GetOwnerOfTenant(Guid tenantId);
 }
