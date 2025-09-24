@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Low Stock Alert</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: auto;
+      background-color: #ffffff;
+      border: 1px solid #ddd;
+      padding: 20px;
+    }
+    .header {
+      background-color: #ffc107;
+      color: #000;
+      padding: 20px;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .content {
+      padding: 20px;
+      color: #333;
+    }
+    .content p {
+      margin: 10px 0;
+    }
+    .cta-button {
+      display: inline-block;
+      padding: 10px 20px;
+      background-color: #ff9800;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+      margin-top: 20px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      ⚠️ Low Stock Alert
+    </div>
+    <div class="content">
+        <p><strong>Product:</strong> {{ProductName}}</p>
+        <p><strong>Id:</strong> {{ProductId}}</p>
+        <p><strong>Current Stock:</strong> {{CurrentQuantity}}</p>
+        <p><strong>Threshold:</strong> {{MinimumQuantity}}</p>
+      <a href="{{restockLink}}" class="cta-button">Restock Now</a>
+    </div>
+    <div class="footer">
+      This is an automated alert. Please do not reply to this email.
+    </div>
+  </div>
+</body>
+</html>
+

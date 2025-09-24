@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Out of Stock Notification</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f2f2f2; margin: 0; padding: 0; }
+    .container { max-width: 600px; margin: auto; background-color: #fff; padding: 20px; border: 1px solid #ddd; }
+    .header { background-color: #d32f2f; color: #fff; padding: 20px; text-align: center; font-size: 24px; font-weight: bold; }
+    .content { padding: 20px; color: #333; }
+    .content p { margin: 10px 0; }
+    .cta-button { display: inline-block; padding: 10px 20px; background-color: #d32f2f; color: #fff; text-decoration: none; border-radius: 4px; margin-top: 20px; }
+    .footer { text-align: center; font-size: 12px; color: #999; margin-top: 30px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">❌ Out of Stock</div>
+    <div class="content">
+      <p><strong>Product:</strong> {{ProductName}}</p>
+      <p><strong>Id:</strong> {{ProductId}}</p>
+      <a href="{{restockLink}}" class="cta-button">Restock Now</a>
+    </div>
+    <div class="footer">
+      This is an automated alert. Please do not reply to this email.
+    </div>
+  </div>
+</body>
+</html>

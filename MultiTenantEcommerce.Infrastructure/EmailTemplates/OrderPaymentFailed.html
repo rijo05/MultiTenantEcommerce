@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Payment Issue</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #fff8f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #f0c090;
+        }
+
+        .header {
+            background-color: #ff9800;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 20px;
+            color: #333333;
+        }
+
+            .content p {
+                margin: 10px 0;
+                line-height: 1.5;
+            }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #999999;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">⚠️ Payment Issue</div>
+        <div class="content">
+            <p>Hi {{CustomerName}},</p>
+            <p>We weren’t able to process your payment for order <strong>#{{OrderId}}</strong>.</p>
+            <p><strong>Reason:</strong> {{FailureReason}}</p>
+            <p>Feel free to check your payment method and try again when you're ready.</p>
+        </div>
+        <div class="footer">
+            This message was sent by {{TenantName}}.
+        </div>
+    </div>
+</body>
+</html>
