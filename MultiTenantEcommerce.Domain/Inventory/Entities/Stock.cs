@@ -83,7 +83,6 @@ public class Stock : TenantBase
 
         Reserved -= quantityToReserve;
         SetUpdatedAt();
-
     }
     public void ReserveStock(int quantity)
     {
