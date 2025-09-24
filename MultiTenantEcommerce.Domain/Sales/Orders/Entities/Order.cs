@@ -18,12 +18,18 @@ public class Order : TenantBase
     private readonly List<OrderItem> _items = new();
 
     private Order() { }
-    public Order(Guid tenantId, Guid customerId, Address address)
+    public Order(Guid tenantId, Guid customerId, Address address, IEnumerable<(Product, PositiveQuantity)> products)
         : base(tenantId)
     {
         CustomerId = customerId;
         OrderStatus = OrderStatus.PendingPayment;
         Address = address;
+
+        foreach (var item in products)
+        {
+            AddItem(item.Item1, item.Item2);
+        }
+
         Price = new Money(_items.Sum(x => x.Total));
     }
 
