@@ -1,8 +1,8 @@
-﻿using MultiTenantEcommerce.Domain.Enums;
+﻿using Microsoft.EntityFrameworkCore;
+using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Users.Entities.Permissions;
 using MultiTenantEcommerce.Domain.Users.Interfaces.Permissions;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
-using System.Data.Entity;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 public class RoleRepository : Repository<Role>, IRoleRepository

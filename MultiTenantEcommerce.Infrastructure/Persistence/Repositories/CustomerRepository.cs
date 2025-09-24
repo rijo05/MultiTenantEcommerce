@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Users.Entities;
 using MultiTenantEcommerce.Domain.Users.Interfaces;
@@ -9,7 +10,7 @@ using System.Data;
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 public class CustomerRepository : Repository<Customer>, ICustomerRepository
 {
-    public CustomerRepository(AppDbContext appDbContext, TenantContext tenantContext) : base(appDbContext, tenantContext) { }
+    public CustomerRepository(AppDbContext appDbContext, ITenantContext tenantContext) : base(appDbContext, tenantContext) { }
 
     public async Task<Customer?> GetByEmailAsync(Email email)
     {
@@ -21,14 +22,13 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
         return await _appDbContext.Customers.FirstOrDefaultAsync(x => x.PhoneNumber.Number == phoneNumber.Number);
     }
 
-    //talvez remover TODO() ##########
     public async Task<List<Customer>> GetFilteredAsync(
-    string? name = null, 
+    string? name = null,
     string? email = null,
     string? phoneNumber = null,
-    bool? isActive = null, 
-    int page = 1, 
-    int pageSize = 20, 
+    bool? isActive = null,
+    int page = 1,
+    int pageSize = 20,
     SortOptions sort = SortOptions.TimeDesc)
     {
         var query = _appDbContext.Customers.AsQueryable();
