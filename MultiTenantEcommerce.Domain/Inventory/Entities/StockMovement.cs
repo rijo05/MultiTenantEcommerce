@@ -13,7 +13,6 @@ public class StockMovement : TenantBase
     private StockMovement() { }
     public StockMovement(Guid tenantId, Guid productId, int quantity, StockMovementReason reason, string? otherReason = null) : base(tenantId)
     {
-        GuardCommon.AgainstNegativeOrZero(quantity, nameof(quantity));
         GuardCommon.AgainstEmptyGuid(productId, nameof(productId));
 
         if (reason == StockMovementReason.Other && string.IsNullOrWhiteSpace(otherReason))
