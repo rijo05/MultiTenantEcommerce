@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
+using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Templates.Entities;
 using Polly;
 using Polly.Retry;
@@ -28,11 +29,9 @@ public class EmailProcessor
                 Console.WriteLine((ex, "Retry {Attempt} in {Delay}s", attempt, ts.TotalSeconds)));
     }
 
-    public async Task ExecuteAsync()
+    public async Task ExecuteAsync(EventPriority priority)
     {
-        Console.WriteLine("entrei nos emails 1");
-        var emails = await _emailQueueRepository.GetBatchUnprocessedEmailsAsync(BATCH_SIZE);
-        Console.WriteLine("entrei nos emails 2");
+        var emails = await _emailQueueRepository.GetBatchUnprocessedEmailsAsync(priority ,BATCH_SIZE);
 
         using var scope = _sp.CreateScope();
         var sender = scope.ServiceProvider.GetRequiredService<IEmailSender>();
@@ -40,7 +39,6 @@ public class EmailProcessor
 
         foreach (var item in emails)
         {
-            Console.WriteLine("entrei nos emails 3");
             try
             {
                 var template = await _emailTemplateRepository.GetDefaultTemplateByTemplateName(item.TemplateName);
@@ -55,7 +53,7 @@ public class EmailProcessor
 
 
                 await _retryPolicy.ExecuteAsync(() =>
-                    sender.SendAsync(item.ToEmail, renderedSubject, html, text, item.ReplyToEmail)
+                    sender.SendAsync(item.ToEmail, item.FromName, renderedSubject, html, text, item.ReplyToEmail)
                 );
 
                 await _emailQueueRepository.MarkEmailAsSentAsync(item.Id);

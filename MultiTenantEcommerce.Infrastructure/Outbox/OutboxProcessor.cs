@@ -1,4 +1,6 @@
 ﻿using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
+using MultiTenantEcommerce.Domain.Enums;
+using System.Diagnostics.Eventing.Reader;
 using System.Text.Json;
 
 namespace MultiTenantEcommerce.Infrastructure.Outbox;
@@ -15,9 +17,9 @@ public class OutboxProcessor
         _eventBus = eventBus;
     }
 
-    public async Task ExecuteAsync()
+    public async Task ExecuteAsync(EventPriority priority)
     {
-        var events = await _outboxRepository.GetUnprocessedEvents(BATCH_SIZE);
+        var events = await _outboxRepository.GetUnprocessedEvents(priority, BATCH_SIZE);
         Console.WriteLine($"Foram encontrados {events.Count} eventos");
 
         foreach (var item in events)
@@ -32,7 +34,7 @@ public class OutboxProcessor
 
                 var json = JsonSerializer.Serialize(wrapper);
 
-                await _eventBus.PublishAsync("", json);
+                await _eventBus.PublishAsync(item.RoutingKey, json);
 
                 item.SetProcessedOn();
             }

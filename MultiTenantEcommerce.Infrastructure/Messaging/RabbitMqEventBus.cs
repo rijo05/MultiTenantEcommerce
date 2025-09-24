@@ -7,7 +7,7 @@ public class RabbitMqEventBus : IEventBus
     private readonly RabbitMqConnectionManager _connectionManager;
     private IConnection _connection = null;
     private IChannel _channel = null;
-    private const string Exchange = "domain-events";
+    private const string EXCHANGE = "domain-events-exchange";
 
     public RabbitMqEventBus(RabbitMqConnectionManager connectionManager)
     {
@@ -22,8 +22,8 @@ public class RabbitMqEventBus : IEventBus
         _channel = await connection.CreateChannelAsync();
 
         await _channel.ExchangeDeclareAsync(
-            exchange: Exchange,
-            type: ExchangeType.Fanout,
+            exchange: EXCHANGE,
+            type: ExchangeType.Topic,
             durable: true,
             autoDelete: false
         );
@@ -37,6 +37,7 @@ public class RabbitMqEventBus : IEventBus
         await EnsureConnectionAsync();
 
         var body = Encoding.UTF8.GetBytes(message);
+
         var props = new BasicProperties()
         {
             DeliveryMode = DeliveryModes.Persistent,
@@ -46,8 +47,11 @@ public class RabbitMqEventBus : IEventBus
         };
 
 
-        await _channel.BasicPublishAsync(exchange: Exchange, routingKey: "", mandatory: true, basicProperties: props, body: body);
-        Console.WriteLine("Publiquei");
+        await _channel.BasicPublishAsync(exchange: EXCHANGE, 
+            routingKey: routingKey, 
+            mandatory: true, 
+            basicProperties: props, 
+            body: body);
 
         return;
     }

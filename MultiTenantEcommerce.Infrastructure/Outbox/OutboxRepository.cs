@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
+using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 using MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 
@@ -11,11 +12,12 @@ public class OutboxRepository : Repository<OutboxEvent>, IOutboxRepository
     {
     }
 
-    public async Task<List<OutboxEvent>> GetUnprocessedEvents(int batchSize)
+    public async Task<List<OutboxEvent>> GetUnprocessedEvents(EventPriority priority, int batchSize)
     {
         return await _appDbContext.OutboxEvents
-            .Where(x => x.ProcessedOn == null && x.Retries < 5)
+            .Where(x => x.ProcessedOn == null && x.Retries < 5 && x.Priority == priority)
             .OrderBy(x => x.OccurredOn)
-            .Take(batchSize).ToListAsync();
+            .Take(batchSize)
+            .ToListAsync();
     }
 }

@@ -1,4 +1,6 @@
 ﻿using MultiTenantEcommerce.Domain.Common.Events;
+using MultiTenantEcommerce.Domain.Enums;
+using System.Diagnostics.Eventing.Reader;
 using System.Text.Json;
 
 namespace MultiTenantEcommerce.Infrastructure.Outbox;
@@ -7,6 +9,8 @@ public class OutboxEvent
     public Guid Id { get; private set; }
     public string Type { get; private set; }
     public string Content { get; private set; }
+    public string RoutingKey { get; private set; }
+    public EventPriority Priority { get; private set; }
     public DateTime OccurredOn { get; private set; }
     public DateTime? ProcessedOn { get; private set; }
     public string? Error { get; private set; }
@@ -20,6 +24,10 @@ public class OutboxEvent
         Content = JsonSerializer.Serialize(domainEvent, domainEvent.GetType());
         OccurredOn = DateTime.UtcNow;
         Retries = 0;
+
+        RoutingKey = $"{domainEvent.EventPriority.ToString().ToLower()}.{domainEvent.GetType().Name.Replace("Events", "").ToLower()}";
+
+        Priority = domainEvent.EventPriority;
     }
 
     public void SetProcessedOn() => ProcessedOn = DateTime.UtcNow;
