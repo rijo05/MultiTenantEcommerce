@@ -29,7 +29,7 @@ public class SendEmailOnOrderDeliveredEventHandler : IEventHandler<OrderDelivere
 
     public async Task HandleAsync(OrderDeliveredEvent domainEvent)
     {
-        var order = await _orderRepository.GetByIdAsync(domainEvent.OrderId)
+        var order = await _orderRepository.GetByIdWithItemsAsync(domainEvent.OrderId)
             ?? throw new Exception("Order not found");
 
         var customer = await _customerRepository.GetByIdAsync(order.CustomerId)
@@ -42,15 +42,18 @@ public class SendEmailOnOrderDeliveredEventHandler : IEventHandler<OrderDelivere
         {
             [EmailMetadataKeys.CustomerName] = customer.Name,
             [EmailMetadataKeys.OrderId] = order.Id.ToString(),
-            [EmailMetadataKeys.ItemsHtml] = string.Join("", order.Items.Select(item => $"<tr><td>{item.ProductName}</td><td>{item.Quantity}</td><td>{item.UnitPrice:C}</td></tr>")),
+            [EmailMetadataKeys.DeliveryDate] = DateTime.UtcNow.ToString(),
+            [EmailMetadataKeys.ItemsHtml] = string.Join("", order.Items.Select(item => $"<tr><td>{item.ProductName}</td><td>{item.Quantity.Value}</td><td>{item.UnitPrice.Value} €</td></tr>")),
             [EmailMetadataKeys.TenantName] = tenant.Name
         };
 
         var email = new EmailJobDataDTO(
             Guid.Empty,
             domainEvent.TenantId,
+            tenant.Name,
             customer.Email.Value,
-            EmailTemplateNames.OrderDeliverd,
+            EmailTemplateNames.OrderDelivered,
+            domainEvent.EventPriority,
             metadata,
             tenant.Email.Value
         );

@@ -14,22 +14,25 @@ public class SendEmailOnOrderPaidEventHandler : IEventHandler<OrderPaidEvent>
     private readonly IOrderRepository _orderRepository;
     private readonly ICustomerRepository _customerRepository;
     private readonly ITenantRepository _tenantRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
     public SendEmailOnOrderPaidEventHandler(
         IEmailQueueRepository emailQueueRepository,
         IOrderRepository orderRepository,
         ICustomerRepository customerRepository,
-        ITenantRepository tenantRepository)
+        ITenantRepository tenantRepository,
+        IUnitOfWork unitOfWork)
     {
         _emailQueueRepository = emailQueueRepository;
         _orderRepository = orderRepository;
         _customerRepository = customerRepository;
         _tenantRepository = tenantRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task HandleAsync(OrderPaidEvent domainEvent)
     {
-        var order = await _orderRepository.GetByIdAsync(domainEvent.OrderId)
+        var order = await _orderRepository.GetByIdWithItemsAsync(domainEvent.OrderId)
             ?? throw new Exception("Order not found");
 
         var customer = await _customerRepository.GetByIdAsync(order.CustomerId)
@@ -42,16 +45,20 @@ public class SendEmailOnOrderPaidEventHandler : IEventHandler<OrderPaidEvent>
         {
             [EmailMetadataKeys.CustomerName] = customer.Name,
             [EmailMetadataKeys.OrderId] = order.Id.ToString(),
-            [EmailMetadataKeys.TrackingNumber] = "12345", //######## TODO
-            [EmailMetadataKeys.ItemsHtml] = string.Join("", order.Items.Select(item => $"<tr><td>{item.ProductName}</td><td>{item.Quantity}</td><td>{item.UnitPrice:C}</td></tr>")),
+            [EmailMetadataKeys.AmountPaid] = order.Price.Value.ToString() + "€",
+            [EmailMetadataKeys.PaymentMethod] = order.OrderPayment.PaymentMethod.ToString(),
+            [EmailMetadataKeys.BillingAddress] = order.Address.ToString(),
+            //[EmailMetadataKeys.ItemsHtml] = string.Join("", order.Items.Select(item => $"<tr><td>{item.ProductName}</td><td>{item.Quantity}</td><td>{item.UnitPrice:C}</td></tr>")),
             [EmailMetadataKeys.TenantName] = tenant.Name
         };
 
         var email = new EmailJobDataDTO(
             Guid.Empty,
             domainEvent.TenantId,
+            tenant.Name,
             customer.Email.Value,
             EmailTemplateNames.OrderPaid,
+            domainEvent.EventPriority,
             metadata,
             tenant.Email.Value
         );

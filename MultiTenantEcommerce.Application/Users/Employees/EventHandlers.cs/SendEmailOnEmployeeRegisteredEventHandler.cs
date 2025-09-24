@@ -24,7 +24,7 @@ public class SendEmailOnEmployeeRegisteredEventHandler : IEventHandler<EmployeeR
 
     public async Task HandleAsync(EmployeeRegisteredEvent domainEvent)
     {
-        var employee = await _employeeRepository.GetByIdAsync(domainEvent.EmployeeId)
+        var employee = await _employeeRepository.GetByIdWithRolesAsync(domainEvent.EmployeeId)
             ?? throw new Exception("Employee not found");
 
         var tenant = await _tenantRepository.GetByIdAsync(domainEvent.TenantId)
@@ -32,16 +32,19 @@ public class SendEmailOnEmployeeRegisteredEventHandler : IEventHandler<EmployeeR
 
         var metadata = new Dictionary<string, string>
         {
-            [EmailMetadataKeys.CustomerName] = employee.Name,
+            [EmailMetadataKeys.EmployeeName] = employee.Name,
             [EmailMetadataKeys.ChangePasswordLink] = "www.link.com", //############### TODO
+            [EmailMetadataKeys.RolesHtml] = $"<ul>{string.Join("", employee.EmployeeRoles.Select(er => $"<li>{er.Role.Name}</li>"))}</ul>",
             [EmailMetadataKeys.TenantName] = tenant.Name
         };
 
         var email = new EmailJobDataDTO(
             Guid.Empty,
             domainEvent.TenantId,
+            tenant.Name,
             employee.Email.Value,
             EmailTemplateNames.EmployeeRegistered,
+            domainEvent.EventPriority,
             metadata,
             tenant.Email.Value
         );

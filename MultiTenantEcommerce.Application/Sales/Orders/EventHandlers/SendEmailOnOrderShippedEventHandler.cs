@@ -43,15 +43,19 @@ public class SendEmailOnOrderShippedEventHandler : IEventHandler<OrderShippedEve
             [EmailMetadataKeys.CustomerName] = customer.Name,
             [EmailMetadataKeys.OrderId] = order.Id.ToString(),
             [EmailMetadataKeys.TrackingNumber] = "12345", //######## TODO
-            [EmailMetadataKeys.ItemsHtml] = string.Join("", order.Items.Select(item => $"<tr><td>{item.ProductName}</td><td>{item.Quantity}</td><td>{item.UnitPrice:C}</td></tr>")),
+            [EmailMetadataKeys.TrackingLink] = "www.ctt.track/1234",
+            [EmailMetadataKeys.CarrierName] = "CTT",
+            [EmailMetadataKeys.DeliveryDate] = DateTime.UtcNow.ToString(),
             [EmailMetadataKeys.TenantName] = tenant.Name
         };
 
         var email = new EmailJobDataDTO(
             Guid.Empty,
             domainEvent.TenantId,
+            tenant.Name,
             customer.Email.Value,
             EmailTemplateNames.OrderShipped,
+            domainEvent.EventPriority,
             metadata,
             tenant.Email.Value
         );

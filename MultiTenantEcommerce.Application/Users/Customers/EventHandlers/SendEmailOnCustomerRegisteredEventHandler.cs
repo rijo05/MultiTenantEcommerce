@@ -33,16 +33,19 @@ public class SendEmailOnCustomerRegisteredEventHandler : IEventHandler<CustomerR
         var metadata = new Dictionary<string, string>
         {
             [EmailMetadataKeys.CustomerName] = customer.Name,
+            [EmailMetadataKeys.CustomerEmail] = customer.Email.Value,
             [EmailMetadataKeys.TenantName] = tenant.Name
         };
 
         var email = new EmailJobDataDTO(
             Guid.Empty,
             domainEvent.TenantId,
+            tenant.Name,
             customer.Email.Value,
             EmailTemplateNames.CustomerRegistered,
+            domainEvent.EventPriority,
             metadata,
-            /*tenant.Email.Value*/ "boasboas@gmail.com"
+            tenant.Email.Value
         );
 
         await _emailQueueRepository.EnqueueEmailAsync(email);
