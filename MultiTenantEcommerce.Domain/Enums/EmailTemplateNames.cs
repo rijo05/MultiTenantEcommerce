@@ -1,9 +1,9 @@
 ﻿namespace MultiTenantEcommerce.Domain.Enums;
 public enum EmailTemplateNames
 {
-    LowStockEvent,
-    OutOfStockEvent,
-    OrderDeliverd,
+    LowStock,
+    OutOfStock,
+    OrderDelivered,
     OrderPaid,
     OrderPaymentFailed,
     OrderShipped,
