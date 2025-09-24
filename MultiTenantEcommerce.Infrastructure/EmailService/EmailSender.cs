@@ -14,14 +14,13 @@ public class EmailSender : IEmailSender
     public EmailSender(IConfiguration config)
     {
         _fromEmail = config["Email:Gmail:FromEmail"];
-        _fromName = config["Email:Gmail:FromName"];
         _appPassword = config["Email:Gmail:AppPassword"];
     }
 
-    public async Task SendAsync(string toEmail, string subject, string htmlBody, string textBody, string? replyToEmail = null)
+    public async Task SendAsync(string toEmail, string fromName, string subject, string htmlBody, string textBody, string? replyToEmail = null)
     {
         var message = new MimeMessage();
-        message.From.Add(new MailboxAddress(_fromName, _fromEmail));
+        message.From.Add(new MailboxAddress(fromName, _fromEmail));
         message.To.Add(new MailboxAddress("", toEmail));
         message.Subject = subject;
 
