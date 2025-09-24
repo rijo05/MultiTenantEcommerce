@@ -18,7 +18,7 @@ public class StockService : IStockService
 
     public async Task<bool> CheckAvailability(Guid productId, PositiveQuantity quantity)
     {
-        var stock = await _stockRepository.GetByIdAsync(productId)
+        var stock = await _stockRepository.GetByProductIdAsync(productId)
             ?? throw new Exception("Product doesnt exist.");
 
         return stock.CheckAvailability(quantity.Value);
