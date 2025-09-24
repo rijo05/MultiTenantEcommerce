@@ -1,17 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MultiTenantEcommerce.Domain.Users.Entities.Permissions;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
 public class EmployeeRoleConfiguration : IEntityTypeConfiguration<EmployeeRole>
 {
-    private readonly TenantContext _tenantContext;
-
-    public EmployeeRoleConfiguration(TenantContext tenantContext)
-    {
-        _tenantContext = tenantContext;
-    }
     public void Configure(EntityTypeBuilder<EmployeeRole> builder)
     {
         builder.HasKey(er => new { er.TenantId, er.EmployeeId, er.RoleId });
@@ -25,7 +18,5 @@ public class EmployeeRoleConfiguration : IEntityTypeConfiguration<EmployeeRole>
                .WithMany()
                .HasForeignKey(er => new { er.TenantId, er.RoleId })
                .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
     }
 }

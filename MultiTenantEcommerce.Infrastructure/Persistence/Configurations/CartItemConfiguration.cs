@@ -1,17 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MultiTenantEcommerce.Domain.Sales.ShoppingCart.Entities;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
 public class CartItemConfiguration : IEntityTypeConfiguration<CartItem>
 {
-    private readonly TenantContext _tenantContext;
-
-    public CartItemConfiguration(TenantContext tenantContext)
-    {
-        _tenantContext = tenantContext;
-    }
     public void Configure(EntityTypeBuilder<CartItem> builder)
     {
         builder.HasKey(x => new { x.TenantId, x.CartId, x.ProductId });
@@ -30,7 +23,5 @@ public class CartItemConfiguration : IEntityTypeConfiguration<CartItem>
                .HasColumnName("Quantity")
                .IsRequired();
         });
-
-        builder.HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
     }
 }

@@ -1,20 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MultiTenantEcommerce.Domain.Payment.Entities;
 using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
 using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Domain.Users.Entities;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
 public class OrderConfiguration : IEntityTypeConfiguration<Order>
 {
-    private readonly TenantContext _tenantContext;
-
-    public OrderConfiguration(TenantContext tenantContext)
-    {
-        _tenantContext = tenantContext;
-    }
-
     public void Configure(EntityTypeBuilder<Order> builder)
     {
         builder.HasKey(x => new { x.TenantId, x.Id });
@@ -28,6 +21,11 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.HasOne<Customer>()
                 .WithMany()
                 .HasForeignKey(x => new { x.TenantId, x.CustomerId })
+                .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(o => o.OrderPayment)
+                .WithOne()
+                .HasForeignKey<OrderPayment>(p => new { p.TenantId, p.OrderId })
                 .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(o => o.Items)
@@ -62,7 +60,5 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
         //builder.HasIndex(o => new { o.TenantId, o.CustomerId })
         //        .HasDatabaseName("IX_Order_TenantId_CustomerId");
-
-        builder.HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
     }
 }

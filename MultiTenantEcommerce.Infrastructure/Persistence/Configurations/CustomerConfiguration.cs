@@ -2,18 +2,10 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Domain.Users.Entities;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
 public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 {
-    private readonly TenantContext _tenantContext;
-
-    public CustomerConfiguration(TenantContext tenantContext)
-    {
-        _tenantContext = tenantContext;
-    }
-
     public void Configure(EntityTypeBuilder<Customer> builder)
     {
         builder.HasKey(x => new { x.TenantId, x.Id });
@@ -77,7 +69,5 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
         //builder.HasIndex(c => new { c.TenantId, c.PhoneNumber.Number })
         //        .HasDatabaseName("IX_Customer_TenantId_PhoneNumber");
-
-        builder.HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
     }
 }

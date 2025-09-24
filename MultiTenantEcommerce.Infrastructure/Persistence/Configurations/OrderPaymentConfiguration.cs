@@ -2,19 +2,11 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MultiTenantEcommerce.Domain.Payment.Entities;
 using MultiTenantEcommerce.Domain.Tenants.Entities;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
-public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
+public class OrderPaymentConfiguration : IEntityTypeConfiguration<OrderPayment>
 {
-    private readonly TenantContext _tenantContext;
-
-    public PaymentConfiguration(TenantContext tenantContext)
-    {
-        _tenantContext = tenantContext;
-    }
-
-    public void Configure(EntityTypeBuilder<Payment> builder)
+    public void Configure(EntityTypeBuilder<OrderPayment> builder)
     {
         builder.HasKey(x => new { x.TenantId, x.Id });
 
@@ -23,16 +15,17 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
                 .HasForeignKey(x => x.TenantId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne<Domain.Sales.Orders.Entities.Order>()
+            .WithOne(x => x.OrderPayment)
+            .HasForeignKey<OrderPayment>(x => new { x.TenantId, x.OrderId })
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.OwnsOne(u => u.Amount, amount =>
         {
             amount.Property(e => e.Value)
                 .HasColumnName("Amount")
                 .IsRequired();
         });
-
-        builder.Property(x => x.Reason)
-                .HasConversion<string>()
-                .IsRequired();
 
         builder.Property(x => x.Status)
                 .HasConversion<string>()
@@ -41,7 +34,5 @@ public class PaymentConfiguration : IEntityTypeConfiguration<Payment>
         builder.Property(x => x.PaymentMethod)
                .HasConversion<string>()
                .IsRequired();
-
-        builder.HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
     }
 }

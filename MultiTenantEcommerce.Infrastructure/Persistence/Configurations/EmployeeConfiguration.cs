@@ -2,18 +2,10 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Domain.Users.Entities;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
 public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
 {
-    private readonly TenantContext _tenantContext;
-
-    public EmployeeConfiguration(TenantContext tenantContext)
-    {
-        _tenantContext = tenantContext;
-    }
-
     public void Configure(EntityTypeBuilder<Employee> builder)
     {
         builder.HasKey(x => new { x.TenantId, x.Id });
@@ -56,7 +48,5 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
 
         //builder.HasIndex(e => new { e.TenantId, e.Role.roleName })
         //    .HasDatabaseName("IX_Employee_TenantId_Role");
-
-        builder.HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
     }
 }
