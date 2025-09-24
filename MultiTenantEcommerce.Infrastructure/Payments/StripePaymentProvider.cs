@@ -1,5 +1,5 @@
-﻿using MultiTenantEcommerce.Application.Payment.DTOs;
-using MultiTenantEcommerce.Application.Payment.Interfaces;
+﻿using MultiTenantEcommerce.Application.Payment.OrderPayment.DTOs;
+using MultiTenantEcommerce.Application.Payment.OrderPayment.Interfaces;
 using Stripe;
 using Stripe.Checkout;
 

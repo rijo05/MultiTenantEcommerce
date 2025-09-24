@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using MultiTenantEcommerce.Application.Payment.Interfaces;
+using MultiTenantEcommerce.Application.Payment.OrderPayment.Interfaces;
 using MultiTenantEcommerce.Domain.Enums;
 
 namespace MultiTenantEcommerce.Infrastructure.Payments;
