@@ -77,7 +77,7 @@ public class CreateTenantCommandHandler : ICommandHandler<CreateTenantCommand, A
         return new AuthTenantResponse
         {
             Email = employee.Email.Value,
-            Id = employee.Id,
+            OwnerId = employee.Id,
             Name = employee.Name,
             Token = _tokenService.CreateToken(employee)
         };
