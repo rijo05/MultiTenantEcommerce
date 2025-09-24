@@ -41,8 +41,10 @@ public class SendEmailOnLowStockEventHandler : IEventHandler<LowStockEvent>
         var email = new EmailJobDataDTO(
             Guid.Empty,
             domainEvent.TenantId,
+            "My Platform",
             owner.Email.Value,
-            EmailTemplateNames.LowStockEvent,
+            EmailTemplateNames.LowStock,
+            domainEvent.EventPriority,
             metadata,
             ""
         );

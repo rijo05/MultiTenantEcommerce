@@ -39,8 +39,10 @@ public class SendEmailOnOutOfStockEventHandler : IEventHandler<OutOfStockEvent>
         var email = new EmailJobDataDTO(
             Guid.Empty,
             domainEvent.TenantId,
+            "My Platform",
             owner.Email.Value,
-            EmailTemplateNames.OutOfStockEvent,
+            EmailTemplateNames.OutOfStock,
+            domainEvent.EventPriority,
             metadata,
             ""
         );
