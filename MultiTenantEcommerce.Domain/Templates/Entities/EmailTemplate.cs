@@ -5,9 +5,9 @@ public class EmailTemplate : BaseEntity
 {
     public string TemplateName { get; private set; }
     public bool IsActive { get; private set; }
-    public string Subject { get; private set; }
-    public string HtmlContent { get; private set; }
-    public string? TextContent { get; private set; }
+    public string Subject { get; set; }
+    public string HtmlContent { get; set; }
+    public string? TextContent { get; set; }
 
     public EmailTemplate(string templateName, bool isActive, string subject, string htmlContent)
     {
