@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Routing;
-
-namespace MultiTenantEcommerce.Application.Common.Helpers.EmailKeys;
+﻿namespace MultiTenantEcommerce.Application.Common.Helpers.EmailKeys;
 public static class EmailMetadataKeys
 {
     public const string CustomerName = "CustomerName";
