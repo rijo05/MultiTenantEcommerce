@@ -34,20 +34,20 @@ public class RabbitMqConsumer : BackgroundService
         var connection = await _connectionManager.GetConnectionAsync();
         _channel = await connection.CreateChannelAsync();
 
-        await _channel.ExchangeDeclareAsync(exchange: EXCHANGE, 
+        await _channel.ExchangeDeclareAsync(exchange: EXCHANGE,
             type: ExchangeType.Topic,
-            durable: true, 
+            durable: true,
             autoDelete: false);
 
 
-        await _channel.QueueDeclareAsync(queue: _queue, 
-            durable: true, 
-            exclusive: false, 
+        await _channel.QueueDeclareAsync(queue: _queue,
+            durable: true,
+            exclusive: false,
             autoDelete: false);
 
 
-        await _channel.QueueBindAsync(queue: _queue, 
-            exchange: EXCHANGE, 
+        await _channel.QueueBindAsync(queue: _queue,
+            exchange: EXCHANGE,
             routingKey: _binding);
 
         Console.WriteLine($"[✓] Queue {_queue} declared and bound with {_binding}");
@@ -64,7 +64,7 @@ public class RabbitMqConsumer : BackgroundService
             var json = Encoding.UTF8.GetString(eventArgs.Body.ToArray());
 
             var wrapper = JsonSerializer.Deserialize<EventWrapper>(json);
-            if (wrapper == null) 
+            if (wrapper == null)
                 return;
 
             var eventType = Type.GetType(wrapper.EventType);

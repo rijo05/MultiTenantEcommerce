@@ -1,6 +1,5 @@
 ﻿using MultiTenantEcommerce.Domain.Common.Events;
 using MultiTenantEcommerce.Domain.Enums;
-using System.Diagnostics.Eventing.Reader;
 using System.Text.Json;
 
 namespace MultiTenantEcommerce.Infrastructure.Outbox;

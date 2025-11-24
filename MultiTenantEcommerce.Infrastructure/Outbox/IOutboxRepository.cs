@@ -1,8 +1,9 @@
-﻿using MultiTenantEcommerce.Domain.Common.Interfaces;
-using MultiTenantEcommerce.Domain.Enums;
+﻿using MultiTenantEcommerce.Domain.Enums;
 
 namespace MultiTenantEcommerce.Infrastructure.Outbox;
-public interface IOutboxRepository : IRepository<OutboxEvent>
+public interface IOutboxRepository
 {
     public Task<List<OutboxEvent>> GetUnprocessedEvents(EventPriority priority, int batchSize);
+    public Task SaveChangesAsync();
+    public Task UpdateAsync(OutboxEvent outboxEvent);
 }

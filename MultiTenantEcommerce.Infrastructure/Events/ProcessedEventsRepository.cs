@@ -1,14 +1,18 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
-using MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 
 namespace MultiTenantEcommerce.Infrastructure.Events;
-public class ProcessedEventsRepository : Repository<ProcessedEvent>, IProcessedEventsRepository
+public class ProcessedEventsRepository : IProcessedEventsRepository
 {
-    public ProcessedEventsRepository(AppDbContext appDbContext, ITenantContext tenantContext)
-        : base(appDbContext, tenantContext)
+    private readonly AppDbContext _appDbContext;
+    public ProcessedEventsRepository(AppDbContext appDbContext)
     {
+        _appDbContext = appDbContext;
+    }
+
+    public async Task AddAsync(ProcessedEvent processedEvent)
+    {
+        await _appDbContext.ProcessedEvents.AddAsync(processedEvent);
     }
 
     public async Task<bool> WasThisEventProcessedAlready(Guid eventId, string handlerName)

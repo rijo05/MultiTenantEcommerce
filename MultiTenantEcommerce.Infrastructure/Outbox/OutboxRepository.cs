@@ -1,15 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
-using MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 
 namespace MultiTenantEcommerce.Infrastructure.Outbox;
-public class OutboxRepository : Repository<OutboxEvent>, IOutboxRepository
+public class OutboxRepository : IOutboxRepository
 {
-    public OutboxRepository(AppDbContext appDbContext, ITenantContext tenantContext)
-        : base(appDbContext, tenantContext)
+    private readonly AppDbContext _appDbContext;
+
+    public OutboxRepository(AppDbContext appDbContext)
     {
+        _appDbContext = appDbContext;
     }
 
     public async Task<List<OutboxEvent>> GetUnprocessedEvents(EventPriority priority, int batchSize)
@@ -19,5 +19,15 @@ public class OutboxRepository : Repository<OutboxEvent>, IOutboxRepository
             .OrderBy(x => x.OccurredOn)
             .Take(batchSize)
             .ToListAsync();
+    }
+
+    public async Task SaveChangesAsync()
+    {
+        await _appDbContext.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(OutboxEvent outboxEvent)
+    {
+        _appDbContext.OutboxEvents.Update(outboxEvent);
     }
 }

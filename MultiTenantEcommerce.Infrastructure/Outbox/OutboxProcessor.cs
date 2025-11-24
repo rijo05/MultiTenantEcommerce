@@ -1,10 +1,10 @@
 ﻿using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Enums;
-using System.Diagnostics.Eventing.Reader;
+using MultiTenantEcommerce.Infrastructure.Workers;
 using System.Text.Json;
 
 namespace MultiTenantEcommerce.Infrastructure.Outbox;
-public class OutboxProcessor
+public class OutboxProcessor : IPriorityProcessor
 {
     private readonly IOutboxRepository _outboxRepository;
     private readonly IEventBus _eventBus;
