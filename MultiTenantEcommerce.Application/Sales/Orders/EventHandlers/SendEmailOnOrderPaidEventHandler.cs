@@ -32,7 +32,7 @@ public class SendEmailOnOrderPaidEventHandler : IEventHandler<OrderPaidEvent>
 
     public async Task HandleAsync(OrderPaidEvent domainEvent)
     {
-        var order = await _orderRepository.GetByIdWithItemsAsync(domainEvent.OrderId)
+        var order = await _orderRepository.GetByIdIncluding(domainEvent.OrderId, x => x.Items, x => x.OrderPayment!)
             ?? throw new Exception("Order not found");
 
         var customer = await _customerRepository.GetByIdAsync(order.CustomerId)
@@ -46,7 +46,7 @@ public class SendEmailOnOrderPaidEventHandler : IEventHandler<OrderPaidEvent>
             [EmailMetadataKeys.CustomerName] = customer.Name,
             [EmailMetadataKeys.OrderId] = order.Id.ToString(),
             [EmailMetadataKeys.AmountPaid] = order.Price.Value.ToString() + "€",
-            [EmailMetadataKeys.PaymentMethod] = order.OrderPayment.PaymentMethod.ToString(),
+            [EmailMetadataKeys.PaymentMethod] = order.OrderPayment!.PaymentMethod.ToString(),
             [EmailMetadataKeys.BillingAddress] = order.Address.ToString(),
             //[EmailMetadataKeys.ItemsHtml] = string.Join("", order.Items.Select(item => $"<tr><td>{item.ProductName}</td><td>{item.Quantity}</td><td>{item.UnitPrice:C}</td></tr>")),
             [EmailMetadataKeys.TenantName] = tenant.Name

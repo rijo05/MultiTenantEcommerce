@@ -26,7 +26,7 @@ public class RemoveRoleFromEmployeeCommandHandler : ICommandHandler<RemoveRoleFr
 
     public async Task<EmployeeResponseDTO> Handle(RemoveRoleFromEmployeeCommand request, CancellationToken cancellationToken)
     {
-        var employee = await _employeeRepository.GetByIdWithRolesAsync(request.employeeId)
+        var employee = await _employeeRepository.GetByIdAllIncluded(request.employeeId)
             ?? throw new Exception("Employee doesnt exist.");
 
         var roles = await _roleRepository.GetByIdsAsync(request.roles.Distinct());

@@ -26,7 +26,7 @@ public class AssignRoleToEmployeeCommandHandler : ICommandHandler<AssignRoleToEm
 
     public async Task<EmployeeResponseDTO> Handle(AssignRoleToEmployeeCommand request, CancellationToken cancellationToken)
     {
-        var employee = await _employeeRepository.GetByIdWithRolesAsync(request.employeeId)
+        var employee = await _employeeRepository.GetByIdAllIncluded(request.employeeId)
             ?? throw new Exception("Employee doesnt exist.");
 
         var roles = await _roleRepository.GetByIdsAsync(request.roles.Distinct());

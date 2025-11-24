@@ -39,7 +39,7 @@ public class CreateEmployeeCommandHandler : ICommandHandler<CreateEmployeeComman
 
     public async Task<AuthEmployeeResponseDTO> Handle(CreateEmployeeCommand request, CancellationToken cancellationToken)
     {
-        var existingEmployee = await _employeeRepository.GetByEmailAsync(new Email(request.Email));
+        var existingEmployee = await _employeeRepository.GetByEmailAllIncluded(new Email(request.Email));
         if (existingEmployee is not null)
             throw new Exception("Employee with this email already exists.");
 
@@ -64,7 +64,7 @@ public class CreateEmployeeCommandHandler : ICommandHandler<CreateEmployeeComman
             Name = employee.Name,
             Permissions = employee.EmployeeRoles.SelectMany(x => x.Role.Permissions.Select(x => x.Name)).ToList(),
             Roles = employee.EmployeeRoles.Select(x => x.Role.Name).ToList(),
-            Token = _tokenService.CreateToken(employee)
+            Token = _tokenService.CreateSessionToken(employee)
         };
     }
 }

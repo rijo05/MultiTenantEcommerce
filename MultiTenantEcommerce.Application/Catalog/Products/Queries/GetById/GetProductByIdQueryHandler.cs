@@ -1,4 +1,4 @@
-﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs;
+﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
 using MultiTenantEcommerce.Application.Catalog.Products.Mappers;
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
@@ -22,7 +22,7 @@ public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, IPr
 
     public async Task<IProductDTO> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetByIdWithCategoryAsync(request.ProductId)
+        var product = await _productRepository.GetByIdIncluding(request.ProductId, x => x.Category, x => x.Images)
             ?? throw new Exception("Product not found");
 
         var stock = await _stockRepository.GetByProductIdAsync(product.Id)

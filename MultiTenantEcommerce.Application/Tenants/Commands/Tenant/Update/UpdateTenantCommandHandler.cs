@@ -23,7 +23,7 @@ public class UpdateTenantCommandHandler : IRequestHandler<UpdateTenantCommand, T
         var tenant = await _tenantRepository.GetByIdAsync(request.Id)
             ?? throw new Exception("Tenant doesn't exist.");
 
-        var existingTenant = await _tenantRepository.GetByCompanyName(request.CompanyName);
+        var existingTenant = await _tenantRepository.GetByCompanyNameAllIncluded(request.CompanyName);
         if (existingTenant is not null && existingTenant.Id != request.Id)
             throw new Exception("Company with this name already exists.");
 

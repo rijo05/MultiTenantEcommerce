@@ -23,7 +23,7 @@ public class ChangeOrderStatusCommandHandler : ICommandHandler<ChangeOrderStatus
 
     public async Task<OrderResponseDTO> Handle(ChangeOrderStatusCommand request, CancellationToken cancellationToken)
     {
-        var order = await _orderRepository.GetByIdAsync(request.orderId)
+        var order = await _orderRepository.GetByIdIncluding(request.orderId, x => x.Items)
             ?? throw new Exception("Order doesnt exist");
 
         if (!Enum.TryParse<OrderStatus>(request.Status, true, out var parsedStatus))

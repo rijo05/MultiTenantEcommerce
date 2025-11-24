@@ -1,13 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
+using MultiTenantEcommerce.Domain.Common.Entities;
 using MultiTenantEcommerce.Domain.Common.Interfaces;
 using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using System.Linq.Expressions;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 
-public class Repository<T> : IRepository<T> where T : class
+public class Repository<T> : IRepository<T> where T : BaseEntity
 {
     protected readonly AppDbContext _appDbContext;
     private readonly ITenantContext _tenantContext;
@@ -29,6 +31,18 @@ public class Repository<T> : IRepository<T> where T : class
 
         return await _appDbContext.Set<T>().FindAsync(validKeyValues);
     }
+
+    public async Task<T?> GetByIdIncluding(Guid id, params Expression<Func<T, object>>[] includes)
+    {
+        IQueryable<T> query = _appDbContext.Set<T>();
+
+        foreach (var include in includes)
+            query = query.Include(include);
+
+        return await query.FirstOrDefaultAsync(x => x.Id == id);
+    }
+
+
     public async Task AddAsync(T entity)
     {
         await _appDbContext.Set<T>().AddAsync(entity);
@@ -45,12 +59,12 @@ public class Repository<T> : IRepository<T> where T : class
 
     public async Task<bool> ExistsAsync(Guid id)
     {
-        return await _appDbContext.Set<T>().AnyAsync(x => EF.Property<Guid>(x, "Id") == id);
+        return await _appDbContext.Set<T>().AnyAsync(x => x.Id == id);
     }
 
     public async Task<List<T>> GetByIdsAsync(IEnumerable<Guid> ids)
     {
-        return await _appDbContext.Set<T>().Where(x => ids.Contains(EF.Property<Guid>(x, "Id"))).ToListAsync();
+        return await _appDbContext.Set<T>().Where(x => ids.Contains(x.Id)).ToListAsync();
     }
 
     public async Task SaveChangesAsync()
@@ -78,12 +92,12 @@ public class Repository<T> : IRepository<T> where T : class
                 SortOptions.PriceDesc => query.OrderByDescending(p => EF.Property<object>(p, sortProperty)),
                 SortOptions.TimeAsc => query.OrderBy(p => EF.Property<object>(p, sortProperty)),
                 SortOptions.TimeDesc => query.OrderByDescending(p => EF.Property<object>(p, sortProperty)),
-                _ => query.OrderBy(p => EF.Property<object>(p, "CreatedAt"))
+                _ => query.OrderBy(p => p.CreatedAt)
             };
         }
         else
         {
-            query = query.OrderBy(p => EF.Property<object>(p, "CreatedAt"));
+            query = query.OrderBy(p => p.CreatedAt);
         }
 
 

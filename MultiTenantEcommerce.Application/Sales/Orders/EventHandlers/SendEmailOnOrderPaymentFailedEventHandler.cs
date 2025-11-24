@@ -29,7 +29,7 @@ public class SendEmailOnOrderPaymentFailedEventHandler : IEventHandler<OrderPaym
 
     public async Task HandleAsync(OrderPaymentFailedEvent domainEvent)
     {
-        var order = await _orderRepository.GetByIdWithItemsAsync(domainEvent.OrderId)
+        var order = await _orderRepository.GetByIdIncluding(domainEvent.OrderId, x => x.OrderPayment!)
             ?? throw new Exception("Order not found");
 
         var customer = await _customerRepository.GetByIdAsync(order.CustomerId)
@@ -42,7 +42,7 @@ public class SendEmailOnOrderPaymentFailedEventHandler : IEventHandler<OrderPaym
         {
             [EmailMetadataKeys.CustomerName] = customer.Name,
             [EmailMetadataKeys.OrderId] = order.Id.ToString(),
-            [EmailMetadataKeys.FailureReason] = order.OrderPayment.Metadata ?? "Something went wrong",
+            [EmailMetadataKeys.FailureReason] = order.OrderPayment!.Metadata ?? "Something went wrong",
             [EmailMetadataKeys.TenantName] = tenant.Name
         };
 

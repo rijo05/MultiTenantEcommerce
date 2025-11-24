@@ -18,7 +18,7 @@ public class GetTenantByIdQueryHandler : IRequestHandler<GetTenantByIdQuery, Ten
 
     public async Task<TenantResponseDTO> Handle(GetTenantByIdQuery request, CancellationToken cancellationToken)
     {
-        var tenant = await _tenantRepository.GetByIdAsync(request.Id)
+        var tenant = await _tenantRepository.GetByIdIncluding(request.Id, x => x.ShippingProviders)
             ?? throw new Exception("Tenant doesn't exist.");
 
         return _mapper.ToTenantResponseDTO(tenant);

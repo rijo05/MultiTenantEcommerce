@@ -16,13 +16,6 @@ public class ProductRepository : Repository<Product>, IProductRepository
         return await _appDbContext.Products.AnyAsync(x => x.CategoryId == categoryId);
     }
 
-    public async Task<Product?> GetByIdWithCategoryAsync(Guid productId)
-    {
-        return await _appDbContext.Products
-            .Include(p => p.Category)
-            .FirstOrDefaultAsync(p => p.Id == productId);
-    }
-
     public async Task<IEnumerable<Product>> GetFilteredAsync(
     Guid? categoryId = null,
     string? name = null,
@@ -35,6 +28,7 @@ public class ProductRepository : Repository<Product>, IProductRepository
     {
         var query = _appDbContext.Products
             .Include(p => p.Category)
+            .Include(p => p.Images)
             .AsQueryable();
 
         if (categoryId.HasValue)

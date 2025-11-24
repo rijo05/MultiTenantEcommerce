@@ -24,7 +24,7 @@ public class SendEmailOnEmployeeRegisteredEventHandler : IEventHandler<EmployeeR
 
     public async Task HandleAsync(EmployeeRegisteredEvent domainEvent)
     {
-        var employee = await _employeeRepository.GetByIdWithRolesAsync(domainEvent.EmployeeId)
+        var employee = await _employeeRepository.GetByIdAllIncluded(domainEvent.EmployeeId)
             ?? throw new Exception("Employee not found");
 
         var tenant = await _tenantRepository.GetByIdAsync(domainEvent.TenantId)

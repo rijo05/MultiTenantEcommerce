@@ -29,7 +29,7 @@ public class UpdateEmployeeCommandHandler : ICommandHandler<UpdateEmployeeComman
 
         if (!string.IsNullOrWhiteSpace(request.Email))
         {
-            var existingEmail = await _employeeRepository.GetByEmailAsync(new Email(request.Email));
+            var existingEmail = await _employeeRepository.GetByEmailAllIncluded(new Email(request.Email));
             if (existingEmail is not null && existingEmail.Id != employee.Id)
                 throw new Exception("Email already in use.");
         }

@@ -10,11 +10,6 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
 {
     public EmployeeRepository(AppDbContext appDbContext, TenantContext tenantContext) : base(appDbContext, tenantContext) { }
 
-    public async Task<Employee?> GetByEmailAsync(Email email)
-    {
-        return await _appDbContext.Employees.FirstOrDefaultAsync(u => u.Email.Value == email.Value);
-    }
-
     public async Task<List<Employee>> GetFilteredAsync(
     string? name = null,
     string? role = null,
@@ -47,22 +42,22 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
         return await SortAndPageAsync(query, sort, page, pageSize);
     }
 
-    public async Task<Employee?> GetByIdWithRolesAsync(Guid employeeId)
-    {
-        return await _appDbContext.Employees
-            .Include(x => x.EmployeeRoles)
-                .ThenInclude(x => x.Role)
-                    .ThenInclude(x => x.Permissions)
-            .FirstOrDefaultAsync(x => x.Id == employeeId);
-    }
-
-    public async Task<Employee?> GetByEmailWithRolesAsync(Email email)
+    public async Task<Employee?> GetByEmailAllIncluded(Email email)
     {
         return await _appDbContext.Employees
             .Include(x => x.EmployeeRoles)
                 .ThenInclude(x => x.Role)
                     .ThenInclude(x => x.Permissions)
             .FirstOrDefaultAsync(x => x.Email.Value == email.Value);
+    }
+
+    public async Task<Employee?> GetByIdAllIncluded(Guid id)
+    {
+        return await _appDbContext.Employees
+            .Include(x => x.EmployeeRoles)
+                .ThenInclude(x => x.Role)
+                    .ThenInclude(x => x.Permissions)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<List<Employee>> GetEmployeesByRole(

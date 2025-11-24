@@ -22,7 +22,7 @@ public class GetOrderByIdQueryHandler : IQueryHandler<GetOrderByIdQuery, OrderRe
 
     public async Task<OrderResponseWithPayment> Handle(GetOrderByIdQuery request, CancellationToken cancellationToken)
     {
-        var order = await _orderRepository.GetByIdWithItemsAsync(request.OrderId)
+        var order = await _orderRepository.GetByIdIncluding(request.OrderId, x => x.Items, x => x.OrderPayment!)
             ?? throw new Exception("Order doesnt exist");
 
         var payment = await _paymentRepository.GetByOrderId(request.OrderId)

@@ -19,7 +19,7 @@ public class GetEmployeeByEmailQueryHandler : IQueryHandler<GetEmployeeByEmailQu
 
     public async Task<EmployeeResponseDTO> Handle(GetEmployeeByEmailQuery request, CancellationToken cancellationToken)
     {
-        var employee = await _employeeRepository.GetByEmailWithRolesAsync(new Email(request.Email))
+        var employee = await _employeeRepository.GetByEmailAllIncluded(new Email(request.Email))
             ?? throw new Exception("Employee with that email doesnt exist.");
 
         return _employeeMapper.ToEmployeeResponseDTO(employee);

@@ -18,7 +18,7 @@ public class GetOrdersByCustomerIdQueryHandler : IQueryHandler<GetOrdersByCustom
 
     public async Task<List<OrderResponseWithPayment>> Handle(GetOrdersByCustomerIdQuery request, CancellationToken cancellationToken)
     {
-        var orders = await _orderRepository.GetByCustomerIdWithItems(
+        var orders = await _orderRepository.GetByCustomerIdAllIncluded(
             request.customerId,
             request.Page,
             request.PageSize,

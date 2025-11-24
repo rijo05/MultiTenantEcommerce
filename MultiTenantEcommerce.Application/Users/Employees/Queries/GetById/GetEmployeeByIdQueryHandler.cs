@@ -18,7 +18,7 @@ public class GetEmployeeByIdQueryHandler : IQueryHandler<GetEmployeeByIdQuery, E
 
     public async Task<EmployeeResponseDTO> Handle(GetEmployeeByIdQuery request, CancellationToken cancellationToken)
     {
-        var employee = await _employeeRepository.GetByIdWithRolesAsync(request.EmployeeId)
+        var employee = await _employeeRepository.GetByIdAllIncluded(request.EmployeeId)
             ?? throw new Exception("Employee doesnt exist.");
 
         return _employeeMapper.ToEmployeeResponseDTO(employee);

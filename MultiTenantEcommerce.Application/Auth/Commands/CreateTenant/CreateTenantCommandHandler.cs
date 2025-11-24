@@ -37,7 +37,7 @@ public class CreateTenantCommandHandler : ICommandHandler<CreateTenantCommand, A
 
     public async Task<AuthTenantResponse> Handle(CreateTenantCommand request, CancellationToken cancellationToken)
     {
-        var existingTenant = await _tenantRepository.GetByCompanyName(request.CompanyName);
+        var existingTenant = await _tenantRepository.GetByCompanyNameAllIncluded(request.CompanyName);
 
         if (existingTenant is not null)
             throw new Exception("Company with this name already exists.");
@@ -79,7 +79,7 @@ public class CreateTenantCommandHandler : ICommandHandler<CreateTenantCommand, A
             Email = employee.Email.Value,
             OwnerId = employee.Id,
             Name = employee.Name,
-            Token = _tokenService.CreateToken(employee)
+            Token = _tokenService.CreateSessionToken(employee)
         };
 
         //por agora q ira haver apenas 1 plano gratis, no futuro vejo como fazer planos pagos
