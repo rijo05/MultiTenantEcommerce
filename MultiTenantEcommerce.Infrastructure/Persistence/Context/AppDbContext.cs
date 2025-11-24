@@ -9,6 +9,7 @@ using MultiTenantEcommerce.Domain.Inventory.Entities;
 using MultiTenantEcommerce.Domain.Payment.Entities;
 using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
 using MultiTenantEcommerce.Domain.Sales.ShoppingCart.Entities;
+using MultiTenantEcommerce.Domain.Shipping.Entities;
 using MultiTenantEcommerce.Domain.Templates.Entities;
 using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Domain.Users.Entities;
@@ -30,10 +31,12 @@ public class AppDbContext : DbContext
 
     public virtual DbSet<Category> Categories { get; set; }
     public virtual DbSet<Product> Products { get; set; }
+    public virtual DbSet<ProductImages> ProductImages { get; set; }
     public virtual DbSet<Customer> Customers { get; set; }
     public virtual DbSet<Employee> Employees { get; set; }
     public virtual DbSet<Stock> Stocks { get; set; }
     public virtual DbSet<StockMovement> StockMovements { get; set; }
+    public virtual DbSet<Shipment> Shipments { get; set; }
     public virtual DbSet<Order> Orders { get; set; }
     public virtual DbSet<OrderItem> OrderItems { get; set; }
     public virtual DbSet<Cart> Carts { get; set; }
@@ -57,9 +60,12 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Category>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
         modelBuilder.Entity<Product>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
+        modelBuilder.Entity<ProductImages>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
 
         modelBuilder.Entity<Customer>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
         modelBuilder.Entity<Employee>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
+
+        modelBuilder.Entity<Shipment>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
 
         modelBuilder.Entity<Order>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
         modelBuilder.Entity<OrderItem>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
@@ -131,7 +137,7 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 
         var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile(@"D:\MultiTenantEcommerce\MultiTenantEcommerce\MultiTenantEcommerce.API\appsettings.json", optional: false, reloadOnChange: true);
+            .AddJsonFile(@"C:\MultiTenantEcommerce\MultiTenantEcommerce\MultiTenantEcommerce.API\appsettings.json", optional: false, reloadOnChange: true);
 
         var configuration = builder.Build();
 
