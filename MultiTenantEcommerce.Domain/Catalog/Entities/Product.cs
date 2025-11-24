@@ -12,6 +12,9 @@ public class Product : TenantBase
     public Guid CategoryId { get; private set; }
     public Category Category { get; private set; }
 
+    private List<ProductImages> _images = new List<ProductImages>();
+    public IReadOnlyCollection<ProductImages> Images => _images.AsReadOnly();
+
     private Product() { }
     public Product(Guid tenantId,
         string name,
@@ -103,4 +106,37 @@ public class Product : TenantBase
         SetUpdatedAt();
     }
     #endregion
+
+    public ProductImages AddImage(string fileName, long size, string contentType, bool isMain = false)
+    {
+        if (isMain)
+        {
+            foreach (var image in _images)
+                image.UnmarkAsMain();
+        }
+        else if (_images.Count == 0)
+            isMain = true;
+
+        var newImage = new ProductImages(this.TenantId, this.Id, fileName, size, contentType, isMain);
+        _images.Add(newImage);
+
+        return newImage;
+    }
+
+    public void DeleteImage(string key)
+    {
+        var image = _images.FirstOrDefault(x => x.Key == key)!;
+
+        _images.Remove(image);
+
+        if (image.IsMain && _images.Count > 0)
+            _images[0].MarkAsMain();
+    }
+
+    public void MarkAsMain(string key)
+    {
+        var image = _images.FirstOrDefault(x => x.Key == key)!;
+
+        image.MarkAsMain();
+    }
 }
