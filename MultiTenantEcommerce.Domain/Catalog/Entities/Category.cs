@@ -9,7 +9,7 @@ public class Category : TenantBase
     public bool IsActive { get; private set; }
 
     private Category() { }
-    public Category(Guid tenantId, string name, string? description, bool isActive = true) 
+    public Category(Guid tenantId, string name, string? description, bool isActive = true)
         : base(tenantId)
     {
         GuardCommon.AgainstNullOrEmpty(name, nameof(name));

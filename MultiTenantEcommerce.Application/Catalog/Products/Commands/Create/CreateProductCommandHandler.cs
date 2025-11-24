@@ -1,4 +1,4 @@
-﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs;
+﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
 using MultiTenantEcommerce.Application.Catalog.Products.Mappers;
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
@@ -17,13 +17,15 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
     private readonly ITenantContext _tenantContext;
     private readonly IUnitOfWork _unitOfWork;
     private readonly ProductMapper _productMapper;
+    private readonly IFileStorageService _fileStorageService;
 
     public CreateProductCommandHandler(ICategoryRepository categoryRepository,
         IProductRepository productRepository,
         IStockRepository stockRepository,
         ProductMapper productMapper,
         ITenantContext tenantContext,
-        IUnitOfWork unitOfWork)
+        IUnitOfWork unitOfWork,
+        IFileStorageService fileStorageService)
     {
         _categoryRepository = categoryRepository;
         _productRepository = productRepository;
@@ -31,6 +33,7 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
         _productMapper = productMapper;
         _tenantContext = tenantContext;
         _unitOfWork = unitOfWork;
+        _fileStorageService = fileStorageService;
     }
 
     public async Task<ProductResponseAdminDTO> Handle(CreateProductCommand request, CancellationToken cancellationToken)
@@ -44,15 +47,13 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
             new Money(request.Price),
             category,
             request.Description,
-            request.IsActive
-            );
+            request.IsActive);
 
         var stock = new Stock(
             product,
             _tenantContext.TenantId,
             request.Quantity,
-            request.MinimumQuantity
-            );
+            request.MinimumQuantity);
 
         await _productRepository.AddAsync(product);
         await _stockRepository.AddAsync(stock);

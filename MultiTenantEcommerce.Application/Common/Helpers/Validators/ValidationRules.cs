@@ -148,13 +148,13 @@ public static class ValidationRules
             .MaximumLength(10).WithMessage("House number cannot exceed 10 characters");
     }
 
-    //Not Empty
+    //Not Empty ################## cuidado com o guidempty pq sq vou ser eu
     public static IRuleBuilderOptions<T, Guid> GuidRules<T>(this IRuleBuilder<T, Guid> ruleBuilder)
     {
         return ruleBuilder
             .NotEqual(Guid.Empty).WithMessage("Id must be valid.");
     }
-    //Not Empty
+    //Not Empty ################## cuidado com o guidempty pq sq vou ser eu
     public static IRuleBuilderOptions<T, Guid?> GuidRules<T>(this IRuleBuilder<T, Guid?> ruleBuilder)
     {
         return ruleBuilder

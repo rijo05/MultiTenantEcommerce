@@ -6,7 +6,7 @@ public abstract class TenantBase : BaseEntity
     public Guid TenantId { get; private set; }
 
     protected TenantBase() { }
-    protected TenantBase(Guid tenantId) 
+    protected TenantBase(Guid tenantId)
     {
         TenantId = tenantId;
     }

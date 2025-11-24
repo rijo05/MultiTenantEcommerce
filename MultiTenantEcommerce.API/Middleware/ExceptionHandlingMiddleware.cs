@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using MultiTenantEcommerce.Application.Common.Helpers;
 
 namespace MultiTenantEcommerce.API.Middleware;
 
@@ -20,7 +21,7 @@ public class ExceptionHandlingMiddleware
         catch (ValidationException ex)
         {
             context.Response.StatusCode = StatusCodes.Status400BadRequest;
-            context.Response.ContentType = "application/json";
+            context.Response.ContentType = MimeTypes.JSON;
 
             var erros = ex.Errors.Select(e => new
             {
@@ -34,11 +35,11 @@ public class ExceptionHandlingMiddleware
                 errors = erros
             });
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-            context.Response.ContentType = "application/json";
+            context.Response.ContentType = MimeTypes.JSON;
 
             await context.Response.WriteAsJsonAsync(new
             {

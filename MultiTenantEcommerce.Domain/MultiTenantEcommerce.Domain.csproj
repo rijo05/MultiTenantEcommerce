@@ -8,16 +8,6 @@
 
   <ItemGroup>
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-    <PackageReference Include="MediatR" Version="11.1.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Catalog\Events\" />
-    <Folder Include="Inventory\Events\" />
-    <Folder Include="Payment\Events\" />
-    <Folder Include="Sales\ShoppingCart\Events\" />
-    <Folder Include="Tenants\Events\" />
-    <Folder Include="Users\Events\" />
   </ItemGroup>
 
 </Project>

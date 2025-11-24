@@ -1,6 +1,7 @@
 ﻿using MultiTenantEcommerce.Domain.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Common.Entities;
 using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
+using MultiTenantEcommerce.Domain.Shipping.Enums;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Domain.Sales.ShoppingCart.Entities;
@@ -67,17 +68,14 @@ public class Cart : TenantBase
         return _items.Count == 0;
     }
 
-    public Order CheckOut(Address address)
+    public Order CheckOut(Address address, ShipmentCarrier carrier)
     {
-        if (_items.Count == 0)
+        if (IsEmpty())
             throw new Exception("Cart is empty.");
 
-        var order = new Order(this.TenantId, this.CustomerId, address);
+        var products = _items.Select(x => (x.Product, x.Quantity)).ToList();
 
-        foreach (var item in _items)
-        {
-            order.AddItem(item.Product, item.Quantity);
-        }
+        var order = new Order(this.TenantId, this.CustomerId, address, products, carrier);
 
         return order;
     }

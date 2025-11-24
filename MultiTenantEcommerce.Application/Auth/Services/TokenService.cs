@@ -17,7 +17,7 @@ public class TokenService : ITokenService
         _config = config;
     }
 
-    public string CreateToken(UserBase user)
+    public string CreateSessionToken(UserBase user)
     {
         var claims = new List<Claim>
         {
@@ -50,6 +50,42 @@ public class TokenService : ITokenService
         else
             claims.Add(new Claim("isEmployee", "false", ClaimValueTypes.Boolean));
 
+        return GenerateToken(claims, DateTime.UtcNow.AddDays(1));
+    }
+
+    public string CreateImageToken(Guid ProductId, Guid TenantId)
+    {
+        var claims = new List<Claim>
+        {
+            new Claim("ProductId", ProductId.ToString()),
+            new Claim("TenantId", TenantId.ToString())
+        };
+
+        return GenerateToken(claims, DateTime.UtcNow.AddHours(100));
+    }
+
+    public ClaimsPrincipal ValidateToken(string token)
+    {
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var key = Encoding.UTF8.GetBytes(_config["Jwt:Key"]!);
+
+        var parameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = _config["Jwt:Issuer"],
+            ValidateAudience = true,
+            ValidAudience = _config["Jwt:Audience"],
+            ValidateLifetime = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidateIssuerSigningKey = true,
+            ClockSkew = TimeSpan.FromSeconds(30)
+        };
+
+        return tokenHandler.ValidateToken(token, parameters, out _);
+    }
+
+    private string GenerateToken(List<Claim> claims, DateTime time)
+    {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
 
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -58,7 +94,7 @@ public class TokenService : ITokenService
                 issuer: _config["Jwt:Issuer"],
                 audience: _config["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.UtcNow.AddDays(1),
+                expires: time,
                 signingCredentials: credentials
                 );
 

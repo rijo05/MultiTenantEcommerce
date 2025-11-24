@@ -10,7 +10,6 @@ using MultiTenantEcommerce.Application.Sales.ShoppingCart.Commands.Create;
 using MultiTenantEcommerce.Application.Sales.ShoppingCart.Commands.RemoveItem;
 using MultiTenantEcommerce.Application.Sales.ShoppingCart.DTOs;
 using MultiTenantEcommerce.Application.Sales.ShoppingCart.Queries.GetByCustomerId;
-using MultiTenantEcommerce.Application.Sales.ShoppingCart.Queries.GetById;
 
 namespace MultiTenantEcommerce.API.Controllers.Customer;
 
@@ -30,7 +29,7 @@ public class CartsController : ControllerBase
     public async Task<ActionResult<PaymentResultDTO>> Checkout([FromBody] CheckoutDTO checkout)
     {
         var userId = User.GetUserId();
-        var command = new CheckoutCommand(userId, checkout.AddressDTO, checkout.PaymentMethod);
+        var command = new CheckoutCommand(userId, checkout.AddressDTO, checkout.PaymentMethod, checkout.Carrier);
 
         var paymentResult = await _mediator.Send(command);
         return Ok(paymentResult);

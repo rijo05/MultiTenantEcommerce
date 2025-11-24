@@ -16,6 +16,7 @@ public class GetCartByIdQueryHandler : IQueryHandler<GetCartByIdQuery, CartRespo
         _cartMapper = cartMapper;
     }
 
+    //NAO USAR TALVEZ???? ##########
     public async Task<CartResponseDTO> Handle(GetCartByIdQuery request, CancellationToken cancellationToken)
     {
         var cart = await _cartRepository.GetByIdAsync(request.CartId)

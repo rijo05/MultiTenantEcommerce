@@ -2,7 +2,6 @@
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Application.Common.Interfaces.Services;
-using MultiTenantEcommerce.Application.Users.Customers.Mappers;
 using MultiTenantEcommerce.Domain.Users.Interfaces;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
@@ -11,20 +10,17 @@ public class CreateCustomerCommandHandler : ICommandHandler<CreateCustomerComman
 {
     private readonly ICustomerRepository _customerRepository;
     private readonly IUnitOfWork _unitOfWork;
-    private readonly CustomerMapper _mapper;
     private readonly ITenantContext _tenantContext;
     private readonly ITokenService _tokenService;
 
     public CreateCustomerCommandHandler(
         ICustomerRepository customerRepository,
         IUnitOfWork unitOfWork,
-        CustomerMapper mapper,
         ITenantContext tenantContext,
         ITokenService tokenService)
     {
         _customerRepository = customerRepository;
         _unitOfWork = unitOfWork;
-        _mapper = mapper;
         _tenantContext = tenantContext;
         _tokenService = tokenService;
     }
@@ -59,7 +55,7 @@ public class CreateCustomerCommandHandler : ICommandHandler<CreateCustomerComman
             Id = customer.Id,
             Email = customer.Email.Value,
             Name = customer.Name,
-            Token = _tokenService.CreateToken(customer)
+            Token = _tokenService.CreateSessionToken(customer)
         };
     }
 }

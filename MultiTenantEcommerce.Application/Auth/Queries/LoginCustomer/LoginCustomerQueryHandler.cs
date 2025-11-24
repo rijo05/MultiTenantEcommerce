@@ -29,7 +29,7 @@ public class LoginCustomerQueryHandler : IQueryHandler<LoginCustomerQuery, AuthC
             Email = request.Email,
             Id = customer.Id,
             Name = customer.Name,
-            Token = _tokenService.CreateToken(customer)
+            Token = _tokenService.CreateSessionToken(customer)
         };
     }
 }

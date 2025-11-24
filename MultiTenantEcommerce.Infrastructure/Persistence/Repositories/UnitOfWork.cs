@@ -1,5 +1,4 @@
-﻿using MediatR;
-using MultiTenantEcommerce.Application.Common.Exceptions;
+﻿using MultiTenantEcommerce.Application.Common.Exceptions;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Infrastructure.Outbox;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;

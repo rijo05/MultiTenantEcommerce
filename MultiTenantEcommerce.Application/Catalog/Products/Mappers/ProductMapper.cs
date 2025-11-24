@@ -1,6 +1,7 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Categories.Mappers;
-using MultiTenantEcommerce.Application.Catalog.Products.DTOs;
+using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
 using MultiTenantEcommerce.Application.Common.Helpers.Services;
+using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Application.Inventory.Mappers;
 using MultiTenantEcommerce.Domain.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Inventory.Entities;
@@ -12,14 +13,17 @@ public class ProductMapper
     private readonly HateoasLinkService _hateoasLinkService;
     private readonly StockMapper _stockMapper;
     private readonly CategoryMapper _categoryMapper;
+    private readonly IFileStorageService _fileStorageService;
 
     public ProductMapper(HateoasLinkService hateoasLinkService,
         StockMapper stockMapper,
-        CategoryMapper categoryMapper)
+        CategoryMapper categoryMapper,
+        IFileStorageService fileStorageService)
     {
         _hateoasLinkService = hateoasLinkService;
         _stockMapper = stockMapper;
         _categoryMapper = categoryMapper;
+        _fileStorageService = fileStorageService;
     }
 
     public ProductResponseDTO ToProductResponseDTO(Product product, Stock stock)
@@ -32,7 +36,8 @@ public class ProductMapper
             Price = product.Price.Value,
             CategoryId = product.CategoryId,
             Category = _categoryMapper.ToCategoryResponseDTO(product.Category),
-            Stock = _stockMapper.ToStockResponseDTO(stock)
+            Stock = _stockMapper.ToStockResponseDTO(stock),  
+            Images = _fileStorageService.GetImageUrl(product.Images.Select(x => x.Key).ToList())
         };
     }
 
@@ -66,7 +71,8 @@ public class ProductMapper
             CreatedAt = product.CreatedAt,
             UpdatedAt = product.UpdatedAt,
             IsActive = product.IsActive,
-            Stock = _stockMapper.ToStockResponseAdminDTO(stock)
+            Stock = _stockMapper.ToStockResponseAdminDTO(stock),
+            ImageLinks = _fileStorageService.GetImageUrl(product.Images.Select(x => x.Key).ToList())
         };
     }
 

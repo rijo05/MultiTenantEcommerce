@@ -1,4 +1,4 @@
-﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs;
+﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Domain.Enums;
 

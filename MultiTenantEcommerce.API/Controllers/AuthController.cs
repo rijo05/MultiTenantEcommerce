@@ -63,8 +63,4 @@ public class AuthController : ControllerBase
 
         return Ok(result);
     }
-
-    [HttpGet("test")]
-    [Authorize]
-    public IActionResult Test() => Ok("ok");
 }

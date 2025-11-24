@@ -1,4 +1,4 @@
-﻿using MultiTenantEcommerce.Application.Common.Helpers;
+﻿using MultiTenantEcommerce.Application.Common.Helpers.Services;
 using MultiTenantEcommerce.Application.Tenants.DTOs.Tenant;
 using MultiTenantEcommerce.Domain.Tenants.Entities;
 
@@ -19,7 +19,6 @@ public class TenantMapper
         {
             CompanyName = tenant.Name,
             CreatedAt = tenant.CreatedAt,
-            TenantId = tenant.Id,
             UpdatedAt = tenant.UpdatedAt
         };
     }
