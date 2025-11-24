@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MultiTenantEcommerce.Domain.Payment.Entities;
 using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
+using MultiTenantEcommerce.Domain.Shipping.Entities;
 using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Domain.Users.Entities;
 
@@ -26,6 +27,11 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         builder.HasOne(o => o.OrderPayment)
                 .WithOne()
                 .HasForeignKey<OrderPayment>(p => new { p.TenantId, p.OrderId })
+                .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne(o => o.Shipment)
+                .WithOne()
+                .HasForeignKey<Shipment>(p => new { p.TenantId, p.OrderId })
                 .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(o => o.Items)

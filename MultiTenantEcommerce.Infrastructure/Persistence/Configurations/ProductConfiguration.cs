@@ -10,7 +10,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
     {
         builder.HasKey(x => new { x.TenantId, x.Id });
 
-
         builder.HasOne<Tenant>()
                 .WithMany()
                 .HasForeignKey(x => x.TenantId)
@@ -27,6 +26,11 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 .HasColumnName("Price")
                 .IsRequired();
         });
+
+        builder.HasMany(x => x.Images)
+            .WithOne()
+            .HasForeignKey(x => new { x.TenantId, x.ProductId })
+            .OnDelete(DeleteBehavior.Restrict);
 
 
         //builder.HasIndex(p => p.TenantId)

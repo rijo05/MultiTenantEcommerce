@@ -7,6 +7,6 @@ public class ProcessedEventsConfiguration : IEntityTypeConfiguration<ProcessedEv
 {
     public void Configure(EntityTypeBuilder<ProcessedEvent> builder)
     {
-        builder.HasKey(e => new { e.EventId , e.HandlerName});
+        builder.HasKey(e => new { e.EventId, e.HandlerName });
     }
 }
