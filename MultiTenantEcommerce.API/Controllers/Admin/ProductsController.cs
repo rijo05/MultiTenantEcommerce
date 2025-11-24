@@ -2,12 +2,17 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Authorization;
+using MultiTenantEcommerce.Application.Catalog.Products.Commands.AddImages;
 using MultiTenantEcommerce.Application.Catalog.Products.Commands.Create;
 using MultiTenantEcommerce.Application.Catalog.Products.Commands.Delete;
+using MultiTenantEcommerce.Application.Catalog.Products.Commands.DeleteImage;
 using MultiTenantEcommerce.Application.Catalog.Products.Commands.Update;
-using MultiTenantEcommerce.Application.Catalog.Products.DTOs;
+using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
+using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
 using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetById;
 using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetFiltered;
+using MultiTenantEcommerce.Application.Common.DTOs;
+using MultiTenantEcommerce.Application.Common.Interfaces.Services;
 
 namespace MultiTenantEcommerce.API.Controllers.Admin;
 
@@ -72,6 +77,17 @@ public class ProductsController : ControllerBase
             );
     }
 
+    [HasPermission("create.product")]
+    [HttpPost("add-image/{productId:guid}")]
+    public async Task<ActionResult<List<PresignedUpload>>> AddImage(Guid productId, [FromBody] List<ProductImageMetadataDTO> metadataDTO)
+    {
+        var command = new AddProductImagesCommand(productId, metadataDTO);
+
+        var uploads = await _mediator.Send(command);
+
+        return uploads;
+    }
+
     [HasPermission("update.product")]
     [HttpPatch("{id:guid}")]
     public async Task<ActionResult<ProductResponseWithoutStockAdminDTO>> Update(Guid id, [FromBody] UpdateProductDTO productDTO)
@@ -95,6 +111,16 @@ public class ProductsController : ControllerBase
     public async Task<IActionResult> Delete(Guid id)
     {
         var command = new DeleteProductCommand(id);
+        await _mediator.Send(command);
+        return NoContent();
+    }
+
+
+    [HasPermission("delete.product")]
+    [HttpDelete("image/{id:guid}/{key}")]
+    public async Task<IActionResult> Delete(Guid id, string key)
+    {
+        var command = new DeleteProductImageCommand(id, key);
         await _mediator.Send(command);
         return NoContent();
     }
