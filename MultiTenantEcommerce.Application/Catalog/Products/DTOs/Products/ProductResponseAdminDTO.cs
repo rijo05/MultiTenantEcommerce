@@ -1,7 +1,8 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Categories.DTOs;
 using MultiTenantEcommerce.Application.Inventory.DTOs;
+using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
 
-namespace MultiTenantEcommerce.Application.Catalog.Products.DTOs;
+namespace MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
 public class ProductResponseAdminDTO : IProductDTO
 {
     public Guid Id { get; set; }
@@ -14,4 +15,5 @@ public class ProductResponseAdminDTO : IProductDTO
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public StockResponseAdminDTO Stock { get; set; }
+    public List<IProductImageDTO> Images { get; set; }
 }

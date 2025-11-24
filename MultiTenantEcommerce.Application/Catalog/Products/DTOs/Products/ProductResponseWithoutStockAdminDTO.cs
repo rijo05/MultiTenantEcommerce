@@ -1,6 +1,7 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Categories.DTOs;
+using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
 
-namespace MultiTenantEcommerce.Application.Catalog.Products.DTOs;
+namespace MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
 public class ProductResponseWithoutStockAdminDTO
 {
     public Guid Id { get; init; }
@@ -12,4 +13,5 @@ public class ProductResponseWithoutStockAdminDTO
     public bool IsActive { get; init; }
     public DateTime CreatedAt { get; init; }
     public DateTime UpdatedAt { get; init; }
+    public List<IProductImageDTO> Images { get; set; }
 }

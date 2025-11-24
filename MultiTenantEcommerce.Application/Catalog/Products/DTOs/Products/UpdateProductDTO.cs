@@ -1,4 +1,4 @@
-﻿namespace MultiTenantEcommerce.Application.Catalog.Products.DTOs;
+﻿namespace MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
 public record UpdateProductDTO(
     string? Name,
     string? Description,
