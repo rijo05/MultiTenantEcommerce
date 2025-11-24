@@ -6,9 +6,7 @@ namespace MultiTenantEcommerce.Domain.Sales.Orders.Interfaces;
 
 public interface IOrderRepository : IRepository<Order>
 {
-    public Task<Order?> GetByIdWithItemsAsync(Guid orderId);
-
-    public Task<List<Order>> GetByCustomerIdWithItems(
+    public Task<List<Order>> GetByCustomerIdAllIncluded(
         Guid customerId,
         int page = 1,
         int pageSize = 20,

@@ -7,7 +7,6 @@ namespace MultiTenantEcommerce.Domain.Catalog.Interfaces;
 public interface IProductRepository : IRepository<Product>
 {
     public Task<bool> HasProductsInCategoryAsync(Guid categoryId);
-    public Task<Product?> GetByIdWithCategoryAsync(Guid productId);
     public Task<IEnumerable<Product>> GetFilteredAsync(
         Guid? categoryId = null,
         string? name = null,

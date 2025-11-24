@@ -5,7 +5,7 @@ using MultiTenantEcommerce.Domain.Tenants.Entities;
 namespace MultiTenantEcommerce.Domain.Tenants.Interfaces;
 public interface ITenantRepository : IRepository<Tenant>
 {
-    public Task<Tenant?> GetByCompanyName(string companyName);
+    public Task<Tenant?> GetByCompanyNameAllIncluded(string companyName);
 
     public Task<List<Tenant>> GetFilteredAsync(
         string? companyName,
