@@ -27,7 +27,7 @@ public class EmailQueueRepository : IEmailQueueRepository
         await _appDbContext.EmailQueue.AddAsync(email);
     }
 
-    public async Task<List<EmailJobDataDTO>> GetBatchUnprocessedEmailsAsync(EventPriority priority ,int batchSize)
+    public async Task<List<EmailJobDataDTO>> GetBatchUnprocessedEmailsAsync(EventPriority priority, int batchSize)
     {
         using var transaction = await _appDbContext.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
 

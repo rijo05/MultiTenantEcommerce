@@ -9,7 +9,7 @@ public class EmailQueue
     public string ToEmail { get; private set; }
     public string FromEmail { get; private set; } = "myplatform@noreply.com";
     public string FromName { get; private set; }
-    public string ReplyToEmail { get; set; } 
+    public string ReplyToEmail { get; set; }
 
     public string? Subject { get; private set; }
     public string? Body { get; private set; }

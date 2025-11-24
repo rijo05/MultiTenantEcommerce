@@ -3,10 +3,10 @@ public enum EmailTemplateNames
 {
     LowStock,
     OutOfStock,
-    OrderDelivered,
+    ShipmentDelivered,
+    ShipmentShipped,
     OrderPaid,
     OrderPaymentFailed,
-    OrderShipped,
     CustomerRegistered,
     EmployeeRegistered
 }

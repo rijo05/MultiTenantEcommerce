@@ -2,12 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using MultiTenantEcommerce.Domain.Templates.Entities;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Seed;
 public static class EmailTemplateSeeder
@@ -27,7 +22,7 @@ public static class EmailTemplateSeeder
             var titleMatch = Regex.Match(html, @"<title>(.*?)</title>", RegexOptions.IgnoreCase);
             var subject = titleMatch.Success ? titleMatch.Groups[1].Value.Trim() : templateName;
 
-            var existingTemplate = await _appDbContext.EmailTemplates.FirstOrDefaultAsync(x => x.TemplateName ==  templateName);
+            var existingTemplate = await _appDbContext.EmailTemplates.FirstOrDefaultAsync(x => x.TemplateName == templateName);
 
             if (existingTemplate is not null)
             {

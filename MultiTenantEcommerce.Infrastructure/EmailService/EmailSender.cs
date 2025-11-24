@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using MimeKit;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
-using System.Runtime.CompilerServices;
 
 namespace MultiTenantEcommerce.Infrastructure.EmailService;
 public class EmailSender : IEmailSender

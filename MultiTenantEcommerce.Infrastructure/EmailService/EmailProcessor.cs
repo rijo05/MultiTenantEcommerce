@@ -2,11 +2,12 @@
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Templates.Entities;
+using MultiTenantEcommerce.Infrastructure.Workers;
 using Polly;
 using Polly.Retry;
 
 namespace MultiTenantEcommerce.Infrastructure.EmailService;
-public class EmailProcessor
+public class EmailProcessor : IPriorityProcessor
 {
     private readonly IEmailQueueRepository _emailQueueRepository;
     private readonly IEmailTemplateRepository _emailTemplateRepository;
@@ -31,7 +32,7 @@ public class EmailProcessor
 
     public async Task ExecuteAsync(EventPriority priority)
     {
-        var emails = await _emailQueueRepository.GetBatchUnprocessedEmailsAsync(priority ,BATCH_SIZE);
+        var emails = await _emailQueueRepository.GetBatchUnprocessedEmailsAsync(priority, BATCH_SIZE);
 
         using var scope = _sp.CreateScope();
         var sender = scope.ServiceProvider.GetRequiredService<IEmailSender>();

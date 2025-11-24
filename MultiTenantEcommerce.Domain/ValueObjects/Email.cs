@@ -17,7 +17,7 @@ public class Email
     {
         ValidateEmail(email);
         VerifySameEmail(email);
-        Value = email; 
+        Value = email;
     }
 
     private void ValidateEmail(string email)
