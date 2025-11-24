@@ -1,12 +1,14 @@
 ﻿using MultiTenantEcommerce.Application.Payment.OrderPayment.DTOs;
 using MultiTenantEcommerce.Application.Payment.OrderPayment.Interfaces;
+using MultiTenantEcommerce.Application.Shipping.DTOs;
+using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
 using Stripe;
 using Stripe.Checkout;
 
 namespace MultiTenantEcommerce.Infrastructure.Payments;
 public class StripePaymentProvider : IPaymentProvider
 {
-    public async Task<PaymentResultDTO> CreatePaymentAsync(Guid PaymentId, Domain.Sales.Orders.Entities.Order order, string tenantPaymentProviderAccountId)
+    public async Task<PaymentResultDTO> CreatePaymentAsync(Guid PaymentId, Order order, ShippingQuoteDTO shipping, string tenantPaymentProviderAccountId)
     {
         var domain = "http://localhost:4242";
 
@@ -30,18 +32,18 @@ public class StripePaymentProvider : IPaymentProvider
             {
                 ShippingRateData = new SessionShippingOptionShippingRateDataOptions
                 {
-                    DisplayName = "CTT",
+                    DisplayName = shipping.Carrier.ToString(),
                     FixedAmount = new SessionShippingOptionShippingRateDataFixedAmountOptions
                     {
-                        Amount = 299, // 2.99€
+                        Amount = (long)shipping.Price * 100,
                         Currency = "eur"
                     },
                     DeliveryEstimate = new SessionShippingOptionShippingRateDataDeliveryEstimateOptions
                     {
                         Minimum = new SessionShippingOptionShippingRateDataDeliveryEstimateMinimumOptions
-                        { Unit = "day", Value = 2 },
+                        { Unit = "day", Value = (long)shipping.MinTransit.TotalDays },
                         Maximum = new SessionShippingOptionShippingRateDataDeliveryEstimateMaximumOptions
-                        { Unit = "day", Value = 7 }
+                        { Unit = "day", Value = (long)shipping.MaxTransit.TotalDays }
                     }
                 }
             }
