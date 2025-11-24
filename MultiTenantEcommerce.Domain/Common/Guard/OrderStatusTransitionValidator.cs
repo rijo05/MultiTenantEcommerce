@@ -7,10 +7,7 @@ public static class OrderStatusTransitionValidator
     private static readonly Dictionary<OrderStatus, List<OrderStatus>> AllowedTransitions = new()
     {
         {OrderStatus.PendingPayment, new List<OrderStatus>() {OrderStatus.Cancelled, OrderStatus.Processing, OrderStatus.Failed } },
-        {OrderStatus.Processing, new List<OrderStatus>() {OrderStatus.Cancelled, OrderStatus.Shipped } },
-        {OrderStatus.Shipped, new List<OrderStatus>() {OrderStatus.Delivered } },
-        {OrderStatus.Delivered, new List<OrderStatus>() {OrderStatus.Invoiced } },
-        {OrderStatus.Invoiced, new List<OrderStatus>() },
+        {OrderStatus.Processing, new List<OrderStatus>() {OrderStatus.Cancelled, OrderStatus.Completed } },
         {OrderStatus.Cancelled, new List<OrderStatus>() },
         {OrderStatus.Failed, new List<OrderStatus>() }
     };
