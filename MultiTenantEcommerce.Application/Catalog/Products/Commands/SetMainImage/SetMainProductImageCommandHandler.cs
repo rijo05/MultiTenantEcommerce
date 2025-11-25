@@ -1,4 +1,5 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs;
+using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
 using MultiTenantEcommerce.Application.Catalog.Products.Mappers;
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
@@ -12,12 +13,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.Commands.SetMainImage;
-public class SetMainProductImageCommandHandler : ICommandHandler<SetMainProductImageCommand, Product>
+public class SetMainProductImageCommandHandler : ICommandHandler<SetMainProductImageCommand, ProductResponseWithoutStockAdminDTO>
 {
     private readonly IProductRepository _productRepository;
     private readonly ProductMapper _productMapper;
     private readonly IFileStorageService _fileStorageService;
-    public async Task<Product> Handle(SetMainProductImageCommand request, CancellationToken cancellationToken)
+    public async Task<ProductResponseWithoutStockAdminDTO> Handle(SetMainProductImageCommand request, CancellationToken cancellationToken)
     {
         var product = await _productRepository.GetByIdIncluding(request.ProductId, x => x.Images)
             ?? throw new Exception("Product doesnt exist");
@@ -27,6 +28,6 @@ public class SetMainProductImageCommandHandler : ICommandHandler<SetMainProductI
 
         product.MarkAsMain(request.Key);
 
-        return _productMapper.ToProductResponseDTO(product);
+        return _productMapper.ToProductResponseWithoutStockDTO(product);
     }
 }

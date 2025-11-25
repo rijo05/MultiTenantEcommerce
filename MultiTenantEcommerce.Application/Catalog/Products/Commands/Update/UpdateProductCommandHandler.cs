@@ -26,7 +26,7 @@ public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand,
 
     public async Task<ProductResponseWithoutStockAdminDTO> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetByIdAsync(request.ProductId)
+        var product = await _productRepository.GetByIdIncluding(request.ProductId, x => x.Images)
             ?? throw new Exception("Product doesnt exist.");
 
         Category? category = null;
