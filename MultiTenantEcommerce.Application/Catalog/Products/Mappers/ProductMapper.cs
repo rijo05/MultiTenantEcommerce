@@ -1,4 +1,5 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Categories.Mappers;
+using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
 using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
 using MultiTenantEcommerce.Application.Common.Helpers.Services;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
@@ -14,16 +15,19 @@ public class ProductMapper
     private readonly StockMapper _stockMapper;
     private readonly CategoryMapper _categoryMapper;
     private readonly IFileStorageService _fileStorageService;
+    private readonly ImageMapper _imageMapper;
 
     public ProductMapper(HateoasLinkService hateoasLinkService,
         StockMapper stockMapper,
         CategoryMapper categoryMapper,
-        IFileStorageService fileStorageService)
+        IFileStorageService fileStorageService,
+        ImageMapper imageMapper)
     {
         _hateoasLinkService = hateoasLinkService;
         _stockMapper = stockMapper;
         _categoryMapper = categoryMapper;
         _fileStorageService = fileStorageService;
+        _imageMapper = imageMapper;
     }
 
     public ProductResponseDTO ToProductResponseDTO(Product product, Stock stock)
@@ -37,7 +41,7 @@ public class ProductMapper
             CategoryId = product.CategoryId,
             Category = _categoryMapper.ToCategoryResponseDTO(product.Category),
             Stock = _stockMapper.ToStockResponseDTO(stock),  
-            Images = _fileStorageService.GetImageUrl(product.Images.Select(x => x.Key).ToList())
+            Images = _imageMapper.ToProductResponseDTO(product.Images.ToList()).Cast<IProductImageDTO>().ToList(),
         };
     }
 
@@ -56,8 +60,6 @@ public class ProductMapper
     }
 
 
-
-
     public ProductResponseAdminDTO ToProductResponseAdminDTO(Product product, Stock stock)
     {
         return new ProductResponseAdminDTO
@@ -72,7 +74,7 @@ public class ProductMapper
             UpdatedAt = product.UpdatedAt,
             IsActive = product.IsActive,
             Stock = _stockMapper.ToStockResponseAdminDTO(stock),
-            ImageLinks = _fileStorageService.GetImageUrl(product.Images.Select(x => x.Key).ToList())
+            Images = _imageMapper.ToProductResponseAdminDTO(product.Images.ToList()).Cast<IProductImageDTO>().ToList(),
         };
     }
 
@@ -104,6 +106,7 @@ public class ProductMapper
             CreatedAt = product.CreatedAt,
             UpdatedAt = product.UpdatedAt,
             IsActive = product.IsActive,
+            Images = _imageMapper.ToProductResponseAdminDTO(product.Images.ToList()).Cast<IProductImageDTO>().ToList(),
         };
     }
 
