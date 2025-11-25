@@ -7,7 +7,8 @@ using System.Threading.Tasks;
 namespace MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
 public class ProductImageResponse : IProductImageDTO
 {
-    public string Key { get; }
-    public string PresignUrl { get; }
-    public bool IsMain { get; }
+    public string Key { get; init; }
+    public string PresignUrl { get; init; }
+    public bool IsMain { get; init; }
+    public string ContentType { get; init; }
 }

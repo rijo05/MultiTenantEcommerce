@@ -15,3 +15,4 @@ public class ProductResponseDTO : IProductDTO
     public StockResponseDTO Stock { get; set; }
     public List<IProductImageDTO> Images { get; set; }
 }
+    

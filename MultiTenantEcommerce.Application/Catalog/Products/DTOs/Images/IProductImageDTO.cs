@@ -10,4 +10,5 @@ public interface IProductImageDTO
     string Key { get; }
     string PresignUrl { get; }
     bool IsMain { get; }
+    string ContentType { get; }
 }

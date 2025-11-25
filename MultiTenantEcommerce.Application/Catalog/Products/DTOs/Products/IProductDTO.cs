@@ -11,5 +11,4 @@ public interface IProductDTO
     decimal Price { get; }
     public Guid CategoryId { get; }
     public List<IProductImageDTO> Images { get; }
-
 }
