@@ -3,6 +3,7 @@ using Amazon.S3;
 using Amazon.S3.Model;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
+using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
 using MultiTenantEcommerce.Application.Common.DTOs;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Catalog.Entities;
@@ -63,11 +64,11 @@ public class FileStorageService : IFileStorageService
         return uploads;
     }
 
-    public string GetImageUrl(string key)
+    public ProductImageResponse GetImageUrl(ProductImages image)
     {
         var client = ConnectClient();
 
-        key = Uri.UnescapeDataString(key);
+        var key = Uri.UnescapeDataString(image.Key);
 
         var request = new GetPreSignedUrlRequest
         {
@@ -79,26 +80,38 @@ public class FileStorageService : IFileStorageService
 
         var presignedUrl = client.GetPreSignedURL(request);
 
-        return presignedUrl;
+        return new ProductImageResponse
+        {
+            Key = image.Key,
+            ContentType = image.ContentType,
+            IsMain = image.IsMain,
+            PresignUrl = presignedUrl
+        };
     }
 
-    public List<string> GetImageUrl(List<string> keys)
+    public List<ProductImageResponse> GetImageUrl(List<ProductImages> images)
     {
         var client = ConnectClient();
 
-        var list = new List<string>();
-        foreach (var item in keys)
+        var list = new List<ProductImageResponse>();
+        foreach (var item in images)
         {
             var request = new GetPreSignedUrlRequest
             {
                 BucketName = _bucketName,
-                Key = Uri.UnescapeDataString(item),
+                Key = Uri.UnescapeDataString(item.Key),
                 Verb = HttpVerb.GET,
                 Expires = DateTime.UtcNow.AddMinutes(10)
             };
             var presignedUrl = client.GetPreSignedURL(request);
 
-            list.Add(presignedUrl);
+            list.Add(new ProductImageResponse 
+            { 
+                Key = item.Key,
+                ContentType = item.ContentType,
+                IsMain = item.IsMain,
+                PresignUrl = presignedUrl
+            });
         }
 
         return list;
