@@ -1,4 +1,5 @@
-﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
+﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
+using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.Commands.Update;
@@ -8,4 +9,4 @@ public record UpdateProductCommand(
     string? Description,
     decimal? Price,
     bool? IsActive,
-    Guid? CategoryId) : ICommand<ProductResponseWithoutStockAdminDTO>;
+    Guid? CategoryId) : ICommand<ProductResponseAdminDTO>;

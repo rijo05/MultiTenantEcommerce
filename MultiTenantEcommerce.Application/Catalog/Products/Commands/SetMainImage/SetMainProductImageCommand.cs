@@ -12,4 +12,4 @@ using System.Windows.Input;
 namespace MultiTenantEcommerce.Application.Catalog.Products.Commands.SetMainImage;
 public record SetMainProductImageCommand(
     Guid ProductId,
-    string Key) : ICommand<ProductResponseWithoutStockAdminDTO>;
+    string Key) : ICommand<ProductResponseAdminDTO>;
