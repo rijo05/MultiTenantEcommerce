@@ -1,8 +1,10 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
 using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
 using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetById;
 using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetFiltered;
+using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetImage;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 
 namespace MultiTenantEcommerce.API.Controllers.Customer;
@@ -50,8 +52,12 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet("get-image/{productId:guid}/{key}")]
-    public async Task<ActionResult<string>> GetByImage(Guid productId, string key)
+    public async Task<ActionResult<ProductImageResponseDTO>> GetImage(Guid productId, string key)
     {
-        return _fileStorageService.GetImageUrl(key);
+        var query = new GetProductImageByKeyAndProductIdQuery(productId, key, false);
+
+        var image = await _mediator.Send(query);
+
+        return Ok(image);
     }
 }
