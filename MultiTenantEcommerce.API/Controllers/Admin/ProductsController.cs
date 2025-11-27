@@ -11,6 +11,7 @@ using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
 using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
 using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetById;
 using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetFiltered;
+using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetImage;
 using MultiTenantEcommerce.Application.Common.DTOs;
 using MultiTenantEcommerce.Application.Common.Interfaces.Services;
 
@@ -48,7 +49,7 @@ public class ProductsController : ControllerBase
 
         var products = await _mediator.Send(query);
 
-        return Ok(products.Cast<ProductResponseAdminDTO>());
+        return Ok(products.Cast<ProductResponseAdminDTO>().ToList());
     }
 
     [HasPermission("read.product")]
@@ -90,7 +91,7 @@ public class ProductsController : ControllerBase
 
     [HasPermission("update.product")]
     [HttpPatch("{id:guid}")]
-    public async Task<ActionResult<ProductResponseWithoutStockAdminDTO>> Update(Guid id, [FromBody] UpdateProductDTO productDTO)
+    public async Task<ActionResult<ProductResponseAdminDTO>> Update(Guid id, [FromBody] UpdateProductDTO productDTO)
     {
         if (productDTO is null)
             return BadRequest("Product data must be provided.");
@@ -118,10 +119,21 @@ public class ProductsController : ControllerBase
 
     [HasPermission("delete.product")]
     [HttpDelete("image/{id:guid}/{key}")]
-    public async Task<IActionResult> Delete(Guid id, string key)
+    public async Task<IActionResult> DeleteImage(Guid id, string key)
     {
         var command = new DeleteProductImageCommand(id, key);
         await _mediator.Send(command);
         return NoContent();
+    }
+
+    [HasPermission("read.product")]
+    [HttpGet("get-image/{productId:guid}/{key}")]
+    public async Task<ActionResult<ProductImageResponseAdminDTO>> GetImage(Guid productId, string key)
+    {
+        var query = new GetProductImageByKeyAndProductIdQuery(productId, key, true);
+
+        var image = await _mediator.Send(query);
+
+        return Ok(image);
     }
 }
