@@ -27,7 +27,7 @@ public class FileStorageService : IFileStorageService
 
     public async Task DeleteImageUrl(string key)
     {
-        var client = new AmazonS3Client();
+        var client = ConnectClient();
 
         var deleteRequest = new DeleteObjectRequest
         {
@@ -50,7 +50,7 @@ public class FileStorageService : IFileStorageService
             var request = new GetPreSignedUrlRequest
             {
                 BucketName = _bucketName,
-                Key = img.Key,
+                Key = Uri.UnescapeDataString(img.Key),
                 Verb = HttpVerb.PUT,
                 Expires = DateTime.UtcNow.AddMinutes(10),
                 ContentType = img.ContentType
@@ -64,57 +64,25 @@ public class FileStorageService : IFileStorageService
         return uploads;
     }
 
-    public ProductImageResponse GetImageUrl(ProductImages image)
+    public Dictionary<string, string> GetImageUrl(List<string> keys)
     {
         var client = ConnectClient();
 
-        var key = Uri.UnescapeDataString(image.Key);
+        var urls = new Dictionary<string, string>();
 
-        var request = new GetPreSignedUrlRequest
-        {
-            BucketName = _bucketName,
-            Key = key,
-            Verb = HttpVerb.GET,
-            Expires = DateTime.UtcNow.AddMinutes(10)
-        };
-
-        var presignedUrl = client.GetPreSignedURL(request);
-
-        return new ProductImageResponse
-        {
-            Key = image.Key,
-            ContentType = image.ContentType,
-            IsMain = image.IsMain,
-            PresignUrl = presignedUrl
-        };
-    }
-
-    public List<ProductImageResponse> GetImageUrl(List<ProductImages> images)
-    {
-        var client = ConnectClient();
-
-        var list = new List<ProductImageResponse>();
-        foreach (var item in images)
+        foreach (var item in keys)
         {
             var request = new GetPreSignedUrlRequest
             {
                 BucketName = _bucketName,
-                Key = Uri.UnescapeDataString(item.Key),
+                Key = Uri.UnescapeDataString(item),
                 Verb = HttpVerb.GET,
-                Expires = DateTime.UtcNow.AddMinutes(10)
+                Expires = DateTime.UtcNow.AddMinutes(60)
             };
-            var presignedUrl = client.GetPreSignedURL(request);
-
-            list.Add(new ProductImageResponse 
-            { 
-                Key = item.Key,
-                ContentType = item.ContentType,
-                IsMain = item.IsMain,
-                PresignUrl = presignedUrl
-            });
+            urls[item] = client.GetPreSignedURL(request);  
         }
 
-        return list;
+        return urls;
     }
 
     public async Task UploadAsync(string key, byte[] content, string contentType)
