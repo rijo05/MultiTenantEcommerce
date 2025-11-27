@@ -1,48 +1,52 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Catalog.Entities;
+using MultiTenantEcommerce.Domain.Enums;
 using System.Xml;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.Mappers;
 public class ImageMapper
 {
-    private readonly IFileStorageService _fileStorageService;
-
-    public ImageMapper(IFileStorageService fileStorageService)
+    public List<IProductImageDTO> ToProductImageResponseDTO(IEnumerable<ProductImages> productImages, Dictionary<string, string> signedUrls)
     {
-        _fileStorageService = fileStorageService;
-    }
+        var list = new List<IProductImageDTO>();
 
-    public List<ProductImageResponse> ToProductResponseDTO(List<ProductImages> productImages)
-    {
-        return _fileStorageService.GetImageUrl(productImages);
-    }
-
-    public List<ProductImageResponseAdminDTO> ToProductResponseAdminDTO(List<ProductImages> productImages)
-    {
-        var images = _fileStorageService.GetImageUrl(productImages);
-
-        List<ProductImageResponseAdminDTO> lista = new List<ProductImageResponseAdminDTO>();
-
-        var dt = images.ToDictionary(s => s.Key);
-
-        foreach (var image in productImages)
+        foreach (var img in productImages)
         {
-            var hasUrl = dt.TryGetValue(image.Key, out var urlDto);
+            if (img.Status != UploadStatus.Completed) continue;
 
-            lista.Add(new ProductImageResponseAdminDTO 
+            var url = signedUrls.TryGetValue(img.Key, out var signedUrl) ? signedUrl : null;
+
+            list.Add(new ProductImageResponseDTO
             {
-                PresignUrl = hasUrl ? urlDto.PresignUrl : null,
-
-                ContentType = image.ContentType,
-                Key = image.Key,
-                IsMain = image.IsMain,
-                FileName = image.FileName,
-                Size = image.Size,
-                Status = image.Status               
+                Key = img.Key,
+                PresignUrl = url,
+                IsMain = img.IsMain,
+                ContentType = img.ContentType
             });
         }
+        return list;
+    }
 
-        return lista;
+    public List<IProductImageDTO> ToProductImageResponseAdminDTO(IEnumerable<ProductImages> productImages, Dictionary<string, string> signedUrls)
+    {
+        var list = new List<IProductImageDTO>();
+
+        foreach (var img in productImages)
+        {
+            var url = signedUrls.TryGetValue(img.Key, out var signedUrl) ? signedUrl : null;
+
+            list.Add(new ProductImageResponseAdminDTO
+            {
+                Key = img.Key,
+                PresignUrl = url,
+                IsMain = img.IsMain,
+                ContentType = img.ContentType,
+                FileName = img.FileName,
+                Size = img.Size,
+                Status = img.Status
+            });
+        }
+        return list;
     }
 }

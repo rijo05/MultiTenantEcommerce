@@ -14,23 +14,20 @@ public class ProductMapper
     private readonly HateoasLinkService _hateoasLinkService;
     private readonly StockMapper _stockMapper;
     private readonly CategoryMapper _categoryMapper;
-    private readonly IFileStorageService _fileStorageService;
     private readonly ImageMapper _imageMapper;
 
     public ProductMapper(HateoasLinkService hateoasLinkService,
         StockMapper stockMapper,
         CategoryMapper categoryMapper,
-        IFileStorageService fileStorageService,
         ImageMapper imageMapper)
     {
         _hateoasLinkService = hateoasLinkService;
         _stockMapper = stockMapper;
         _categoryMapper = categoryMapper;
-        _fileStorageService = fileStorageService;
         _imageMapper = imageMapper;
     }
 
-    public ProductResponseDTO ToProductResponseDTO(Product product, Stock stock)
+    public ProductResponseDTO ToProductResponseDTO(Product product, Stock stock, Dictionary<string, string> signedUrls)
     {
         return new ProductResponseDTO
         {
@@ -41,11 +38,11 @@ public class ProductMapper
             CategoryId = product.CategoryId,
             Category = _categoryMapper.ToCategoryResponseDTO(product.Category),
             Stock = _stockMapper.ToStockResponseDTO(stock),  
-            Images = _imageMapper.ToProductResponseDTO(product.Images.ToList()).Cast<IProductImageDTO>().ToList(),
+            Images = _imageMapper.ToProductImageResponseDTO(product.Images, signedUrls)
         };
     }
 
-    public List<ProductResponseDTO> ToProductResponseDTOList(IEnumerable<Product> products, IEnumerable<Stock> stocks)
+    public List<ProductResponseDTO> ToProductResponseDTOList(IEnumerable<Product> products, IEnumerable<Stock> stocks, Dictionary<string, string> signedUrls)
     {
         var stockDict = stocks.ToDictionary(s => s.ProductId);
 
@@ -55,12 +52,12 @@ public class ProductMapper
             if (stock == null)
                 throw new Exception($"Stock not found for product {p.Id}");
 
-            return ToProductResponseDTO(p, stock);
+            return ToProductResponseDTO(p, stock, signedUrls);
         }).ToList();
     }
 
 
-    public ProductResponseAdminDTO ToProductResponseAdminDTO(Product product, Stock stock)
+    public ProductResponseAdminDTO ToProductResponseAdminDTO(Product product, Stock stock, Dictionary<string, string> signedUrls)
     {
         return new ProductResponseAdminDTO
         {
@@ -74,11 +71,11 @@ public class ProductMapper
             UpdatedAt = product.UpdatedAt,
             IsActive = product.IsActive,
             Stock = _stockMapper.ToStockResponseAdminDTO(stock),
-            Images = _imageMapper.ToProductResponseAdminDTO(product.Images.ToList()).Cast<IProductImageDTO>().ToList(),
+            Images = _imageMapper.ToProductImageResponseAdminDTO(product.Images, signedUrls)
         };
     }
 
-    public List<ProductResponseAdminDTO> ToProductResponseAdminDTOList(IEnumerable<Product> products, IEnumerable<Stock> stocks)
+    public List<ProductResponseAdminDTO> ToProductResponseAdminDTOList(IEnumerable<Product> products, IEnumerable<Stock> stocks, Dictionary<string, string> signedUrls)
     {
         var stockDict = stocks.ToDictionary(s => s.ProductId);
 
@@ -88,33 +85,9 @@ public class ProductMapper
             if (stock == null)
                 throw new Exception($"Stock not found for product {p.Id}");
 
-            return ToProductResponseAdminDTO(p, stock);
+            return ToProductResponseAdminDTO(p, stock, signedUrls);
         }).ToList();
     }
-
-
-    public ProductResponseWithoutStockAdminDTO ToProductResponseWithoutStockDTO(Product product)
-    {
-        return new ProductResponseWithoutStockAdminDTO
-        {
-            Id = product.Id,
-            Name = product.Name,
-            Description = product.Description,
-            Price = product.Price.Value,
-            CategoryId = product.CategoryId,
-            Category = _categoryMapper.ToCategoryResponseAdminDTO(product.Category),
-            CreatedAt = product.CreatedAt,
-            UpdatedAt = product.UpdatedAt,
-            IsActive = product.IsActive,
-            Images = _imageMapper.ToProductResponseAdminDTO(product.Images.ToList()).Cast<IProductImageDTO>().ToList(),
-        };
-    }
-
-    public List<ProductResponseWithoutStockAdminDTO> ToProductResponseWithoutStockDTOList(IEnumerable<Product> products)
-    {
-        return products.Select(x => ToProductResponseWithoutStockDTO(x)).ToList();
-    }
-
 
     //private Dictionary<string, object> GenerateLinks(Product product)
     //{

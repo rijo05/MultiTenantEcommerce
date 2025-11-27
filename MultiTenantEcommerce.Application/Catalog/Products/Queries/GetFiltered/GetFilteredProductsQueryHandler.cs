@@ -1,6 +1,8 @@
 ﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
 using MultiTenantEcommerce.Application.Catalog.Products.Mappers;
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
+using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
+using MultiTenantEcommerce.Domain.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
 using MultiTenantEcommerce.Domain.Inventory.Interfaces;
 
@@ -11,16 +13,19 @@ public class GetFilteredProductsQueryHandler : IQueryHandler<GetFilteredProducts
     private readonly ICategoryRepository _categoryRepository;
     private readonly IStockRepository _stockRepository;
     private readonly ProductMapper _productMapper;
+    private readonly IFileStorageService _fileStorageService;
 
     public GetFilteredProductsQueryHandler(IProductRepository productRepository,
         ICategoryRepository categoryRepository,
         IStockRepository stockRepository,
-        ProductMapper productMapper)
+        ProductMapper productMapper,
+        IFileStorageService fileStorageService)
     {
         _productRepository = productRepository;
         _categoryRepository = categoryRepository;
         _stockRepository = stockRepository;
         _productMapper = productMapper;
+        _fileStorageService = fileStorageService;
     }
 
     public async Task<List<IProductDTO>> Handle(GetFilteredProductsQuery request, CancellationToken cancellationToken)
@@ -48,8 +53,12 @@ public class GetFilteredProductsQueryHandler : IQueryHandler<GetFilteredProducts
 
         var stocks = await _stockRepository.GetBulkByIdsAsync(products.Select(x => x.Id).ToList());
 
+        var imagesKeys = products.SelectMany(x => x.Images).Select(x => x.Key).ToList();
+
+        var signedUrls = _fileStorageService.GetImageUrl(imagesKeys);
+
         return request.IsAdmin
-            ? _productMapper.ToProductResponseAdminDTOList(products, stocks).Cast<IProductDTO>().ToList()
-            : _productMapper.ToProductResponseDTOList(products, stocks).Cast<IProductDTO>().ToList();
+            ? _productMapper.ToProductResponseAdminDTOList(products, stocks, signedUrls).Cast<IProductDTO>().ToList()
+            : _productMapper.ToProductResponseDTOList(products, stocks, signedUrls).Cast<IProductDTO>().ToList();
     }
 }

@@ -58,7 +58,9 @@ public class CreateProductCommandHandler : ICommandHandler<CreateProductCommand,
         await _productRepository.AddAsync(product);
         await _stockRepository.AddAsync(stock);
 
+        var emptyImages = new Dictionary<string, string>();
+
         await _unitOfWork.CommitAsync();
-        return _productMapper.ToProductResponseAdminDTO(product, stock);
+        return _productMapper.ToProductResponseAdminDTO(product, stock, emptyImages);
     }
 }
