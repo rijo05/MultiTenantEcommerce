@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
-public class ProductImageResponse : IProductImageDTO
+public class ProductImageResponseDTO : IProductImageDTO
 {
     public string Key { get; init; }
     public string PresignUrl { get; init; }
