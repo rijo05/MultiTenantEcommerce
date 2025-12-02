@@ -20,6 +20,6 @@ public class GetPermissionByActionQueryHandler : IQueryHandler<GetPermissionByAc
     {
         var permissions = await _permissionRepository.GetByAction(request.Action);
 
-        return _rolesMapper.ToPermissionResponseDTOList(permissions);
+        return _rolesMapper.ToPermissionList(permissions);
     }
 }

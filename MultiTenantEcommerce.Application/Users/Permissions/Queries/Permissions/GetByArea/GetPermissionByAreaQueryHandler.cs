@@ -20,6 +20,6 @@ public class GetPermissionByAreaQueryHandler : IQueryHandler<GetPermissionByArea
     {
         var permissions = await _permissionRepository.GetByArea(request.Area);
 
-        return _rolesMapper.ToPermissionResponseDTOList(permissions);
+        return _rolesMapper.ToPermissionList(permissions);
     }
 }
