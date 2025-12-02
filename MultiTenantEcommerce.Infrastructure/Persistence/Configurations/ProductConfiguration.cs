@@ -15,11 +15,6 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
                 .HasForeignKey(x => x.TenantId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(p => p.Category)
-               .WithMany()
-               .HasForeignKey(p => new { p.TenantId, p.CategoryId })
-               .OnDelete(DeleteBehavior.Restrict);
-
         builder.OwnsOne(u => u.Price, price =>
         {
             price.Property(e => e.Value)

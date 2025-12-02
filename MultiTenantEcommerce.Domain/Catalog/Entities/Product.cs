@@ -10,7 +10,6 @@ public class Product : TenantBase
     public Money Price { get; private set; }
     public bool IsActive { get; private set; }
     public Guid CategoryId { get; private set; }
-    public Category Category { get; private set; }
 
     private List<ProductImages> _images = new List<ProductImages>();
     public IReadOnlyCollection<ProductImages> Images => _images.AsReadOnly();
@@ -32,7 +31,6 @@ public class Product : TenantBase
         Price = price;
         IsActive = isActive ?? true;
         CategoryId = category.Id;
-        Category = category;
     }
 
     #region UPDATE DATA
@@ -41,11 +39,10 @@ public class Product : TenantBase
     string? Description,
     decimal? Price,
     bool? IsActive,
-    Guid? CategoryId,
-    Category? category)
+    Guid? CategoryId)
     {
         if (CategoryId.HasValue)
-            UpdateCategory(CategoryId.Value, category);
+            UpdateCategory(CategoryId.Value);
 
 
         if (!string.IsNullOrEmpty(Name))
@@ -86,11 +83,10 @@ public class Product : TenantBase
         SetUpdatedAt();
     }
 
-    public void UpdateCategory(Guid newCategoryId, Category category)
+    public void UpdateCategory(Guid newCategoryId)
     {
         GuardCommon.AgainstEmptyGuid(newCategoryId, nameof(newCategoryId));
         CategoryId = newCategoryId;
-        Category = category;
         SetUpdatedAt();
     }
 
@@ -123,9 +119,9 @@ public class Product : TenantBase
         return newImage;
     }
 
-    public void DeleteImage(string key)
+    public void DeleteImage(Guid id)
     {
-        var image = _images.FirstOrDefault(x => x.Key == key)!;
+        var image = _images.FirstOrDefault(x => x.Id == id)!;
 
         _images.Remove(image);
 
@@ -133,9 +129,9 @@ public class Product : TenantBase
             _images[0].MarkAsMain();
     }
 
-    public void MarkAsMain(string key)
+    public void MarkAsMain(Guid id)
     {
-        var image = _images.FirstOrDefault(x => x.Key == key)!;
+        var image = _images.FirstOrDefault(x => x.Id == id)!;
 
         image.MarkAsMain();
     }

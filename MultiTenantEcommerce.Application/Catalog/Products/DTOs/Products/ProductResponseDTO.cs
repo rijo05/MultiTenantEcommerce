@@ -11,8 +11,11 @@ public class ProductResponseDTO : IProductDTO
     public string? Description { get; set; }
     public decimal Price { get; set; }
     public Guid CategoryId { get; set; }
-    public CategoryResponseDTO Category { get; set; }
+    public ICategoryDTO Category { get; set; }
     public StockResponseDTO Stock { get; set; }
-    public List<IProductImageDTO> Images { get; set; }
+    public List<ProductImageResponseDTO> Images { get; set; }
+
+    IStockDTO IProductDTO.Stock => Stock;
+    List<IProductImageDTO> IProductDTO.Images
+    => Images.Cast<IProductImageDTO>().ToList();
 }
-    
