@@ -17,7 +17,8 @@ public class StockController : ControllerBase
     }
 
     [HttpGet("{productId:guid}")]
-    public async Task<ActionResult<StockResponseDTO>> GetStockByProductId(Guid productId)
+    [ProducesResponseType(typeof(StockResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IStockDTO>> GetStockByProductId(Guid productId)
     {
         var query = new GetStockByProductIdQuery(productId, false);
 

@@ -13,7 +13,6 @@ using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetById;
 using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetFiltered;
 using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetImage;
 using MultiTenantEcommerce.Application.Common.DTOs;
-using MultiTenantEcommerce.Application.Common.Interfaces.Services;
 
 namespace MultiTenantEcommerce.API.Controllers.Admin;
 
@@ -31,9 +30,13 @@ public class ProductsController : ControllerBase
         _mediator = mediator;
     }
 
+
+    #region PRODUCT
+
     [HasPermission("read.product")]
     [HttpGet]
-    public async Task<ActionResult<List<ProductResponseAdminDTO>>> GetProducts([FromQuery] ProductFilterAdminDTO productFilter)
+    [ProducesResponseType(typeof(List<ProductResponseAdminDTO>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<IProductDTO>>> GetProducts([FromQuery] ProductFilterAdminDTO productFilter)
     {
         var query = new GetFilteredProductsQuery(
             productFilter.CategoryName,
@@ -49,12 +52,13 @@ public class ProductsController : ControllerBase
 
         var products = await _mediator.Send(query);
 
-        return Ok(products.Cast<ProductResponseAdminDTO>().ToList());
+        return Ok(products);
     }
 
     [HasPermission("read.product")]
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<ProductResponseAdminDTO>> GetById(Guid id)
+    [ProducesResponseType(typeof(ProductResponseAdminDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IProductDTO>> GetById(Guid id)
     {
         var query = new GetProductByIdQuery(id, true);
         var product = await _mediator.Send(query);
@@ -76,17 +80,6 @@ public class ProductsController : ControllerBase
             new { id = product.Id },
             product
             );
-    }
-
-    [HasPermission("create.product")]
-    [HttpPost("add-image/{productId:guid}")]
-    public async Task<ActionResult<List<PresignedUpload>>> AddImage(Guid productId, [FromBody] List<ProductImageMetadataDTO> metadataDTO)
-    {
-        var command = new AddProductImagesCommand(productId, metadataDTO);
-
-        var uploads = await _mediator.Send(command);
-
-        return uploads;
     }
 
     [HasPermission("update.product")]
@@ -113,27 +106,45 @@ public class ProductsController : ControllerBase
     {
         var command = new DeleteProductCommand(id);
         await _mediator.Send(command);
+
         return NoContent();
+    }
+
+    #endregion
+
+    #region PRODUCT IMAGE
+
+    [HasPermission("create.product")]
+    [HttpPost("add-image/{productId:guid}")]
+    public async Task<ActionResult<List<PresignedUpload>>> AddImage(Guid productId, [FromBody] List<ProductImageMetadataDTO> metadataDTO)
+    {
+        var command = new AddProductImagesCommand(productId, metadataDTO);
+        var uploads = await _mediator.Send(command);
+
+        return uploads;
     }
 
 
     [HasPermission("delete.product")]
-    [HttpDelete("image/{id:guid}/{key}")]
-    public async Task<IActionResult> DeleteImage(Guid id, string key)
+    [HttpDelete("image/{productId:guid}/{imageId:guid}")]
+    public async Task<IActionResult> DeleteImage(Guid productId, Guid imageId)
     {
-        var command = new DeleteProductImageCommand(id, key);
+        var command = new DeleteProductImageCommand(productId, imageId);
         await _mediator.Send(command);
+
         return NoContent();
     }
 
     [HasPermission("read.product")]
-    [HttpGet("get-image/{productId:guid}/{key}")]
-    public async Task<ActionResult<ProductImageResponseAdminDTO>> GetImage(Guid productId, string key)
+    [HttpGet("get-image/{productId:guid}/{imageId:guid}")]
+    [ProducesResponseType(typeof(ProductImageResponseAdminDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IProductImageDTO>> GetImage(Guid productId, Guid imageId)
     {
-        var query = new GetProductImageByKeyAndProductIdQuery(productId, key, true);
-
+        var query = new GetProductImageByIdQuery(productId, imageId, true);
         var image = await _mediator.Send(query);
 
         return Ok(image);
     }
+
+    #endregion
 }

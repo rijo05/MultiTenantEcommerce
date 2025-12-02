@@ -5,7 +5,6 @@ using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
 using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetById;
 using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetFiltered;
 using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetImage;
-using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 
 namespace MultiTenantEcommerce.API.Controllers.Customer;
 
@@ -14,16 +13,15 @@ namespace MultiTenantEcommerce.API.Controllers.Customer;
 public class ProductsController : ControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly IFileStorageService _fileStorageService;
 
-    public ProductsController(IMediator mediator, IFileStorageService fileStorageService)
+    public ProductsController(IMediator mediator)
     {
         _mediator = mediator;
-        _fileStorageService = fileStorageService;
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<ProductResponseDTO>>> GetProducts([FromQuery] ProductFilterDTO productFilter)
+    [ProducesResponseType(typeof(List<ProductResponseDTO>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<IProductDTO>>> GetProducts([FromQuery] ProductFilterDTO productFilter)
     {
         var query = new GetFilteredProductsQuery(
             productFilter.CategoryName,
@@ -39,11 +37,12 @@ public class ProductsController : ControllerBase
 
         var products = await _mediator.Send(query);
 
-        return Ok(products.Cast<ProductResponseDTO>());
+        return Ok(products);
     }
 
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<ProductResponseDTO>> GetById(Guid id)
+    [ProducesResponseType(typeof(ProductResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IProductDTO>> GetById(Guid id)
     {
         var query = new GetProductByIdQuery(id, false);
         var product = await _mediator.Send(query);
@@ -51,10 +50,11 @@ public class ProductsController : ControllerBase
         return Ok(product);
     }
 
-    [HttpGet("get-image/{productId:guid}/{key}")]
-    public async Task<ActionResult<ProductImageResponseDTO>> GetImage(Guid productId, string key)
+    [HttpGet("get-image/{productId:guid}/{imageId:guid}")]
+    [ProducesResponseType(typeof(ProductImageResponseDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IProductImageDTO>> GetImage(Guid productId, Guid imageId)
     {
-        var query = new GetProductImageByKeyAndProductIdQuery(productId, key, false);
+        var query = new GetProductImageByIdQuery(productId, imageId, false);
 
         var image = await _mediator.Send(query);
 

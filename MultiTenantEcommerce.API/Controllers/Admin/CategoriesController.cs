@@ -26,7 +26,8 @@ public class CategoriesController : ControllerBase
 
     [HasPermission("read.category")]
     [HttpGet]
-    public async Task<ActionResult<List<CategoryResponseAdminDTO>>> GetCategories([FromQuery] CategoryFilterAdminDTO filteredQuery)
+    [ProducesResponseType(typeof(List<CategoryResponseAdminDTO>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<List<ICategoryDTO>>> GetCategories([FromQuery] CategoryFilterAdminDTO filteredQuery)
     {
         var query = new GetFilteredCategoriesQuery(
             filteredQuery.Name,
@@ -39,12 +40,13 @@ public class CategoriesController : ControllerBase
 
         var categories = await _mediator.Send(query);
 
-        return Ok(categories.Cast<CategoryResponseAdminDTO>());
+        return Ok(categories);
     }
 
     [HasPermission("read.category")]
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<CategoryResponseAdminDTO>> GetById(Guid id)
+    [ProducesResponseType(typeof(CategoryResponseAdminDTO), StatusCodes.Status200OK)]
+    public async Task<ActionResult<ICategoryDTO>> GetById(Guid id)
     {
         var query = new GetCategoryByIdQuery(id, true);
         var category = await _mediator.Send(query);

@@ -34,7 +34,7 @@ public class OrdersController : ControllerBase
 
     [HasPermission("read.order")]
     [HttpGet("{id:guid}")]
-    public async Task<ActionResult<OrderResponseWithPayment>> GetOrderById(Guid id)
+    public async Task<ActionResult<OrderResponseDetailDTO>> GetOrderById(Guid id)
     {
         var query = new GetOrderByIdQuery(null, id);
 
@@ -56,7 +56,7 @@ public class OrdersController : ControllerBase
 
     [HasPermission("update.order")]
     [HttpPatch("{id:guid}/status")]
-    public async Task<ActionResult<OrderResponseDTO>> ChangeOrderStatus(Guid id, [FromBody] ChangeOrderStatusDTO statusDTO)
+    public async Task<ActionResult<OrderResponseDetailDTO>> ChangeOrderStatus(Guid id, [FromBody] ChangeOrderStatusDTO statusDTO)
     {
         var command = new ChangeOrderStatusCommand(id, statusDTO.Status);
 
