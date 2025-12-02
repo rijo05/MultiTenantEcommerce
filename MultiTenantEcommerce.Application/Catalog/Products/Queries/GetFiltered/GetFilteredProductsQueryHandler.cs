@@ -2,7 +2,6 @@
 using MultiTenantEcommerce.Application.Catalog.Products.Mappers;
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
-using MultiTenantEcommerce.Domain.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
 using MultiTenantEcommerce.Domain.Inventory.Interfaces;
 
@@ -51,11 +50,11 @@ public class GetFilteredProductsQueryHandler : IQueryHandler<GetFilteredProducts
             request.PageSize,
             request.Sort)).ToList();
 
-        var stocks = await _stockRepository.GetBulkByIdsAsync(products.Select(x => x.Id).ToList());
+        var stocks = await _stockRepository.GetBulkByProductIdsAsync(products.Select(x => x.Id).ToList());
 
         var imagesKeys = products.SelectMany(x => x.Images).Select(x => x.Key).ToList();
 
-        var signedUrls = _fileStorageService.GetImageUrl(imagesKeys);
+        var signedUrls = _fileStorageService.GetPresignedUrls(imagesKeys);
 
         return request.IsAdmin
             ? _productMapper.ToProductResponseAdminDTOList(products, stocks, signedUrls).Cast<IProductDTO>().ToList()

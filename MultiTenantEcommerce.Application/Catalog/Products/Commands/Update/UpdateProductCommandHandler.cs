@@ -5,7 +5,6 @@ using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
 using MultiTenantEcommerce.Domain.Inventory.Interfaces;
-using System.Runtime.CompilerServices;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.Commands.Update;
 public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand, ProductResponseAdminDTO>
@@ -34,9 +33,8 @@ public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand,
 
     public async Task<ProductResponseAdminDTO> Handle(UpdateProductCommand request, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetByIdIncluding(request.ProductId, x => x.Images)
+        var product = await _productRepository.GetByIdAsync(request.ProductId)
             ?? throw new Exception("Product doesnt exist.");
-
 
         Category? category = null;
 
@@ -49,14 +47,13 @@ public class UpdateProductCommandHandler : ICommandHandler<UpdateProductCommand,
         var stock = await _stockRepository.GetByProductIdAsync(product.Id)
             ?? throw new Exception("Stock not found. This shouldnt happen");
 
-        var images = _fileStorageService.GetImageUrl(product.Images.Select(x => x.Key).ToList());
+        var images = _fileStorageService.GetPresignedUrls(product.Images.Select(x => x.Key).ToList());
 
         product.UpdateProduct(request.Name,
             request.Description,
             request.Price,
             request.IsActive,
-            request.CategoryId,
-            category);
+            request.CategoryId);
 
         await _unitOfWork.CommitAsync();
         return _productMapper.ToProductResponseAdminDTO(product, stock, images);

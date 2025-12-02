@@ -26,13 +26,13 @@ public class GetProductByIdQueryHandler : IQueryHandler<GetProductByIdQuery, IPr
 
     public async Task<IProductDTO> Handle(GetProductByIdQuery request, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetByIdIncluding(request.ProductId, x => x.Category, x => x.Images)
+        var product = await _productRepository.GetByIdAsync(request.ProductId)
             ?? throw new Exception("Product not found");
 
         var stock = await _stockRepository.GetByProductIdAsync(product.Id)
             ?? throw new Exception("Stock not found. This shouldnt happen");
 
-        var images = _fileStorageService.GetImageUrl(product.Images.Select(x => x.Key).ToList());
+        var images = _fileStorageService.GetPresignedUrls(product.Images.Select(x => x.Key).ToList());
 
         return request.IsAdmin
             ? _productMapper.ToProductResponseAdminDTO(product, stock, images)

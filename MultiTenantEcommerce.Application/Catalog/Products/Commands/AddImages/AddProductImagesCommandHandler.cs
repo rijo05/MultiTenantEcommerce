@@ -30,7 +30,7 @@ public class AddProductImagesCommandHandler : ICommandHandler<AddProductImagesCo
 
     public async Task<List<PresignedUpload>> Handle(AddProductImagesCommand request, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetByIdIncluding(request.ProductId, x => x.Images)
+        var product = await _productRepository.GetByIdAsync(request.ProductId)
             ?? throw new Exception("Product not found");
 
         var tenant = await _tenantRepository.GetByIdAsync(_tenantContext.TenantId)

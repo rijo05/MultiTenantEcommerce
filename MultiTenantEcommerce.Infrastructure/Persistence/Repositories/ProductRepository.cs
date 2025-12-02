@@ -8,12 +8,29 @@ namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 
 public class ProductRepository : Repository<Product>, IProductRepository
 {
-    public ProductRepository(AppDbContext appDbContext, TenantContext tenantContext)
-    : base(appDbContext, tenantContext) { }
+    public ProductRepository(AppDbContext appDbContext)
+    : base(appDbContext) { }
 
     public async Task<bool> HasProductsInCategoryAsync(Guid categoryId)
     {
         return await _appDbContext.Products.AnyAsync(x => x.CategoryId == categoryId);
+    }
+
+    public override async Task<Product?> GetByIdAsync(Guid productId)
+    {
+        return await _appDbContext.Products 
+            .Include(x => x.Images)
+            .AsSplitQuery()
+            .FirstOrDefaultAsync(x => x.Id == productId);
+    }
+
+    public override async Task<List<Product>> GetByIdsAsync(IEnumerable<Guid> ids)
+    {
+        return await _appDbContext.Products
+            .Include (x => x.Images)
+            .Where(x => ids.Contains(x.Id))
+            .AsSplitQuery()
+            .ToListAsync();
     }
 
     public async Task<IEnumerable<Product>> GetFilteredAsync(
@@ -27,8 +44,9 @@ public class ProductRepository : Repository<Product>, IProductRepository
     SortOptions sort = SortOptions.TimeDesc)
     {
         var query = _appDbContext.Products
-            .Include(p => p.Category)
+            .AsNoTracking()
             .Include(p => p.Images)
+            .AsSplitQuery()
             .AsQueryable();
 
         if (categoryId.HasValue)

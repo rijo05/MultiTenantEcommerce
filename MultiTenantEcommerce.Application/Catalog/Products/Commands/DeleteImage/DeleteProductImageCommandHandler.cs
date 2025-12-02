@@ -2,11 +2,6 @@
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.Commands.DeleteImage;
 public class DeleteProductImageCommandHandler : ICommandHandler<DeleteProductImageCommand, Unit>
@@ -22,15 +17,15 @@ public class DeleteProductImageCommandHandler : ICommandHandler<DeleteProductIma
 
     public async Task<Unit> Handle(DeleteProductImageCommand request, CancellationToken cancellationToken)
     {
-        var product = await _productRepository.GetByIdIncluding(request.ProductId, x => x.Images)
+        var product = await _productRepository.GetByIdAsync(request.ProductId)
             ?? throw new Exception("Product doesnt exist");
 
-        if (!product.Images.Select(x => x.Key).Contains(request.Key))
-            throw new Exception("Image doesnt exist");
+        var image = product.Images.FirstOrDefault(x => x.Id == request.ImageId)
+            ?? throw new Exception("Image doesnt exist");
 
-        product.DeleteImage(request.Key);
+        product.DeleteImage(request.ImageId);
 
-        await _fileStorageService.DeleteImageUrl(request.Key);
+        await _fileStorageService.DeleteImageUrl(image.Key);
 
         return Unit.Value;
     }
