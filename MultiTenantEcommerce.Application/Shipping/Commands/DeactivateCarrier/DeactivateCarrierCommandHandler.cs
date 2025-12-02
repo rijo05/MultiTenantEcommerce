@@ -21,7 +21,7 @@ public class DeactivateCarrierCommandHandler : ICommandHandler<DeactivateCarrier
 
     public async Task<Unit> Handle(DeactivateCarrierCommand request, CancellationToken cancellationToken)
     {
-        var tenant = await _tenantRepository.GetByIdIncluding(_tenantContext.TenantId, x => x.ShippingProviders)
+        var tenant = await _tenantRepository.GetByIdAsync(_tenantContext.TenantId)
             ?? throw new Exception("Tenant doesnt exist");
 
         var carrier = tenant.ShippingProviders.FirstOrDefault(x => x.Carrier == request.Carrier)

@@ -5,6 +5,7 @@ using MultiTenantEcommerce.Application.Shipping.Interfaces;
 using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
 using MultiTenantEcommerce.Domain.Shipping.Entities;
 using MultiTenantEcommerce.Domain.Shipping.Enums;
+using MultiTenantEcommerce.Domain.Shipping.Interfaces;
 using MultiTenantEcommerce.Domain.Tenants.Interfaces;
 using MultiTenantEcommerce.Domain.Users.Interfaces;
 using MultiTenantEcommerce.Domain.ValueObjects;
@@ -18,13 +19,15 @@ public class ShippingService : IShippingService
     private readonly ICustomerRepository _customerRepository;
     private readonly IAddressValidator _addressValidator;
     private readonly IFileStorageService _fileStorageService;
+    private readonly IShipmentRepository _shipmentRepository;
 
     public ShippingService(IShippingProviderFactory factory,
         ITenantRepository tenantRepository,
         ITenantContext tenantContext,
         ICustomerRepository customerRepository,
         IAddressValidator addressValidator,
-        IFileStorageService fileStorageService)
+        IFileStorageService fileStorageService,
+        IShipmentRepository shipmentRepository)
     {
         _factory = factory;
         _tenantRepository = tenantRepository;
@@ -32,6 +35,7 @@ public class ShippingService : IShippingService
         _customerRepository = customerRepository;
         _addressValidator = addressValidator;
         _fileStorageService = fileStorageService;
+        _shipmentRepository = shipmentRepository;
     }
 
     public async Task<Shipment> CreateShipment(Guid tenantId, Order order, ShipmentCarrier carrier)
@@ -39,12 +43,11 @@ public class ShippingService : IShippingService
         if (order.OrderStatus != Domain.Enums.OrderStatus.Processing)
             throw new Exception("Cant create a shipment for a order not in processing");
 
-        if (order.Shipment != null)
+        if (await _shipmentRepository.GetByOrderId(order.Id) != null)
             throw new Exception("This order already has a shipment");
 
         var customer = await _customerRepository.GetByIdAsync(order.CustomerId)
             ?? throw new Exception("Customer doesnt exist");
-
 
         var provider = _factory.GetProvider(carrier);
 
@@ -61,8 +64,6 @@ public class ShippingService : IShippingService
             info.MaxTransit);
 
         await _fileStorageService.UploadAsync(shipment.LabelKey, info.LabelPdf, MimeTypes.Pdf);
-
-        order.AttachShipment(shipment);
 
         return shipment;
     }

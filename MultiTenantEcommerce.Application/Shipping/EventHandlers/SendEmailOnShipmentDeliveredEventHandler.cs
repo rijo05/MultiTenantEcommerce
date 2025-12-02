@@ -29,7 +29,7 @@ public class SendEmailOnShipmentDeliveredEventHandler : IEventHandler<ShipmentDe
 
     public async Task HandleAsync(ShipmentDeliveredEvent domainEvent)
     {
-        var order = await _orderRepository.GetByIdIncluding(domainEvent.OrderId, x => x.Items)
+        var order = await _orderRepository.GetByIdAsync(domainEvent.OrderId)
             ?? throw new Exception("Order not found");
 
         var customer = await _customerRepository.GetByIdAsync(order.CustomerId)

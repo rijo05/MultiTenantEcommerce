@@ -5,6 +5,7 @@ using MultiTenantEcommerce.Application.Shipping.Interfaces;
 using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Sales.Orders.Interfaces;
 using MultiTenantEcommerce.Domain.Shipping.Events;
+using MultiTenantEcommerce.Domain.Shipping.Interfaces;
 using MultiTenantEcommerce.Domain.Tenants.Interfaces;
 using MultiTenantEcommerce.Domain.Users.Interfaces;
 
@@ -16,28 +17,31 @@ public class SendEmailOnShipmentShippedEventHandler : IEventHandler<ShipmentShip
     private readonly ICustomerRepository _customerRepository;
     private readonly ITenantRepository _tenantRepository;
     private readonly IShippingService _shippingService;
+    private readonly IShipmentRepository _shipmentRepository;
 
     public SendEmailOnShipmentShippedEventHandler(
         IEmailQueueRepository emailQueueRepository,
         IOrderRepository orderRepository,
         ICustomerRepository customerRepository,
         ITenantRepository tenantRepository,
-        IShippingService shippingService)
+        IShippingService shippingService,
+        IShipmentRepository shipmentRepository)
     {
         _emailQueueRepository = emailQueueRepository;
         _orderRepository = orderRepository;
         _customerRepository = customerRepository;
         _tenantRepository = tenantRepository;
         _shippingService = shippingService;
+        _shipmentRepository = shipmentRepository;
     }
 
     public async Task HandleAsync(ShipmentShippedEvent domainEvent)
     {
-        var order = await _orderRepository.GetByIdIncluding(domainEvent.OrderId, x => x.Shipment!)
+        var order = await _orderRepository.GetByIdAsync(domainEvent.OrderId)
             ?? throw new Exception("Order not found");
 
-        if (order.Shipment is null)
-            throw new Exception("Shipment doesnt exist for this order");
+        var shipment = await _shipmentRepository.GetByOrderId(order.Id)
+            ?? throw new Exception("Shipment doesnt exist for this order");
 
         var customer = await _customerRepository.GetByIdAsync(order.CustomerId)
             ?? throw new Exception("Customer not found");
@@ -49,10 +53,10 @@ public class SendEmailOnShipmentShippedEventHandler : IEventHandler<ShipmentShip
         {
             [EmailMetadataKeys.CustomerName] = customer.Name,
             [EmailMetadataKeys.OrderId] = order.Id.ToString(),
-            [EmailMetadataKeys.TrackingNumber] = order.Shipment.TrackingNumber,
-            [EmailMetadataKeys.TrackingLink] = $"{order.Shipment.Carrier.ToString()}/track/{order.Shipment.TrackingNumber}",
-            [EmailMetadataKeys.CarrierName] = order.Shipment.Carrier.ToString(),
-            [EmailMetadataKeys.DeliveryDate] = order.Shipment.EstimatedDeliveryDate.ToString(),
+            [EmailMetadataKeys.TrackingNumber] = shipment.TrackingNumber,
+            [EmailMetadataKeys.TrackingLink] = $"{shipment.Carrier.ToString()}/track/{shipment.TrackingNumber}",
+            [EmailMetadataKeys.CarrierName] = shipment.Carrier.ToString(),
+            [EmailMetadataKeys.DeliveryDate] = shipment.EstimatedDeliveryDate.ToString(),
             [EmailMetadataKeys.TenantName] = tenant.Name
         };
 
