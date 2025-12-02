@@ -1,5 +1,4 @@
-﻿using MultiTenantEcommerce.Domain.Catalog.Entities;
-using MultiTenantEcommerce.Domain.Common.Entities;
+﻿using MultiTenantEcommerce.Domain.Common.Entities;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Domain.Sales.ShoppingCart.Entities;
@@ -8,14 +7,13 @@ public class CartItem : TenantBase
     public Guid CartId { get; private set; }
     public Guid ProductId { get; private set; }
     public PositiveQuantity Quantity { get; private set; }
-    public Product Product { get; private set; }
 
     private CartItem() { }
-    internal CartItem(Product product, PositiveQuantity quantity)
+    internal CartItem(Guid tenantId, Guid productId, PositiveQuantity quantity)
+        : base(tenantId)
     {
-        Product = product;
         Quantity = quantity;
-        ProductId = product.Id;
+        ProductId = productId;
     }
 
     internal void DecreaseQuantity(PositiveQuantity quantity)

@@ -1,17 +1,13 @@
-﻿using MultiTenantEcommerce.Domain.Catalog.Entities;
-using MultiTenantEcommerce.Domain.Common.Entities;
-using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
-using MultiTenantEcommerce.Domain.Shipping.Enums;
+﻿using MultiTenantEcommerce.Domain.Common.Entities;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Domain.Sales.ShoppingCart.Entities;
 public class Cart : TenantBase
 {
-    private List<CartItem> _items = new();
-
     public Guid CustomerId { get; private set; }
     public bool IsOpen { get; private set; }
     public IReadOnlyCollection<CartItem> Items => _items.AsReadOnly();
+    private List<CartItem> _items = new();
 
     private Cart() { }
     public Cart(Guid tenantId, Guid customerId)
@@ -21,22 +17,22 @@ public class Cart : TenantBase
         IsOpen = true;
     }
 
-    public void AddItem(Product product, PositiveQuantity quantity)
+    public void AddItem(Guid productId, PositiveQuantity quantity)
     {
-        var existingItem = _items.Where(x => x.Product.Id == product.Id).FirstOrDefault();
+        var existingItem = _items.Where(x => x.ProductId == productId).FirstOrDefault();
 
         if (existingItem is not null)
             existingItem.IncreaseQuantity(quantity);
         else
         {
-            var item = new CartItem(product, quantity);
+            var item = new CartItem(this.TenantId, productId, quantity);
             _items.Add(item);
         }
     }
 
     public void DecreaseItem(Guid productId, PositiveQuantity quantity)
     {
-        var item = _items.Where(x => x.Product.Id == productId).FirstOrDefault()
+        var item = _items.Where(x => x.ProductId == productId).FirstOrDefault()
             ?? throw new Exception("Product isnt on cart.");
 
         var remaining = item.Quantity.Value - quantity.Value;
@@ -52,7 +48,7 @@ public class Cart : TenantBase
 
     public void RemoveItem(Guid productId)
     {
-        var item = _items.Where(x => x.Product.Id == productId).FirstOrDefault()
+        var item = _items.Where(x => x.ProductId == productId).FirstOrDefault()
             ?? throw new Exception("Product isnt on cart.");
 
         _items.Remove(item);
@@ -66,17 +62,5 @@ public class Cart : TenantBase
     public bool IsEmpty()
     {
         return _items.Count == 0;
-    }
-
-    public Order CheckOut(Address address, ShipmentCarrier carrier)
-    {
-        if (IsEmpty())
-            throw new Exception("Cart is empty.");
-
-        var products = _items.Select(x => (x.Product, x.Quantity)).ToList();
-
-        var order = new Order(this.TenantId, this.CustomerId, address, products, carrier);
-
-        return order;
     }
 }

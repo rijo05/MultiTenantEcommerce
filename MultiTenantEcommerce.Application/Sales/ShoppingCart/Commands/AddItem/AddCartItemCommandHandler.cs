@@ -4,6 +4,7 @@ using MultiTenantEcommerce.Application.Common.Interfaces.Services;
 using MultiTenantEcommerce.Application.Sales.ShoppingCart.DTOs;
 using MultiTenantEcommerce.Application.Sales.ShoppingCart.Mappers;
 using MultiTenantEcommerce.Domain.Catalog.Interfaces;
+using MultiTenantEcommerce.Domain.Inventory.Interfaces;
 using MultiTenantEcommerce.Domain.Sales.ShoppingCart.Entities;
 using MultiTenantEcommerce.Domain.Sales.ShoppingCart.Interfaces;
 using MultiTenantEcommerce.Domain.ValueObjects;
@@ -17,13 +18,17 @@ public class AddCartItemCommandHandler : ICommandHandler<AddCartItemCommand, Car
     private readonly IUnitOfWork _unitOfWork;
     private readonly IStockService _stockService;
     private readonly ITenantContext _tenantContext;
+    private readonly IFileStorageService _fileStorageService;
+    private readonly IStockRepository _stockRepository;
 
-    public AddCartItemCommandHandler(ICartRepository cartRepository,
-        CartMapper cartMapper,
-        IProductRepository productRepository,
-        IUnitOfWork unitOfWork,
-        IStockService stockService,
-        ITenantContext tenantContext)
+    public AddCartItemCommandHandler(ICartRepository cartRepository, 
+        CartMapper cartMapper, 
+        IProductRepository productRepository, 
+        IUnitOfWork unitOfWork, 
+        IStockService stockService, 
+        ITenantContext tenantContext, 
+        IFileStorageService fileStorageService, 
+        IStockRepository stockRepository)
     {
         _cartRepository = cartRepository;
         _cartMapper = cartMapper;
@@ -31,6 +36,8 @@ public class AddCartItemCommandHandler : ICommandHandler<AddCartItemCommand, Car
         _unitOfWork = unitOfWork;
         _stockService = stockService;
         _tenantContext = tenantContext;
+        _fileStorageService = fileStorageService;
+        _stockRepository = stockRepository;
     }
 
     public async Task<CartResponseDTO> Handle(AddCartItemCommand request, CancellationToken cancellationToken)
@@ -46,14 +53,20 @@ public class AddCartItemCommandHandler : ICommandHandler<AddCartItemCommand, Car
         var product = await _productRepository.GetByIdAsync(request.ProductId)
             ?? throw new Exception("Product doesnt exist");
 
+        var productIds = cart.Items.Select(x => x.Id);
+        var products = await _productRepository.GetByIdsAsync(productIds);
+        products.Add(product);
+
         if (!await _stockService.CheckAvailability(request.ProductId, new PositiveQuantity(request.Quantity)))
             throw new Exception($"Not enough stock for {request.ProductId}");
+        var stocks = await _stockRepository.GetBulkByProductIdsAsync(products.Select(x => x.Id));
 
+        cart.AddItem(product.Id, new PositiveQuantity(request.Quantity));
 
-        cart.AddItem(product, new PositiveQuantity(request.Quantity));
+        var images = _fileStorageService.GetPresignedUrls(products.SelectMany(x => x.Images).Select(x => x.Key).ToList());
 
         await _unitOfWork.CommitAsync();
 
-        return _cartMapper.ToCartResponseDTO(cart);
+        return _cartMapper.ToCartResponseDTO(cart, products, stocks, images);
     }
 }

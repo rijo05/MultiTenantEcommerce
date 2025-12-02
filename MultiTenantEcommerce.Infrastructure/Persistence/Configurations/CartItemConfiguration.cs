@@ -13,10 +13,6 @@ public class CartItemConfiguration : IEntityTypeConfiguration<CartItem>
                 .WithMany(c => c.Items)
                 .HasForeignKey(ci => new { ci.TenantId, ci.CartId });
 
-        builder.HasOne(x => x.Product)
-                .WithMany()
-                .HasForeignKey(x => new { x.TenantId, x.ProductId });
-
         builder.OwnsOne(x => x.Quantity, qty =>
         {
             qty.Property(q => q.Value)
