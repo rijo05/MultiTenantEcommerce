@@ -7,8 +7,8 @@ using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 public class EmailTemplateRepository : Repository<EmailTemplate>, IEmailTemplateRepository
 {
-    public EmailTemplateRepository(AppDbContext appDbContext, ITenantContext tenantContext)
-        : base(appDbContext, tenantContext)
+    public EmailTemplateRepository(AppDbContext appDbContext)
+        : base(appDbContext)
     {
     }
 

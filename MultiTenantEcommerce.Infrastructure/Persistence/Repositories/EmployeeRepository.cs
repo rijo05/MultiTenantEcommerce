@@ -8,21 +8,21 @@ using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
 {
-    public EmployeeRepository(AppDbContext appDbContext, TenantContext tenantContext) : base(appDbContext, tenantContext) { }
+    public EmployeeRepository(AppDbContext appDbContext) : base(appDbContext) { }
 
     public async Task<List<Employee>> GetFilteredAsync(
-    string? name = null,
-    string? role = null,
-    string? email = null,
-    bool? isActive = null,
-    int page = 1,
-    int pageSize = 20,
-    SortOptions sort = SortOptions.TimeDesc)
+            string? name = null,
+            string? role = null,
+            string? email = null,
+            bool? isActive = null,
+            int page = 1,
+            int pageSize = 20,
+            SortOptions sort = SortOptions.TimeDesc)
     {
         var query = _appDbContext.Employees
+            .AsNoTracking()
             .Include(e => e.EmployeeRoles)
-            .ThenInclude(er => er.Role)
-            .ThenInclude(r => r.Permissions)
+            .AsSplitQuery()
             .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(name))
@@ -35,31 +35,32 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
             query = query.Where(p => p.Email != null && EF.Functions.Like(p.Email.Value, $"%{email}%"));
 
         if (!string.IsNullOrWhiteSpace(role))
-            query = query.Where(p => p.EmployeeRoles
-                .Any(x => EF.Functions.Like(x.Role.Name, $"%{role}%")));
+        {
+            var roleIds = _appDbContext.Roles
+                .Where(r => EF.Functions.Like(r.Name, $"%{role}%"))
+                .Select(r => r.Id);
 
+            query = query.Where(e => e.EmployeeRoles.Any(er => roleIds.Contains(er.RoleId)));
+        }
 
         return await SortAndPageAsync(query, sort, page, pageSize);
     }
 
-    public async Task<Employee?> GetByEmailAllIncluded(Email email)
+    public async Task<Employee?> GetByEmail(Email email)
     {
         return await _appDbContext.Employees
             .Include(x => x.EmployeeRoles)
-                .ThenInclude(x => x.Role)
-                    .ThenInclude(x => x.Permissions)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(x => x.Email.Value == email.Value);
     }
 
-    public async Task<Employee?> GetByIdAllIncluded(Guid id)
+    public override async Task<Employee?> GetByIdAsync(Guid id)
     {
         return await _appDbContext.Employees
             .Include(x => x.EmployeeRoles)
-                .ThenInclude(x => x.Role)
-                    .ThenInclude(x => x.Permissions)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(x => x.Id == id);
     }
-
     public async Task<List<Employee>> GetEmployeesByRole(
         Guid roleId,
         int page = 1,
@@ -68,26 +69,34 @@ public class EmployeeRepository : Repository<Employee>, IEmployeeRepository
     {
         var query = _appDbContext.Employees
             .Include(x => x.EmployeeRoles)
-                .ThenInclude(x => x.Role)
-                    .ThenInclude(x => x.Permissions)
-            .Where(x => x.EmployeeRoles.Any(x => x.RoleId == roleId));
+            .AsSplitQuery()
+            .Where(x => x.EmployeeRoles.Any(er => er.RoleId == roleId));
 
         return await SortAndPageAsync(query, sort, page, pageSize);
     }
 
     public async Task<bool> HasEmployeesWithRole(Guid roleId)
     {
-        return await _appDbContext.Employees.AnyAsync(e => e.EmployeeRoles.Any(er => er.RoleId == roleId));
+        return await _appDbContext.Employees
+            .AnyAsync(e => e.EmployeeRoles.Any(er => er.RoleId == roleId));
     }
 
     public async Task<Employee?> GetOwnerOfTenant(Guid tenantId)
     {
+        var ownerRoleId = await _appDbContext.Roles
+                .IgnoreQueryFilters()
+                .Where(r => r.TenantId == tenantId && r.Name == SystemRoles.Owner)
+                .Select(r => r.Id)
+                .FirstOrDefaultAsync();
+
+        if (ownerRoleId == Guid.Empty) return null;
+
         return await _appDbContext.Employees
             .IgnoreQueryFilters()
             .Include(e => e.EmployeeRoles)
-                .ThenInclude(er => er.Role)
             .Where(e => e.TenantId == tenantId
-                        && e.EmployeeRoles.Any(er => er.Role.Name.ToLower() == "owner"))
+                        && e.EmployeeRoles.Any(er => er.RoleId == ownerRoleId))
+            .AsSplitQuery()
             .FirstOrDefaultAsync();
     }
 }

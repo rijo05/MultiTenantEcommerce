@@ -1,12 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MultiTenantEcommerce.Domain.Inventory.Entities;
 using MultiTenantEcommerce.Domain.Inventory.Interfaces;
+using MultiTenantEcommerce.Domain.ValueObjects;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 public class StockRepository : Repository<Stock>, IStockRepository
 {
-    public StockRepository(AppDbContext appDbContext, TenantContext tenantContext) : base(appDbContext, tenantContext) { }
+    public StockRepository(AppDbContext appDbContext) : base(appDbContext) { }
 
     public async Task<Stock?> GetByProductIdAsync(Guid productId)
     {
@@ -18,14 +19,21 @@ public class StockRepository : Repository<Stock>, IStockRepository
         await _appDbContext.Stocks.AddRangeAsync(items);
     }
 
-    public async Task<List<Stock>> GetBulkByIdsAsync(IEnumerable<Guid> ids)
+    public async Task<List<Stock>> GetBulkByProductIdsAsync(IEnumerable<Guid> ids)
     {
         return await _appDbContext.Stocks.Where(x => ids.Contains(x.ProductId)).ToListAsync();
     }
 
-    public void UpdateWithRow(Stock stock)
+    public async Task<int> DecreaseStockAsync(Guid productId, int quantity)
     {
-        _appDbContext.Entry(stock).OriginalValues["RowVersion"] = stock.RowVersion;
-        _appDbContext.Stocks.Update(stock);
+        var rowsAffected = await _appDbContext.Database.ExecuteSqlInterpolatedAsync($@"
+            UPDATE ""Stocks""
+            SET ""Quantity"" = ""Quantity"" - {quantity},
+                ""UpdatedAt"" = {DateTime.UtcNow}
+            WHERE ""ProductId"" = {productId} 
+                AND ""Quantity"" >= {quantity}
+        ");
+
+        return rowsAffected;
     }
 }

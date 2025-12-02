@@ -10,7 +10,7 @@ using System.Data;
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 public class CustomerRepository : Repository<Customer>, ICustomerRepository
 {
-    public CustomerRepository(AppDbContext appDbContext, ITenantContext tenantContext) : base(appDbContext, tenantContext) { }
+    public CustomerRepository(AppDbContext appDbContext) : base(appDbContext) { }
 
     public async Task<Customer?> GetByEmailAsync(Email email)
     {
@@ -31,7 +31,10 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
     int pageSize = 20,
     SortOptions sort = SortOptions.TimeDesc)
     {
-        var query = _appDbContext.Customers.AsQueryable();
+        var query = _appDbContext.Customers
+            .AsNoTracking()
+            .AsSplitQuery()
+            .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(name))
             query = query.Where(p => EF.Functions.Like(p.Name, $"%{name}%"));
@@ -42,6 +45,7 @@ public class CustomerRepository : Repository<Customer>, ICustomerRepository
         if (!string.IsNullOrWhiteSpace(email))
             query = query.Where(p => p.Email != null && EF.Functions.Like(p.Email.Value, $"%{email}%"));
 
+        //talvez tirar #########
         if (!string.IsNullOrWhiteSpace(phoneNumber))
             query = query.Where(p => p.PhoneNumber != null && EF.Functions.Like(p.PhoneNumber.Number, $"%{phoneNumber}%"));
 

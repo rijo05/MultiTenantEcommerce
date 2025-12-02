@@ -8,7 +8,7 @@ namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 
 public class CategoryRepository : Repository<Category>, ICategoryRepository
 {
-    public CategoryRepository(AppDbContext appDbContext, TenantContext tenantContext) : base(appDbContext, tenantContext) { }
+    public CategoryRepository(AppDbContext appDbContext) : base(appDbContext) { }
 
     public async Task<Category?> GetByExactNameAsync(string name)
     {
@@ -23,7 +23,10 @@ public class CategoryRepository : Repository<Category>, ICategoryRepository
     int pageSize = 20,
     SortOptions sort = SortOptions.TimeDesc)
     {
-        var query = _appDbContext.Categories.AsQueryable();
+        var query = _appDbContext.Categories
+            .AsNoTracking()
+            .AsSplitQuery()
+            .AsQueryable();
 
         if (!string.IsNullOrWhiteSpace(name))
             query = query.Where(p => EF.Functions.Like(p.Name, $"%{name}%"));

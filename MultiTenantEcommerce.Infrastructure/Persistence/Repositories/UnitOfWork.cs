@@ -1,9 +1,9 @@
-﻿using MultiTenantEcommerce.Application.Common.Exceptions;
+﻿using Microsoft.EntityFrameworkCore;
+using MultiTenantEcommerce.Application.Common.Exceptions;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Infrastructure.Outbox;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 using MultiTenantEcommerce.Infrastructure.Persistence.Transaction;
-using System.Data.Entity.Infrastructure;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 

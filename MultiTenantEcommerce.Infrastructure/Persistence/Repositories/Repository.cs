@@ -12,12 +12,10 @@ namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 public class Repository<T> : IRepository<T> where T : BaseEntity
 {
     protected readonly AppDbContext _appDbContext;
-    private readonly ITenantContext _tenantContext;
 
-    public Repository(AppDbContext appDbContext, ITenantContext tenantContext)
+    public Repository(AppDbContext appDbContext)
     {
         _appDbContext = appDbContext;
-        _tenantContext = tenantContext;
     }
 
     public async Task<List<T>> GetAllAsync()
@@ -25,29 +23,15 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         return await _appDbContext.Set<T>().ToListAsync();
     }
 
-    public async Task<T?> GetByIdAsync(params object[] keyValues)
+    public virtual async Task<T?> GetByIdAsync(Guid id)
     {
-        var validKeyValues = CheckIfItsValid(keyValues);
-
-        return await _appDbContext.Set<T>().FindAsync(validKeyValues);
+        return await _appDbContext.Set<T>().FirstOrDefaultAsync(x => x.Id == id);
     }
-
-    public async Task<T?> GetByIdIncluding(Guid id, params Expression<Func<T, object>>[] includes)
-    {
-        IQueryable<T> query = _appDbContext.Set<T>();
-
-        foreach (var include in includes)
-            query = query.Include(include);
-
-        return await query.FirstOrDefaultAsync(x => x.Id == id);
-    }
-
 
     public async Task AddAsync(T entity)
     {
         await _appDbContext.Set<T>().AddAsync(entity);
     }
-
     public async Task DeleteAsync(T entity)
     {
         _appDbContext.Set<T>().Remove(entity);
@@ -62,9 +46,16 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         return await _appDbContext.Set<T>().AnyAsync(x => x.Id == id);
     }
 
-    public async Task<List<T>> GetByIdsAsync(IEnumerable<Guid> ids)
+    public virtual async Task<List<T>> GetByIdsAsync(IEnumerable<Guid> ids)
     {
-        return await _appDbContext.Set<T>().Where(x => ids.Contains(x.Id)).ToListAsync();
+        var distinctIds = ids.Distinct().ToList();
+
+        if (!distinctIds.Any())
+            return new List<T>();
+
+        return await _appDbContext.Set<T>()
+            .Where(x => distinctIds.Contains(x.Id))
+            .ToListAsync();
     }
 
     public async Task SaveChangesAsync()
@@ -112,22 +103,5 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
     private bool HasProperty<T>(string propertyName)
     {
         return typeof(T).GetProperty(propertyName) != null;
-    }
-
-    private object[] CheckIfItsValid(params object[] keyValues)
-    {
-        if (keyValues == null || keyValues.Length == 0)
-            throw new ArgumentException("At least one key must be provided.");
-
-        if (typeof(T) != typeof(Tenant))
-        {
-            var updatedKeyValues = new object[keyValues.Length + 1];
-            updatedKeyValues[0] = _tenantContext.TenantId;
-            Array.Copy(keyValues, 0, updatedKeyValues, 1, keyValues.Length);
-
-            return updatedKeyValues;
-        }
-
-        return keyValues;
     }
 }

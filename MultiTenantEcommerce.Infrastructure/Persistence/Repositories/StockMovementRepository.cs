@@ -8,7 +8,7 @@ using System.Data;
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 public class StockMovementRepository : Repository<StockMovement>, IStockMovementRepository
 {
-    public StockMovementRepository(AppDbContext appDbContext, TenantContext tenantContext) : base(appDbContext, tenantContext) { }
+    public StockMovementRepository(AppDbContext appDbContext) : base(appDbContext) { }
 
     public async Task<List<StockMovement>> GetFilteredAsync(
     Guid? productId = null,
@@ -21,7 +21,10 @@ public class StockMovementRepository : Repository<StockMovement>, IStockMovement
     int pageSize = 20,
     SortOptions sort = SortOptions.TimeDesc)
     {
-        var query = _appDbContext.StockMovements.AsQueryable();
+        var query = _appDbContext.StockMovements
+            .AsNoTracking()
+            .AsSplitQuery()
+            .AsQueryable();
 
         if (productId.HasValue)
             query = query.Where(p => p.ProductId == productId);

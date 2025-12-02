@@ -6,14 +6,14 @@ using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 public class CartRepository : Repository<Cart>, ICartRepository
 {
-    public CartRepository(AppDbContext appDbContext, TenantContext tenantContext)
-        : base(appDbContext, tenantContext) { }
+    public CartRepository(AppDbContext appDbContext)
+        : base(appDbContext) { }
 
     public async Task<Cart?> GetByCustomerIdAsync(Guid customerId)
     {
         return await _appDbContext.Carts
             .Include(x => x.Items)
-            .ThenInclude(x => x.Product)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(x => x.IsOpen && x.CustomerId == customerId);
     }
 }
