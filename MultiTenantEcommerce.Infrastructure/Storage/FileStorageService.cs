@@ -1,9 +1,7 @@
 ﻿using Amazon.Runtime;
 using Amazon.S3;
 using Amazon.S3.Model;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Configuration;
-using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
 using MultiTenantEcommerce.Application.Common.DTOs;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Catalog.Entities;
@@ -64,7 +62,7 @@ public class FileStorageService : IFileStorageService
         return uploads;
     }
 
-    public Dictionary<string, string> GetImageUrl(List<string> keys)
+    public Dictionary<string, string> GetPresignedUrls(List<string> keys)
     {
         var client = ConnectClient();
 
@@ -79,7 +77,7 @@ public class FileStorageService : IFileStorageService
                 Verb = HttpVerb.GET,
                 Expires = DateTime.UtcNow.AddMinutes(60)
             };
-            urls[item] = client.GetPreSignedURL(request);  
+            urls[item] = client.GetPreSignedURL(request);
         }
 
         return urls;
