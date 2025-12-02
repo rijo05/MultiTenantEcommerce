@@ -31,11 +31,6 @@ public class EmployeeConfiguration : IEntityTypeConfiguration<Employee>
                 .IsRequired();
         });
 
-        builder.HasMany(e => e.EmployeeRoles)
-                .WithOne(er => er.Employee)
-                .HasForeignKey(er => new { er.TenantId, er.EmployeeId })
-                .OnDelete(DeleteBehavior.Cascade);
-
 
         //builder.HasIndex(e => e.TenantId)
         //        .HasDatabaseName("IX_Employee_TenantId");

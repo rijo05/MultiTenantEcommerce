@@ -2,6 +2,7 @@
 using MultiTenantEcommerce.Application.Users.Employees.DTOs;
 using MultiTenantEcommerce.Application.Users.Permissions.Mappers;
 using MultiTenantEcommerce.Domain.Users.Entities;
+using MultiTenantEcommerce.Domain.Users.Entities.Permissions;
 
 namespace MultiTenantEcommerce.Application.Users.Employees.Mappers;
 
@@ -17,39 +18,34 @@ public class EmployeeMapper
         _rolesMapper = rolesMapper;
     }
 
-    public EmployeeResponseDTO ToEmployeeResponseDTO(Employee employee)
+    public EmployeeResponseDTO ToEmployeeResponseDTO(Employee employee, List<Role> roles)
     {
-        var roles = employee.EmployeeRoles.Select(x => x.Role).ToList();
-        var permissions = roles.SelectMany(r => r.Permissions).DistinctBy(p => p.Id);
-
         return new EmployeeResponseDTO
         {
             Id = employee.Id,
             Name = employee.Name,
             Email = employee.Email.Value,
             Roles = _rolesMapper.ToRoleResponseDTOList(roles),
-            Permissions = _rolesMapper.ToPermissionResponseDTOList(permissions),
             IsActive = employee.IsActive,
             CreatedAt = employee.CreatedAt,
             UpdatedAt = employee.UpdatedAt,
-            //Links = GenerateLinks(Employee)
         };
     }
 
-    public List<EmployeeResponseDTO> ToEmployeeResponseDTOList(IEnumerable<Employee> Employees)
+    public List<EmployeeResponseDTO> ToEmployeeResponseDTOList(List<Employee> employees, List<Role> allRoles)
     {
-        return Employees.Select(x => ToEmployeeResponseDTO(x)).ToList();
+        var roleDict = allRoles.ToDictionary(r => r.Id);
+
+        return employees.Select(emp =>
+        {
+            var empRoleIds = emp.EmployeeRoles.Select(er => er.RoleId).ToList();
+
+            var empRoles = empRoleIds
+                .Select(id => roleDict.TryGetValue(id, out var r) ? r : null)
+                .Where(r => r != null)
+                .ToList()!;
+
+            return ToEmployeeResponseDTO(emp, empRoles);
+        }).ToList();
     }
-
-
-    //private Dictionary<string, object> GenerateLinks(Employee Employee)
-    //{
-    //    return _hateoasLinkService.GenerateLinksCRUD(
-    //                Employee.Id,
-    //                "Employees",
-    //                "GetById",
-    //                "Update",
-    //                "Delete"
-    //    );
-    //}
 }

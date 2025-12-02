@@ -9,24 +9,30 @@ public class Employee : UserBase
     public IReadOnlyCollection<EmployeeRole> EmployeeRoles => _employeeRoles;
 
     private Employee() { }
-    public Employee(Guid tenantId, string name, Email email, Password password, List<Role>? roles)
+    public Employee(Guid tenantId, string name, Email email, Password password, List<Guid>? roleIds)
         : base(tenantId, name, password, email)
     {
-        roles?.ForEach(x => AddRole(x));
+        if (roleIds != null)
+        {
+            foreach (var item in roleIds)
+            {
+                AddRole(item);
+            }
+        }
 
         AddDomainEvent(new EmployeeRegisteredEvent(this.TenantId, this.Id));
     }
-    public void AddRole(Role role)
+    public void AddRole(Guid roleId)
     {
-        if (_employeeRoles.Any(x => x.RoleId == role.Id))
+        if (_employeeRoles.Any(x => x.RoleId == roleId))
             return;
 
-        _employeeRoles.Add(new EmployeeRole(Id, role.Id));
+        _employeeRoles.Add(new EmployeeRole(this.TenantId, Id, roleId));
     }
 
-    public void RemoveRole(Role role)
+    public void RemoveRole(Guid roleId)
     {
-        var employeeRole = _employeeRoles.FirstOrDefault(x => x.RoleId == role.Id);
+        var employeeRole = _employeeRoles.FirstOrDefault(x => x.RoleId == roleId);
 
         if (employeeRole != null)
             _employeeRoles.Remove(employeeRole);

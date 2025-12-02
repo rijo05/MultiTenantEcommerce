@@ -7,8 +7,7 @@ namespace MultiTenantEcommerce.Domain.Users.Interfaces;
 
 public interface IEmployeeRepository : IRepository<Employee>
 {
-    public Task<Employee?> GetByIdAllIncluded(Guid id);
-    public Task<Employee?> GetByEmailAllIncluded(Email email);
+    public Task<Employee?> GetByEmail(Email email);
     public Task<List<Employee>> GetEmployeesByRole(
         Guid roleId,
         int page = 1,
