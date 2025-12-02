@@ -15,9 +15,6 @@ public class Stock : TenantBase
     public NonNegativeQuantity Reserved { get; private set; }
     public NonNegativeQuantity StockAvailableAtMoment => Quantity - Reserved;
 
-    [Timestamp]
-    public byte[] RowVersion { get; set; }
-
     private Stock() { }
     public Stock(Product product, Guid tenantId, int? quantity = null, int? minimumQuantity = null)
         : base(tenantId)
@@ -26,8 +23,6 @@ public class Stock : TenantBase
         Quantity = new NonNegativeQuantity(quantity ?? 0);
         MinimumQuantity = new NonNegativeQuantity(minimumQuantity ?? 10);
         Reserved = new NonNegativeQuantity(0);
-
-        RowVersion = BitConverter.GetBytes(DateTime.UtcNow.Ticks);
     }
 
 

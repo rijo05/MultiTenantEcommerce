@@ -24,59 +24,21 @@ public class StockService : IStockService
         return stock.CheckAvailability(quantity.Value);
     }
 
-    public async Task<bool> TryReserveStockWithRetries(List<CartItem> items, int retries = 3)
+    public async Task<bool> TryReserveStock(List<(Guid ProductId, int Quantity)> items)
     {
-        var pendingItems = new List<CartItem>(items);
+        var sortedItems = items.OrderBy(x => x.ProductId).ToList();
 
-        for (int attempt = 0; attempt < retries; attempt++)
+        foreach (var item in sortedItems)
         {
-            var failedItems = new List<CartItem>();
+            var rows = await _stockRepository.DecreaseStockAsync(item.ProductId, item.Quantity);
 
-            var stocks = await _stockRepository.GetBulkByIdsAsync(pendingItems.Select(x => x.Product.Id).ToList());
-            var stockDict = stocks.ToDictionary(x => x.ProductId);
-
-            foreach (var item in pendingItems)
+            if (rows == 0)
             {
-                if (!stockDict.TryGetValue(item.Product.Id, out var stock))
-                    throw new Exception($"Garantia extra NUNCA deve entrar aqui");
-
-                bool reserved = false;
-
-                for (int prodAttempt = 0; prodAttempt < retries; prodAttempt++)
-                {
-                    try
-                    {
-                        stock.ReserveStock(item.Quantity.Value);
-                        _stockRepository.UpdateWithRow(stock);
-                        reserved = true;
-                        break;
-                    }
-                    catch (ConcurrencyException)
-                    {
-                        if (prodAttempt < retries - 1)
-                            await Task.Delay(200);
-                    }
-                    catch (/*InsufficientStockException*/ Exception)
-                    {
-                        reserved = false;
-                        break;
-                    }
-                }
-
-                if (!reserved)
-                    failedItems.Add(item);
+                //Falta de stock
+                return false;
             }
-
-            if (!failedItems.Any())
-                return true;
-
-            pendingItems = failedItems;
-
-            if (attempt < retries - 1)
-                await Task.Delay(500);
         }
-
-        return false;
+        return true;
     }
 
     public async Task CommitStock(Order order)
@@ -91,7 +53,7 @@ public class StockService : IStockService
 
     private async Task ApplyStockAction(Order order, Action<Stock, int> action)
     {
-        var stocks = await _stockRepository.GetBulkByIdsAsync(order.Items.Select(x => x.ProductId).ToList());
+        var stocks = await _stockRepository.GetBulkByProductIdsAsync(order.Items.Select(x => x.ProductId).ToList());
 
         var stockDict = stocks.ToDictionary(s => s.ProductId);
 
