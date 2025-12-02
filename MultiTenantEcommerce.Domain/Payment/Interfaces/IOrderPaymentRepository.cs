@@ -13,7 +13,6 @@ public interface IOrderPaymentRepository : IRepository<OrderPayment>
     public Task<OrderPayment?> GetByOrderId(Guid orderId);
     public Task<List<OrderPayment>> GetFilteredAsync(
         Guid? customerId = null,
-        Guid? orderId = null,
         PaymentStatus? status = null,
         PaymentMethod? method = null,
         DateTime? minCreatedAt = null,

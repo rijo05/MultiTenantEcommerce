@@ -21,12 +21,12 @@ public class OrderPayment : TenantBase
     public string? Metadata { get; private set; }
 
     private OrderPayment() { }
-    public OrderPayment(
+    public OrderPayment(Guid tenantId,
         Guid customerId,
         Guid orderId,
-        Guid tenantId,
         Money amount,
-        PaymentMethod method) : base(tenantId)
+        PaymentMethod method)
+        : base(tenantId)
     {
         CustomerId = customerId;
         OrderId = orderId;

@@ -15,11 +15,6 @@ public class OrderPaymentConfiguration : IEntityTypeConfiguration<OrderPayment>
                 .HasForeignKey(x => x.TenantId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne<Domain.Sales.Orders.Entities.Order>()
-            .WithOne(x => x.OrderPayment)
-            .HasForeignKey<OrderPayment>(x => new { x.TenantId, x.OrderId })
-            .OnDelete(DeleteBehavior.Restrict);
-
         builder.OwnsOne(u => u.Amount, amount =>
         {
             amount.Property(e => e.Value)

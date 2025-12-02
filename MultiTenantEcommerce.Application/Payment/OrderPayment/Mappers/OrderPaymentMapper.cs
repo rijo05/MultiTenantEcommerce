@@ -10,7 +10,7 @@ public class OrderPaymentMapper
             PaymentId = payment.Id,
             CustomerId = payment.CustomerId,
             OrderId = payment.OrderId,
-            Amount = payment.Amount.Value,
+            Total = payment.Amount.Value,
             PaymentMethod = payment.PaymentMethod.ToString(),
             Status = payment.Status.ToString(),
             TransactionId = payment.TransactionId,

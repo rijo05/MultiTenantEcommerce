@@ -5,7 +5,7 @@ namespace MultiTenantEcommerce.Application.Sales.Orders.DTOs;
 public class OrderResponseDTO
 {
     public Guid Id { get; init; }
-    public Guid? CustomerId { get; init; }
+    public Guid CustomerId { get; init; }
     public string OrderStatus { get; init; }
     public DateTime CreatedAt { get; init; }
     public DateTime UpdatedAt { get; init; }
