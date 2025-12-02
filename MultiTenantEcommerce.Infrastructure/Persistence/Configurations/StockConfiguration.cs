@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using MultiTenantEcommerce.Domain.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Inventory.Entities;
+using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
 public class StockConfiguration : IEntityTypeConfiguration<Stock>
@@ -15,29 +16,22 @@ public class StockConfiguration : IEntityTypeConfiguration<Stock>
                 .HasForeignKey<Stock>(s => new { s.TenantId, s.ProductId })
                 .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property(x => x.RowVersion)
-            .IsRowVersion()
-            .IsConcurrencyToken()
-            .ValueGeneratedOnAdd();
 
-        builder.OwnsOne(x => x.Quantity, qty =>
-        {
-            qty.Property(q => q.Value)
-               .HasColumnName("Quantity")
-               .IsRequired();
-        });
-        builder.OwnsOne(x => x.Reserved, rsv =>
-        {
-            rsv.Property(q => q.Value)
-               .HasColumnName("ReservedStock")
-               .IsRequired();
-        });
-        builder.OwnsOne(x => x.MinimumQuantity, minqty =>
-        {
-            minqty.Property(q => q.Value)
-               .HasColumnName("MinimumQuantity")
-               .IsRequired();
-        });
+        builder.Property(x => x.Quantity)
+            .HasConversion(
+                vo => vo.Value,
+                dbValue => new NonNegativeQuantity(dbValue))
+            .IsRequired();
+
+        builder.Property(x => x.MinimumQuantity)
+            .HasConversion(
+            vo => vo.Value, 
+            db => new NonNegativeQuantity(db));
+
+        builder.Property(x => x.Reserved)
+            .HasConversion(
+            vo => vo.Value,
+            db => new NonNegativeQuantity(db));
 
         //builder.HasIndex(s => s.TenantId)
         //        .HasDatabaseName("IX_Stock_TenantId");
