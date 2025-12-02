@@ -3,5 +3,5 @@ using MultiTenantEcommerce.Application.Users.Permissions.DTOs;
 
 namespace MultiTenantEcommerce.Application.Users.Permissions.Commands.AddToRole;
 public record AddPermissionsToRoleCommand(
-    Guid roleId,
-    List<Guid> permissions) : ICommand<RoleResponseDTO>;
+    Guid RoleId,
+    List<Guid> Permissions) : ICommand<RoleDetailResponseDTO>;

@@ -3,5 +3,5 @@ using MultiTenantEcommerce.Application.Users.Permissions.DTOs;
 
 namespace MultiTenantEcommerce.Application.Users.Permissions.Queries.Roles.GetByName;
 public record GetRoleByNameQuery(
-    string Name) : IQuery<RoleResponseDTO>;
+    string Name) : IQuery<RoleDetailResponseDTO>;
 

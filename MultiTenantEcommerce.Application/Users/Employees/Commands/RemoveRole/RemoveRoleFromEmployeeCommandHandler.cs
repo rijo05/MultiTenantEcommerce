@@ -26,7 +26,7 @@ public class RemoveRoleFromEmployeeCommandHandler : ICommandHandler<RemoveRoleFr
 
     public async Task<EmployeeResponseDTO> Handle(RemoveRoleFromEmployeeCommand request, CancellationToken cancellationToken)
     {
-        var employee = await _employeeRepository.GetByIdAllIncluded(request.employeeId)
+        var employee = await _employeeRepository.GetByIdAsync(request.employeeId)
             ?? throw new Exception("Employee doesnt exist.");
 
         var roles = await _roleRepository.GetByIdsAsync(request.roles.Distinct());
@@ -36,10 +36,10 @@ public class RemoveRoleFromEmployeeCommandHandler : ICommandHandler<RemoveRoleFr
             throw new Exception($"Invalid role ids: {string.Join(", ", missingIds)}");
 
         foreach (var item in roles)
-            employee.RemoveRole(item);
+            employee.RemoveRole(item.Id);
 
         await _unitOfWork.CommitAsync();
 
-        return _employeeMapper.ToEmployeeResponseDTO(employee);
+        return _employeeMapper.ToEmployeeResponseDTO(employee, roles);
     }
 }

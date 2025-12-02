@@ -20,12 +20,12 @@ public class DeleteRoleCommandHandler : ICommandHandler<DeleteRoleCommand, Unit>
 
     public async Task<Unit> Handle(DeleteRoleCommand request, CancellationToken cancellationToken)
     {
-        var role = await _roleRepository.GetByIdAsync(request.roleId)
+        var role = await _roleRepository.GetByIdAsync(request.RoleId)
             ?? throw new Exception("Role doesnt exist.");
 
         role.CanItBeModifiedOrDeleted();
 
-        if (await _employeeRepository.HasEmployeesWithRole(request.roleId))
+        if (await _employeeRepository.HasEmployeesWithRole(request.RoleId))
             throw new Exception("There are employees with this role. Impossible to delete");
 
         await _roleRepository.DeleteAsync(role);

@@ -5,7 +5,7 @@ using MultiTenantEcommerce.Application.Users.Permissions.Mappers;
 using MultiTenantEcommerce.Domain.Users.Interfaces.Permissions;
 
 namespace MultiTenantEcommerce.Application.Users.Permissions.Commands.AddToRole;
-public class AddPermissionsToRoleCommandHandler : ICommandHandler<AddPermissionsToRoleCommand, RoleResponseDTO>
+public class AddPermissionsToRoleCommandHandler : ICommandHandler<AddPermissionsToRoleCommand, RoleDetailResponseDTO>
 {
     private readonly IRoleRepository _roleRepository;
     private readonly IPermissionRepository _permissionRepository;
@@ -23,24 +23,31 @@ public class AddPermissionsToRoleCommandHandler : ICommandHandler<AddPermissions
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<RoleResponseDTO> Handle(AddPermissionsToRoleCommand request, CancellationToken cancellationToken)
+    public async Task<RoleDetailResponseDTO> Handle(AddPermissionsToRoleCommand request, CancellationToken cancellationToken)
     {
-        var role = await _roleRepository.GetRoleAndPermissionById(request.roleId)
+        var role = await _roleRepository.GetByIdWithPermisionsAsync(request.RoleId)
             ?? throw new Exception("Role doesnt exist.");
 
-        var permissions = await _permissionRepository.GetByIdsAsync(request.permissions);
+        var existingIds = role.Permissions.Select(x => x.PermissionId);
+        var newIds = request.Permissions.Distinct();
 
-        var missingIds = request.permissions.Except(permissions.Select(p => p.Id)).ToList();
+        var allIdsToFetch = existingIds.Union(newIds).ToList();
+
+        var allPermissions = await _permissionRepository.GetByIdsAsync(allIdsToFetch);
+
+        var fetchedIds = allPermissions.Select(p => p.Id).ToHashSet();
+        var missingIds = newIds.Where(id => !fetchedIds.Contains(id)).ToList();
+
         if (missingIds.Any())
             throw new Exception($"Invalid permission ids: {string.Join(",", missingIds)}");
 
-        foreach (var item in permissions)
+        foreach (var id in newIds)
         {
-            role.AddPermission(item);
+            role.AddPermission(id);
         }
 
         await _unitOfWork.CommitAsync();
 
-        return _rolesMapper.ToRoleResponseDTO(role);
+        return _rolesMapper.ToRoleDetailResponseDTO(role, allPermissions);
     }
 }

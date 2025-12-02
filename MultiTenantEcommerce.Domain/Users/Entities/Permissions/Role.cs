@@ -1,4 +1,5 @@
 ﻿using MultiTenantEcommerce.Domain.Common.Entities;
+using MultiTenantEcommerce.Domain.Common.Guard;
 
 namespace MultiTenantEcommerce.Domain.Users.Entities.Permissions;
 public class Role : TenantBase
@@ -7,31 +8,36 @@ public class Role : TenantBase
     public string Description { get; private set; }
     public bool IsSystemRole { get; private set; }
 
-    private readonly HashSet<Permission> _permissions = new();
-    public IReadOnlyCollection<Permission> Permissions => _permissions;
+    private readonly HashSet<RolePermission> _permissions = new();
+    public IReadOnlyCollection<RolePermission> Permissions => _permissions;
 
     private Role() { }
 
-    public Role(string name, string description, Guid tenantId)
+    public Role(Guid tenantId, string name, string description)
         : base(tenantId)
     {
+        GuardCommon.AgainstNullOrEmpty(name, nameof(name));
         Name = name;
         Description = description;
         IsSystemRole = false;
     }
 
-    public void AddPermission(Permission permission)
+    public void AddPermission(Guid permissionId)
     {
         CanItBeModifiedOrDeleted();
 
-        _permissions.Add(permission);
+        if (_permissions.Any(x => x.PermissionId == permissionId)) return;
+
+        _permissions.Add(new RolePermission(this.TenantId, this.Id, permissionId));
     }
 
-    public void RemovePermission(Permission permission)
+    public void RemovePermission(Guid permissionId)
     {
         CanItBeModifiedOrDeleted();
 
-        _permissions.Remove(permission);
+        if (_permissions.Any(x => x.PermissionId == permissionId)) return;
+
+        _permissions.Remove(new RolePermission(this.TenantId, this.Id, permissionId));
     }
 
     public void CanItBeModifiedOrDeleted()
