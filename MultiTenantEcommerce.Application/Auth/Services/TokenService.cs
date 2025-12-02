@@ -17,7 +17,7 @@ public class TokenService : ITokenService
         _config = config;
     }
 
-    public string CreateSessionToken(UserBase user)
+    public string GenerateToken(UserBase user, List<string> roles, List<string> permissions)
     {
         var claims = new List<Claim>
         {
@@ -28,40 +28,26 @@ public class TokenService : ITokenService
             new Claim(JwtClaimNames.Jti, Guid.NewGuid().ToString())
         };
 
-        if (user is Employee)
+        if (roles != null)
         {
-            var employee = user as Employee;
-
-            var roles = employee.EmployeeRoles.Select(x => x.Role.Name).Distinct();
-            var permissions = employee.EmployeeRoles.SelectMany(x => x.Role.Permissions.Select(x => x.Name)).Distinct();
-
-            foreach (var roleName in roles)
+            foreach (var role in roles.Distinct())
             {
-                claims.Add(new Claim("Role", roleName));
+                claims.Add(new Claim("Role", role));
             }
-
-            foreach (var permissionName in permissions)
-            {
-                claims.Add(new Claim("Permission", permissionName));
-            }
-
-            claims.Add(new Claim("isEmployee", "true", ClaimValueTypes.Boolean));
         }
-        else
-            claims.Add(new Claim("isEmployee", "false", ClaimValueTypes.Boolean));
 
-        return GenerateToken(claims, DateTime.UtcNow.AddDays(1));
-    }
-
-    public string CreateImageToken(Guid ProductId, Guid TenantId)
-    {
-        var claims = new List<Claim>
+        if (permissions != null)
         {
-            new Claim("ProductId", ProductId.ToString()),
-            new Claim("TenantId", TenantId.ToString())
-        };
+            foreach (var permission in permissions.Distinct())
+            {
+                claims.Add(new Claim("Permission", permission));
+            }
+        }
 
-        return GenerateToken(claims, DateTime.UtcNow.AddHours(100));
+        var isEmployee = user is Employee;
+        claims.Add(new Claim("isEmployee", isEmployee.ToString().ToLower(), ClaimValueTypes.Boolean));
+
+        return GenerateJwtString(claims, DateTime.UtcNow.AddDays(7));
     }
 
     public ClaimsPrincipal ValidateToken(string token)
@@ -84,19 +70,18 @@ public class TokenService : ITokenService
         return tokenHandler.ValidateToken(token, parameters, out _);
     }
 
-    private string GenerateToken(List<Claim> claims, DateTime time)
+    private string GenerateJwtString(List<Claim> claims, DateTime expires)
     {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]!));
-
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
         var token = new JwtSecurityToken(
-                issuer: _config["Jwt:Issuer"],
-                audience: _config["Jwt:Audience"],
-                claims: claims,
-                expires: time,
-                signingCredentials: credentials
-                );
+            issuer: _config["Jwt:Issuer"],
+            audience: _config["Jwt:Audience"],
+            claims: claims,
+            expires: expires,
+            signingCredentials: credentials
+        );
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }
