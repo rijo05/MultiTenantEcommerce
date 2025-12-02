@@ -2,6 +2,7 @@
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Application.Common.Interfaces.Services;
+using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Domain.Tenants.Interfaces;
 using MultiTenantEcommerce.Domain.Users.Entities;
@@ -43,43 +44,49 @@ public class CreateTenantCommandHandler : ICommandHandler<CreateTenantCommand, A
             throw new Exception("Company with this name already exists.");
 
         var tenant = new Tenant(request.CompanyName, new Email(request.CompanyEmail));
+        await _tenantRepository.AddAsync(tenant);
 
+        var ownerRole = new Role(tenant.Id, SystemRoles.Owner, "Full access");
+        var adminRole = new Role(tenant.Id, SystemRoles.Admin, "Full access except tenant settings");
 
-        var ownerRole = new Role("Owner", "Has all permissions", tenant.Id);
-        var adminRole = new Role("Admin", "Has all permissions except tenant related ones", tenant.Id);
+        var allPermissions = await _permissionRepository.GetAllAsync();
 
-        var permissions = await _permissionRepository.GetAllAsync();
+        foreach (var perm in allPermissions)
+        {
+            ownerRole.AddPermission(perm.Id);
 
-        permissions.ToList()
-            .ForEach(x => ownerRole.AddPermission(x));
-
-        permissions.Where(p => p.Area != "tenant").ToList()
-            .ForEach(x => adminRole.AddPermission(x));
+            if (!perm.Area.Equals("tenant", StringComparison.OrdinalIgnoreCase))
+            {
+                adminRole.AddPermission(perm.Id);
+            }
+        }
 
         ownerRole.MarkRoleAsSystemRole();
         adminRole.MarkRoleAsSystemRole();
+
+        await _roleRepository.AddAsync(ownerRole);
+        await _roleRepository.AddAsync(adminRole);
 
 
         var employee = new Employee(
             tenant.Id,
             request.OwnerName,
             new Email(request.OwnerEmail),
-            new Password(request.Password), new List<Role> { ownerRole });
+            new Password(request.Password), new List<Guid> { ownerRole.Id });
 
-
-        await _tenantRepository.AddAsync(tenant);
         await _employeeRepository.AddAsync(employee);
-        await _roleRepository.AddAsync(ownerRole);
-        await _roleRepository.AddAsync(adminRole);
 
         await _unitOfWork.CommitAsync();
+
+        var roleNames = new List<string> { ownerRole.Name };
+        var permissionNames = allPermissions.Select(p => p.Name).ToList();
 
         return new AuthTenantResponse
         {
             Email = employee.Email.Value,
             OwnerId = employee.Id,
             Name = employee.Name,
-            Token = _tokenService.CreateSessionToken(employee)
+            Token = _tokenService.GenerateToken(employee, roleNames, permissionNames)
         };
 
         //por agora q ira haver apenas 1 plano gratis, no futuro vejo como fazer planos pagos

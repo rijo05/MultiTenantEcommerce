@@ -55,7 +55,7 @@ public class CreateCustomerCommandHandler : ICommandHandler<CreateCustomerComman
             Id = customer.Id,
             Email = customer.Email.Value,
             Name = customer.Name,
-            Token = _tokenService.CreateSessionToken(customer)
+            Token = _tokenService.GenerateToken(customer, new List<string> { }, new List<string> { })
         };
     }
 }
