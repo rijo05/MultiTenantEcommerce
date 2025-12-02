@@ -2,26 +2,30 @@
 using MultiTenantEcommerce.Application.Common.Helpers.Services;
 using MultiTenantEcommerce.Application.Payment.OrderPayment.Mappers;
 using MultiTenantEcommerce.Application.Sales.Orders.DTOs;
+using MultiTenantEcommerce.Application.Shipping.Mappers;
+using MultiTenantEcommerce.Domain.Payment.Entities;
 using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
+using MultiTenantEcommerce.Domain.Shipping.Entities;
 
 namespace MultiTenantEcommerce.Application.Sales.Orders.Mappers;
 
 public class OrderMapper
 {
-    private readonly HateoasLinkService _hateoasLinkService;
     private readonly OrderItemMapper _orderItemMapper;
     private readonly AddressMapper _addressMapper;
     private readonly OrderPaymentMapper _paymentMapper;
+    private readonly ShipmentMapper _shipmentMapper;
 
     public OrderMapper(HateoasLinkService hateoasLinkService,
         OrderItemMapper orderItemMapper,
         AddressMapper addressMapper,
-        OrderPaymentMapper paymentMapper)
+        OrderPaymentMapper paymentMapper,
+        ShipmentMapper shipmentMapper)
     {
-        _hateoasLinkService = hateoasLinkService;
         _orderItemMapper = orderItemMapper;
         _addressMapper = addressMapper;
         _paymentMapper = paymentMapper;
+        _shipmentMapper = shipmentMapper;
     }
 
     public OrderResponseDTO ToOrderResponseDTO(Order order)
@@ -33,7 +37,7 @@ public class OrderMapper
             OrderStatus = order.OrderStatus.ToString(),
             Address = _addressMapper.ToAddressResponseFromDTO(order.Address),
             Items = _orderItemMapper.ToOrderItemResponseDTOList(order.Items),
-            TotalPrice = order.Items.Sum(x => x.UnitPrice.Value * x.Quantity.Value),
+            TotalPrice = order.Price.Value,
             CreatedAt = order.CreatedAt,
             UpdatedAt = order.UpdatedAt,
         };
@@ -44,29 +48,22 @@ public class OrderMapper
         return orders.Select(x => ToOrderResponseDTO(x)).ToList();
     }
 
-    public OrderResponseWithPayment ToOrderResponseWithPaymentDTO(Order order)
+
+    public OrderResponseDetailDTO ToOrderResponseDetailDTO(Order order, OrderPayment? payment, Shipment? shipment)
     {
-        return new OrderResponseWithPayment()
+        return new OrderResponseDetailDTO
         {
-            Order = ToOrderResponseDTO(order),
-            Payment = _paymentMapper.ToOrderPaymentResponseDTO(order.OrderPayment)
+            Id = order.Id,
+            CustomerId = order.CustomerId,
+            OrderStatus = order.OrderStatus.ToString(),
+            TotalPrice = order.Price.Value,
+            CreatedAt = order.CreatedAt,
+            UpdatedAt = order.UpdatedAt,
+            Address = _addressMapper.ToAddressResponseFromDTO(order.Address),
+            Items = _orderItemMapper.ToOrderItemResponseDTOList(order.Items),
+
+            Payment = payment != null ? _paymentMapper.ToOrderPaymentResponseDTO(payment) : null,
+            Shipping = shipment != null ? _shipmentMapper.ToShipmentDTO(shipment) : null
         };
     }
-
-    public List<OrderResponseWithPayment> ToOrderResponseWithPaymentDTOList(IEnumerable<Order> orders)
-    {
-        return orders.Select(x => ToOrderResponseWithPaymentDTO(x)).ToList();
-    }
-
-
-    //private Dictionary<string, object> GenerateLinks(Order order)
-    //{
-    //    return _hateoasLinkService.GenerateLinksCRUD(
-    //                order.Id,
-    //                "Orders",
-    //                "GetById",
-    //                "Update",
-    //                "Delete"
-    //    );
-    //}
 }

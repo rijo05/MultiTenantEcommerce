@@ -30,7 +30,6 @@ public class MarkOrderPaymentAsCompletedCommandHandler : ICommandHandler<MarkOrd
 
         payment.MarkAsCompleted(request.TransactionId);
         order.MarkAsPaid();
-        order.AttachPayment(payment);
 
         await _unitOfWork.CommitAsync();
 

@@ -12,8 +12,8 @@ public class CreateShipmentOnOrderPaidEventHandler : IEventHandler<OrderPaidEven
     private readonly IOrderRepository _orderRepository;
 
     public CreateShipmentOnOrderPaidEventHandler(IShippingService shippingService,
-        IOrderRepository orderRepository,
-        IShipmentRepository shipmentRepository)
+        IShipmentRepository shipmentRepository,
+        IOrderRepository orderRepository)
     {
         _shippingService = shippingService;
         _orderRepository = orderRepository;

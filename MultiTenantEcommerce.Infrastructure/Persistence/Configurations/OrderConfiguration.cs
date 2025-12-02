@@ -24,16 +24,6 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
                 .HasForeignKey(x => new { x.TenantId, x.CustomerId })
                 .OnDelete(DeleteBehavior.Restrict);
 
-        builder.HasOne(o => o.OrderPayment)
-                .WithOne()
-                .HasForeignKey<OrderPayment>(p => new { p.TenantId, p.OrderId })
-                .OnDelete(DeleteBehavior.Restrict);
-
-        builder.HasOne(o => o.Shipment)
-                .WithOne()
-                .HasForeignKey<Shipment>(p => new { p.TenantId, p.OrderId })
-                .OnDelete(DeleteBehavior.Restrict);
-
         builder.HasMany(o => o.Items)
                .WithOne()
                .HasForeignKey(oi => new { oi.TenantId, oi.OrderId })

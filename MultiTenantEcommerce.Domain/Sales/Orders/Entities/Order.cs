@@ -1,10 +1,7 @@
-﻿using MultiTenantEcommerce.Domain.Catalog.Entities;
-using MultiTenantEcommerce.Domain.Common.Entities;
+﻿using MultiTenantEcommerce.Domain.Common.Entities;
 using MultiTenantEcommerce.Domain.Common.Guard;
 using MultiTenantEcommerce.Domain.Enums;
-using MultiTenantEcommerce.Domain.Payment.Entities;
 using MultiTenantEcommerce.Domain.Sales.Orders.Events;
-using MultiTenantEcommerce.Domain.Shipping.Entities;
 using MultiTenantEcommerce.Domain.Shipping.Enums;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
@@ -16,13 +13,15 @@ public class Order : TenantBase
     public Address Address { get; private set; }
     public Money Price { get; private set; }
     public ShipmentCarrier ShipmentCarrier { get; private set; }
-    public OrderPayment? OrderPayment { get; private set; }
-    public Shipment? Shipment { get; private set; }
     public IReadOnlyCollection<OrderItem> Items => _items.AsReadOnly();
     private readonly List<OrderItem> _items = new();
 
     private Order() { }
-    public Order(Guid tenantId, Guid customerId, Address address, IEnumerable<(Product, PositiveQuantity)> products, ShipmentCarrier carrier)
+    public Order(Guid tenantId,
+        Guid customerId,
+        Address address,
+        ShipmentCarrier carrier,
+        IEnumerable<(Guid ProductId, string Name, Money UnitPrice, PositiveQuantity Quantity)> itemsData)
         : base(tenantId)
     {
         CustomerId = customerId;
@@ -30,12 +29,12 @@ public class Order : TenantBase
         Address = address;
         ShipmentCarrier = carrier;
 
-        foreach (var item in products)
+        foreach (var item in itemsData)
         {
-            AddItem(item.Item1, item.Item2);
+            _items.Add(new OrderItem(Id, TenantId, item.ProductId, item.Name, item.UnitPrice, item.Quantity));
         }
 
-        Price = new Money(_items.Sum(x => x.Total));
+        Price = new Money(_items.Sum(x => x.Total.Value));
     }
 
 
@@ -55,22 +54,6 @@ public class Order : TenantBase
     public void MarkAsFailed()
     {
         ChangeStatus(OrderStatus.Failed);
-    }
-
-    public void AddItem(Product product, PositiveQuantity quantity)
-    {
-        var orderItem = new OrderItem(Id, TenantId, product, quantity);
-        _items.Add(orderItem);
-    }
-
-    public void AttachPayment(OrderPayment payment)
-    {
-        OrderPayment = payment;
-    }
-
-    public void AttachShipment(Shipment shipment)
-    {
-        Shipment = shipment;
     }
 
     #region PRIVATES

@@ -20,7 +20,6 @@ public class GetFilteredOrderPaymentsQueryHandler : IQueryHandler<GetFilteredOrd
     {
         var payments = await _paymentRepository.GetFilteredAsync(
             request.CustomerId,
-            request.OrderId,
             request.Status,
             request.Method,
             request.MinCreatedAt,

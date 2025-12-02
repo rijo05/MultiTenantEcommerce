@@ -1,5 +1,4 @@
-﻿using MultiTenantEcommerce.Domain.Catalog.Entities;
-using MultiTenantEcommerce.Domain.Common.Entities;
+﻿using MultiTenantEcommerce.Domain.Common.Entities;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Domain.Sales.Orders.Entities;
@@ -10,15 +9,16 @@ public class OrderItem : TenantBase
     public string ProductName { get; private set; }
     public Money UnitPrice { get; private set; }
     public PositiveQuantity Quantity { get; private set; }
-    public decimal Total => Quantity.Value * UnitPrice.Value;
+    public Money Total => new Money(Quantity.Value * UnitPrice.Value);
 
     private OrderItem() { }
-    internal OrderItem(Guid orderId, Guid tenantId, Product product, PositiveQuantity quantity)
+    internal OrderItem(Guid orderId, Guid tenantId, Guid productId, string productName, Money unitPrice, PositiveQuantity quantity)
+        : base(tenantId)
     {
         OrderId = orderId;
-        ProductId = product.Id;
-        ProductName = product.Name;
-        UnitPrice = product.Price;
+        ProductId = productId;
+        ProductName = productName;
+        UnitPrice = unitPrice;
         Quantity = quantity;
     }
 }

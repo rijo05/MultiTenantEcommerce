@@ -18,7 +18,7 @@ public class CommitStockOnOrderPaidEventHandler : IEventHandler<OrderPaidEvent>
 
     public async Task HandleAsync(OrderPaidEvent domainEvent)
     {
-        var order = await _orderRepository.GetByIdIncluding(domainEvent.OrderId, x => x.Items)
+        var order = await _orderRepository.GetByIdAsync(domainEvent.OrderId)
             ?? throw new Exception("Order not found");
 
         await _stockService.CommitStock(order);

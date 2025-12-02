@@ -8,9 +8,9 @@ namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 
 public class OrderRepository : Repository<Order>, IOrderRepository
 {
-    public OrderRepository(AppDbContext appDbContext, TenantContext tenantContext) : base(appDbContext, tenantContext) { }
+    public OrderRepository(AppDbContext appDbContext) : base(appDbContext) { }
 
-    public async Task<List<Order>> GetByCustomerIdAllIncluded(
+    public async Task<List<Order>> GetByCustomerId(
         Guid customerId,
         int page = 1,
         int pageSize = 20,
@@ -18,11 +18,16 @@ public class OrderRepository : Repository<Order>, IOrderRepository
     {
         var query = _appDbContext.Orders
             .Include(x => x.Items)
-            .Include(x => x.OrderPayment)
-            .Include(x => x.Shipment)
             .Where(x => x.CustomerId == customerId);
 
         return await SortAndPageAsync(query, sort, page, pageSize);
+    }
+
+    public override async Task<Order?> GetByIdAsync(Guid orderId)
+    {
+        return await _appDbContext.Orders
+            .Include(x => x.Items)
+            .FirstOrDefaultAsync(x => x.Id == orderId);
     }
 
     public async Task<List<Order>> GetFilteredAsync(
@@ -37,9 +42,9 @@ public class OrderRepository : Repository<Order>, IOrderRepository
         SortOptions sort = SortOptions.TimeDesc)
     {
         var query = _appDbContext.Orders
+            .AsNoTracking()
             .Include(o => o.Items)
-            .Include(o => o.OrderPayment)
-            .Include(o => o.Shipment)
+            .AsSplitQuery()
             .AsQueryable();
 
         if (customerId.HasValue)

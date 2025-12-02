@@ -2,6 +2,7 @@
 using MultiTenantEcommerce.Application.Common.Helpers.EmailKeys;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Enums;
+using MultiTenantEcommerce.Domain.Payment.Interfaces;
 using MultiTenantEcommerce.Domain.Sales.Orders.Events;
 using MultiTenantEcommerce.Domain.Sales.Orders.Interfaces;
 using MultiTenantEcommerce.Domain.Tenants.Interfaces;
@@ -14,23 +15,29 @@ public class SendEmailOnOrderPaymentFailedEventHandler : IEventHandler<OrderPaym
     private readonly IOrderRepository _orderRepository;
     private readonly ICustomerRepository _customerRepository;
     private readonly ITenantRepository _tenantRepository;
+    private readonly IOrderPaymentRepository _orderPaymentRepository;
 
     public SendEmailOnOrderPaymentFailedEventHandler(
         IEmailQueueRepository emailQueueRepository,
         IOrderRepository orderRepository,
         ICustomerRepository customerRepository,
-        ITenantRepository tenantRepository)
+        ITenantRepository tenantRepository,
+        IOrderPaymentRepository orderPaymentRepository)
     {
         _emailQueueRepository = emailQueueRepository;
         _orderRepository = orderRepository;
         _customerRepository = customerRepository;
         _tenantRepository = tenantRepository;
+        _orderPaymentRepository = orderPaymentRepository;
     }
 
     public async Task HandleAsync(OrderPaymentFailedEvent domainEvent)
     {
-        var order = await _orderRepository.GetByIdIncluding(domainEvent.OrderId, x => x.OrderPayment!)
+        var order = await _orderRepository.GetByIdAsync(domainEvent.OrderId)
             ?? throw new Exception("Order not found");
+
+        var payment = await _orderPaymentRepository.GetByOrderId(domainEvent.OrderId)
+            ?? throw new Exception("payment not found, shouldnt happen");
 
         var customer = await _customerRepository.GetByIdAsync(order.CustomerId)
             ?? throw new Exception("Customer not found");
@@ -42,7 +49,7 @@ public class SendEmailOnOrderPaymentFailedEventHandler : IEventHandler<OrderPaym
         {
             [EmailMetadataKeys.CustomerName] = customer.Name,
             [EmailMetadataKeys.OrderId] = order.Id.ToString(),
-            [EmailMetadataKeys.FailureReason] = order.OrderPayment!.Metadata ?? "Something went wrong",
+            [EmailMetadataKeys.FailureReason] = payment.Metadata ?? "Something went wrong",
             [EmailMetadataKeys.TenantName] = tenant.Name
         };
 

@@ -5,7 +5,6 @@ using MultiTenantEcommerce.Domain.Enums;
 namespace MultiTenantEcommerce.Application.Payment.OrderPayment.Queries.GetFiltered;
 public record GetFilteredOrderPaymentsQuery(
     Guid? CustomerId = null,
-    Guid? OrderId = null,
     PaymentStatus? Status = null,
     PaymentMethod? Method = null,
     DateTime? MinCreatedAt = null,

@@ -7,4 +7,4 @@ public record GetOrdersByCustomerIdQuery(
     Guid customerId,
     int Page = 1,
     int PageSize = 20,
-    SortOptions Sort = SortOptions.TimeDesc) : IQuery<List<OrderResponseWithPayment>>;
+    SortOptions Sort = SortOptions.TimeDesc) : IQuery<List<OrderResponseDTO>>;
