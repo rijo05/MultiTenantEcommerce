@@ -1,9 +1,7 @@
-﻿using MultiTenantEcommerce.Application.Common.Exceptions;
-using MultiTenantEcommerce.Application.Common.Interfaces.Services;
+﻿using MultiTenantEcommerce.Application.Common.Interfaces.Services;
 using MultiTenantEcommerce.Domain.Inventory.Entities;
 using MultiTenantEcommerce.Domain.Inventory.Interfaces;
 using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
-using MultiTenantEcommerce.Domain.Sales.ShoppingCart.Entities;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Application.Inventory.Services;

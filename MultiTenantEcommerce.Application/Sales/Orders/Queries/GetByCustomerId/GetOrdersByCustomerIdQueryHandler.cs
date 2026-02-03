@@ -1,10 +1,7 @@
 ﻿using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Sales.Orders.DTOs;
 using MultiTenantEcommerce.Application.Sales.Orders.Mappers;
-using MultiTenantEcommerce.Domain.Payment.Interfaces;
-using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
 using MultiTenantEcommerce.Domain.Sales.Orders.Interfaces;
-using MultiTenantEcommerce.Domain.Shipping.Interfaces;
 
 namespace MultiTenantEcommerce.Application.Sales.Orders.Queries.GetByCustomerId;
 public class GetOrdersByCustomerIdQueryHandler : IQueryHandler<GetOrdersByCustomerIdQuery, List<OrderResponseDTO>>

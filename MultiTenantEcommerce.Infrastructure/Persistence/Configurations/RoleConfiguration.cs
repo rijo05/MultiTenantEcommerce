@@ -16,6 +16,7 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
                .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(r => r.Permissions)
-                .WithMany();
+                .WithOne()
+                .HasForeignKey(rp => new { rp.TenantId, rp.RoleId });
     }
 }

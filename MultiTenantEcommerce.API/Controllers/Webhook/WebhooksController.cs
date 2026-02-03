@@ -1,7 +1,5 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using MultiTenantEcommerce.Application.Payment.OrderPayment.Commands.Completed;
-using MultiTenantEcommerce.Application.Payment.OrderPayment.Commands.Failed;
+﻿using Microsoft.AspNetCore.Mvc;
+using MultiTenantEcommerce.Infrastructure.Webhooks.Interface;
 using Stripe;
 
 namespace MultiTenantEcommerce.API.Controllers.Webhook;
@@ -10,58 +8,35 @@ namespace MultiTenantEcommerce.API.Controllers.Webhook;
 [Route("api/[controller]")]
 public class WebhooksController : ControllerBase
 {
-    private readonly IMediator _mediator;
+    private readonly string _secret;
+    private readonly IWebhookDispatcher _dispatcher;
 
-    public WebhooksController(IMediator mediator)
+    public WebhooksController(IConfiguration config, IWebhookDispatcher dispatcher)
     {
-        _mediator = mediator;
+        _secret = config["Stripe:WebhookSecret"];
+        _dispatcher = dispatcher;
     }
 
-    [HttpPost("stripe")]
-    public async Task<IActionResult> StripeWebhook()
+    [HttpPost]
+    public async Task<IActionResult> Handle()
     {
-        const string endpointSecret = "whsec_...";
-
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
 
-        Event stripeEvent = EventUtility.ParseEvent(json);
-        var signatureHeader = Request.Headers["Stripe-Signature"];
-
-        stripeEvent = EventUtility.ConstructEvent(json, signatureHeader, endpointSecret);
-
-
-        if (stripeEvent.Type == EventTypes.PaymentIntentSucceeded)
+        try
         {
-            var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
+            var stripeEvent = EventUtility.ConstructEvent(
+                json,
+                Request.Headers["Stripe-Signature"],
+                _secret
+            );
 
-            var paymentId = Guid.Parse(paymentIntent.Metadata["PaymentId"]);
+            await _dispatcher.ProcessAsync(stripeEvent);
 
-            var payment = new MarkOrderPaymentAsCompletedCommand(paymentId, paymentIntent.Id);
-
-            await _mediator.Send(payment);
+            return Ok();
         }
-        else if (stripeEvent.Type == EventTypes.PaymentIntentPaymentFailed)
+        catch (StripeException e)
         {
-            var paymentIntent = stripeEvent.Data.Object as PaymentIntent;
-
-            var paymentId = Guid.Parse(paymentIntent.Metadata["PaymentId"]);
-
-            var payment = new MarkPaymentAsFailedCommand(paymentId, paymentIntent.LastPaymentError.Message);
-
-            await _mediator.Send(payment);
+            return BadRequest();
         }
-        else
-        {
-            //loggar talvez ou simplesmente ignorar
-        }
-
-        return NoContent();
-    }
-
-    [HttpPost("paypal")]
-    public async Task<IActionResult> PaypalWebhook()
-    {
-
-        throw new NotImplementedException();
     }
 }

@@ -8,7 +8,7 @@ namespace MultiTenantEcommerce.Application.Users.Employees.Queries.GetById;
 public class GetEmployeeByIdQueryHandler : IQueryHandler<GetEmployeeByIdQuery, EmployeeResponseDTO>
 {
     private readonly IEmployeeRepository _employeeRepository;
-    private readonly IRoleRepository _roleRepository; 
+    private readonly IRoleRepository _roleRepository;
     private readonly EmployeeMapper _employeeMapper;
 
     public GetEmployeeByIdQueryHandler(IEmployeeRepository employeeRepository,

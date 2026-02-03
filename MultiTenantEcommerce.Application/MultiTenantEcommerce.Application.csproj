@@ -24,6 +24,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Sales\ShoppingCart\Validators\" />
     <Folder Include="Shipping\Queries\GetQuotes\" />
   </ItemGroup>
 

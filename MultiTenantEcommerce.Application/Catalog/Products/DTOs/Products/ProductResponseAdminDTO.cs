@@ -1,5 +1,4 @@
-﻿using MultiTenantEcommerce.Application.Catalog.Categories.DTOs;
-using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
+﻿using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
 using MultiTenantEcommerce.Application.Inventory.DTOs;
 
 namespace MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;

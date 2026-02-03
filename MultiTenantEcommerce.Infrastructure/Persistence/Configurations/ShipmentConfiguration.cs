@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
 using MultiTenantEcommerce.Domain.Shipping.Entities;
 using MultiTenantEcommerce.Domain.Tenants.Entities;
 
@@ -13,6 +14,11 @@ public class ShipmentConfiguration : IEntityTypeConfiguration<Shipment>
         builder.HasOne<Tenant>()
             .WithMany()
             .HasForeignKey(x => x.TenantId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        builder.HasOne<Order>()
+            .WithMany()
+            .HasForeignKey(x => new { x.TenantId, x.OrderId })
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.OwnsOne(o => o.Address, address =>
@@ -30,5 +36,8 @@ public class ShipmentConfiguration : IEntityTypeConfiguration<Shipment>
                 .HasColumnName("Price")
                 .IsRequired();
         });
+
+        builder.Property(x => x.Carrier).HasConversion<string>().IsRequired();
+        builder.Property(x => x.Status).HasConversion<string>().IsRequired();
     }
 }

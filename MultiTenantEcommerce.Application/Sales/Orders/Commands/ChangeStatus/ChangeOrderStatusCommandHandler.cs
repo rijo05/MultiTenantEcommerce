@@ -16,10 +16,10 @@ public class ChangeOrderStatusCommandHandler : ICommandHandler<ChangeOrderStatus
     private readonly IUnitOfWork _unitOfWork;
     private readonly OrderMapper _orderMapper;
 
-    public ChangeOrderStatusCommandHandler(IOrderRepository orderRepository, 
-        IShipmentRepository shipmentRepository, 
-        IOrderPaymentRepository orderPaymentRepository, 
-        IUnitOfWork unitOfWork, 
+    public ChangeOrderStatusCommandHandler(IOrderRepository orderRepository,
+        IShipmentRepository shipmentRepository,
+        IOrderPaymentRepository orderPaymentRepository,
+        IUnitOfWork unitOfWork,
         OrderMapper orderMapper)
     {
         _orderRepository = orderRepository;

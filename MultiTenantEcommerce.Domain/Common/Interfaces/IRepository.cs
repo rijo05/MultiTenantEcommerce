@@ -1,5 +1,4 @@
 ﻿using MultiTenantEcommerce.Domain.Common.Entities;
-using System.Linq.Expressions;
 
 namespace MultiTenantEcommerce.Domain.Common.Interfaces;
 

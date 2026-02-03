@@ -15,10 +15,10 @@ public class GetCartByCustomerIdQueryHandler : IQueryHandler<GetCartByCustomerId
     private readonly IFileStorageService _fileStorageService;
     private readonly CartMapper _cartMapper;
 
-    public GetCartByCustomerIdQueryHandler(ICartRepository cartRepository, 
-        IProductRepository productRepository, 
-        IStockRepository stockRepository, 
-        IFileStorageService fileStorageService, 
+    public GetCartByCustomerIdQueryHandler(ICartRepository cartRepository,
+        IProductRepository productRepository,
+        IStockRepository stockRepository,
+        IFileStorageService fileStorageService,
         CartMapper cartMapper)
     {
         _cartRepository = cartRepository;

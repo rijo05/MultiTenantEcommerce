@@ -3,7 +3,6 @@ using MultiTenantEcommerce.Application.Sales.ShoppingCart.DTOs;
 using MultiTenantEcommerce.Domain.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Inventory.Entities;
 using MultiTenantEcommerce.Domain.Sales.ShoppingCart.Entities;
-using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Application.Sales.ShoppingCart.Mappers;
 public class CartMapper

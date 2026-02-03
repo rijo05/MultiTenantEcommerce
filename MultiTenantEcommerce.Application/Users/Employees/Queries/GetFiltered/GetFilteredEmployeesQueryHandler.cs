@@ -11,7 +11,7 @@ public class GetFilteredEmployeesQueryHandler : IQueryHandler<GetFilteredEmploye
     private readonly IRoleRepository _roleRepository;
     private readonly EmployeeMapper _employeeMapper;
 
-    public GetFilteredEmployeesQueryHandler(IEmployeeRepository employeeRepository, 
+    public GetFilteredEmployeesQueryHandler(IEmployeeRepository employeeRepository,
         EmployeeMapper employeeMapper,
         IRoleRepository roleRepository)
     {
@@ -20,7 +20,7 @@ public class GetFilteredEmployeesQueryHandler : IQueryHandler<GetFilteredEmploye
         _roleRepository = roleRepository;
     }
 
-    public async Task<List<EmployeeResponseDTO>> Handle(GetFilteredEmployeesQuery    request, CancellationToken cancellationToken)
+    public async Task<List<EmployeeResponseDTO>> Handle(GetFilteredEmployeesQuery request, CancellationToken cancellationToken)
     {
         var employees = await _employeeRepository.GetFilteredAsync(
             request.Name,

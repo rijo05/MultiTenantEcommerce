@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Shipping.Entities;
 using MultiTenantEcommerce.Domain.Shipping.Interfaces;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;

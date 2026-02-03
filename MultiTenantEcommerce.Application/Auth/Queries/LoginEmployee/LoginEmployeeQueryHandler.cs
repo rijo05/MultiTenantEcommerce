@@ -13,9 +13,9 @@ public class LoginEmployeeQueryHandler : IQueryHandler<LoginEmployeeQuery, AuthE
     private readonly IPermissionRepository _permissionRepository;
     private readonly ITokenService _tokenService;
 
-    public LoginEmployeeQueryHandler(IEmployeeRepository employeeRepository, 
-        IRoleRepository roleRepository, 
-        IPermissionRepository permissionRepository, 
+    public LoginEmployeeQueryHandler(IEmployeeRepository employeeRepository,
+        IRoleRepository roleRepository,
+        IPermissionRepository permissionRepository,
         ITokenService tokenService)
     {
         _employeeRepository = employeeRepository;

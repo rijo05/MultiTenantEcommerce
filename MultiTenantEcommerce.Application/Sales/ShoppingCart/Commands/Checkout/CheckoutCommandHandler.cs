@@ -58,7 +58,7 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, PaymentRe
         var cart = await _cartRepository.GetByCustomerIdAsync(request.CustomerId)
             ?? throw new Exception("Cart not found");
 
-        if (cart.IsEmpty()) 
+        if (cart.IsEmpty())
             throw new Exception("Cart is empty");
 
         var productsIds = cart.Items.Select(x => x.ProductId).Distinct();
@@ -141,10 +141,11 @@ public class CheckoutCommandHandler : ICommandHandler<CheckoutCommand, PaymentRe
         try
         {
             var paymentProvider = _paymentProviderFactory.GetProvider(request.PaymentMethod);
-            //STRIPE ACCOUNT ID ERRADO ######### CONFIGURAR FUTURO
+
             var tenant = await _tenantRepository.GetByIdAsync(_tenantContext.TenantId)
                 ?? throw new Exception("Tenant not found, Shouldnt happen");
-            var paymentResult = await paymentProvider.CreatePaymentAsync(payment.Id, order, quote, tenant.Id.ToString());
+
+            var paymentResult = await paymentProvider.CreatePaymentAsync(payment.Id, order, quote, tenant.Id.ToString(), tenant.Subscription.Plan.TransactionFee);
 
             return paymentResult;
         }

@@ -4,7 +4,6 @@ using MultiTenantEcommerce.Domain.Common.Guard;
 using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Inventory.Events;
 using MultiTenantEcommerce.Domain.ValueObjects;
-using System.ComponentModel.DataAnnotations;
 
 namespace MultiTenantEcommerce.Domain.Inventory.Entities;
 public class Stock : TenantBase

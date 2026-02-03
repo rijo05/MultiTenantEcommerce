@@ -18,7 +18,7 @@ public class ProductRepository : Repository<Product>, IProductRepository
 
     public override async Task<Product?> GetByIdAsync(Guid productId)
     {
-        return await _appDbContext.Products 
+        return await _appDbContext.Products
             .Include(x => x.Images)
             .AsSplitQuery()
             .FirstOrDefaultAsync(x => x.Id == productId);
@@ -27,7 +27,7 @@ public class ProductRepository : Repository<Product>, IProductRepository
     public override async Task<List<Product>> GetByIdsAsync(IEnumerable<Guid> ids)
     {
         return await _appDbContext.Products
-            .Include (x => x.Images)
+            .Include(x => x.Images)
             .Where(x => ids.Contains(x.Id))
             .AsSplitQuery()
             .ToListAsync();

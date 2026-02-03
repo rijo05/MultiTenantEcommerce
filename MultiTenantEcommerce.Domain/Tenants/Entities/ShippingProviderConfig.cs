@@ -7,6 +7,7 @@ public class ShippingProviderConfig : TenantBase
     public ShipmentCarrier Carrier { get; private set; }
     public bool IsActive { get; private set; }
 
+    private ShippingProviderConfig() { }
     internal ShippingProviderConfig(Guid tenantId, ShipmentCarrier carrier, bool isActive)
         : base(tenantId)
     {

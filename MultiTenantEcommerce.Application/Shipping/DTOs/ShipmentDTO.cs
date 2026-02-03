@@ -1,11 +1,6 @@
 ﻿using MultiTenantEcommerce.Application.Common.DTOs.Address;
 using MultiTenantEcommerce.Domain.Shipping.Enums;
 using MultiTenantEcommerce.Domain.ValueObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Shipping.DTOs;
 public class ShipmentDTO

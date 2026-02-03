@@ -37,13 +37,16 @@ public class AppDbContext : DbContext
     public virtual DbSet<Stock> Stocks { get; set; }
     public virtual DbSet<StockMovement> StockMovements { get; set; }
     public virtual DbSet<Shipment> Shipments { get; set; }
+    public virtual DbSet<ShippingProviderConfig> ShippingProviderConfigs { get; set; }
     public virtual DbSet<Order> Orders { get; set; }
     public virtual DbSet<OrderItem> OrderItems { get; set; }
     public virtual DbSet<Cart> Carts { get; set; }
     public virtual DbSet<CartItem> CartItems { get; set; }
     public virtual DbSet<OrderPayment> OrderPayments { get; set; }
     public virtual DbSet<Tenant> Tenants { get; set; }
+    public virtual DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
     public virtual DbSet<Role> Roles { get; set; }
+    public virtual DbSet<RolePermission> RolePermissions { get; set; }
     public virtual DbSet<Permission> Permissions { get; set; }
     public virtual DbSet<EmployeeRole> EmployeeRoles { get; set; }
     public virtual DbSet<OutboxEvent> OutboxEvents { get; set; }
@@ -66,6 +69,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Employee>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
 
         modelBuilder.Entity<Shipment>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
+        modelBuilder.Entity<ShippingProviderConfig>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
 
         modelBuilder.Entity<Order>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
         modelBuilder.Entity<OrderItem>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
@@ -79,7 +83,7 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Role>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
         modelBuilder.Entity<EmployeeRole>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
-
+        modelBuilder.Entity<RolePermission>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
     }
 
     public override int SaveChanges()

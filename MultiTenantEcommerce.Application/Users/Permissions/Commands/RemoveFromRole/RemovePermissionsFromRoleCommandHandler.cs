@@ -43,7 +43,7 @@ public class RemovePermissionsFromRoleCommandHandler : ICommandHandler<RemovePer
         var remainingPermissions = remainingIds.Any()
             ? await _permissionRepository.GetByIdsAsync(remainingIds)
             : new List<Permission>();
-            
+
         return _rolesMapper.ToRoleDetailResponseDTO(role, remainingPermissions);
     }
 }

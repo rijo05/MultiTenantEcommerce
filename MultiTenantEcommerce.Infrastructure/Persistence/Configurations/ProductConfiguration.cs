@@ -27,6 +27,11 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
             .HasForeignKey(x => new { x.TenantId, x.ProductId })
             .OnDelete(DeleteBehavior.Restrict);
 
+        builder.HasOne<Category>()
+            .WithMany()
+            .HasForeignKey(x => new { x.TenantId, x.CategoryId })
+            .OnDelete(DeleteBehavior.Restrict);
+
 
         //builder.HasIndex(p => p.TenantId)
         //        .HasDatabaseName("IX_Product_TenantId");

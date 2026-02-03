@@ -1,5 +1,4 @@
 ﻿using MultiTenantEcommerce.Application.Users.Permissions.DTOs;
-using MultiTenantEcommerce.Domain.Users.Entities;
 using MultiTenantEcommerce.Domain.Users.Entities.Permissions;
 
 namespace MultiTenantEcommerce.Application.Users.Permissions.Mappers;

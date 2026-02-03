@@ -1,16 +1,15 @@
-﻿using MultiTenantEcommerce.Application.Common.Helpers.Services;
-using MultiTenantEcommerce.Application.Tenants.DTOs.Tenant;
+﻿using MultiTenantEcommerce.Application.Tenants.DTOs.Tenant;
 using MultiTenantEcommerce.Domain.Tenants.Entities;
 
 namespace MultiTenantEcommerce.Application.Tenants.Mappers;
 
 public class TenantMapper
 {
-    private readonly HateoasLinkService _hateoasLinkService;
+    private readonly SubscriptionPlanMapper _subscriptionPlanMapper;
 
-    public TenantMapper(HateoasLinkService hateoasLinkService)
+    public TenantMapper(SubscriptionPlanMapper subscriptionPlanMapper)
     {
-        _hateoasLinkService = hateoasLinkService;
+        _subscriptionPlanMapper = subscriptionPlanMapper;
     }
 
     public TenantResponseDTO ToTenantResponseDTO(Tenant tenant)
@@ -18,8 +17,17 @@ public class TenantMapper
         return new TenantResponseDTO
         {
             CompanyName = tenant.Name,
+            Email = tenant.Email.Value,
+            Shipping = tenant.ShippingProviders.Select(s => new ShippingProviderConfigDTO
+            {
+                Carrier = s.Carrier.ToString(),
+                IsActive = s.IsActive
+            }).ToList(),
+            Status = tenant.Subscription.Status.ToString(),
+            CurrentPeriodStart = tenant.Subscription.CurrentPeriodStart,
+            CurrentPeriodEnd = tenant.Subscription.CurrentPeriodEnd,
             CreatedAt = tenant.CreatedAt,
-            UpdatedAt = tenant.UpdatedAt
+            SubscriptionPlan = _subscriptionPlanMapper.ToSubscriptionPlanResponseDTO(tenant.Subscription.Plan)
         };
     }
 

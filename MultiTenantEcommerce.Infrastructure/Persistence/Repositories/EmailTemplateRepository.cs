@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Domain.Templates.Entities;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;

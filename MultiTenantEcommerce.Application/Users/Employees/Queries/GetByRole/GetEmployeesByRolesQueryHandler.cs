@@ -1,7 +1,6 @@
 ﻿using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 using MultiTenantEcommerce.Application.Users.Employees.DTOs;
 using MultiTenantEcommerce.Application.Users.Employees.Mappers;
-using MultiTenantEcommerce.Domain.Users.Entities;
 using MultiTenantEcommerce.Domain.Users.Interfaces;
 using MultiTenantEcommerce.Domain.Users.Interfaces.Permissions;
 
@@ -12,7 +11,7 @@ public class GetEmployeesByRolesQueryHandler : IQueryHandler<GetEmployeesByRoles
     private readonly IRoleRepository _roleRepository;
     private readonly EmployeeMapper _employeeMapper;
 
-    public GetEmployeesByRolesQueryHandler(IEmployeeRepository employeeRepository, 
+    public GetEmployeesByRolesQueryHandler(IEmployeeRepository employeeRepository,
         IRoleRepository roleRepository,
         EmployeeMapper employeeMapper)
     {

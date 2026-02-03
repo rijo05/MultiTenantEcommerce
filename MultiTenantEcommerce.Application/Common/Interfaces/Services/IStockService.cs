@@ -1,5 +1,4 @@
 ﻿using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
-using MultiTenantEcommerce.Domain.Sales.ShoppingCart.Entities;
 using MultiTenantEcommerce.Domain.ValueObjects;
 
 namespace MultiTenantEcommerce.Application.Common.Interfaces.Services;

@@ -2,6 +2,6 @@
 using MultiTenantEcommerce.Application.Common.Interfaces.CQRS;
 
 namespace MultiTenantEcommerce.Application.Payment.OrderPayment.Commands.Completed;
-public record MarkOrderPaymentAsCompletedCommand(
-    Guid PaymentId,
+public record MarkOrderAsPaidCommand(
+    Guid OrderId,
     string TransactionId) : ICommand<Unit>;

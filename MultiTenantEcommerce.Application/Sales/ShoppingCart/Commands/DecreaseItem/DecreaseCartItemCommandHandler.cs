@@ -17,11 +17,11 @@ public class DecreaseCartItemCommandHandler : ICommandHandler<DecreaseCartItemCo
     private readonly CartMapper _cartMapper;
     private readonly IUnitOfWork _unitOfWork;
 
-    public DecreaseCartItemCommandHandler(ICartRepository cartRepository, 
-        IProductRepository productRepository, 
-        IStockRepository stockRepository, 
-        IFileStorageService fileStorageService, 
-        CartMapper cartMapper, 
+    public DecreaseCartItemCommandHandler(ICartRepository cartRepository,
+        IProductRepository productRepository,
+        IStockRepository stockRepository,
+        IFileStorageService fileStorageService,
+        CartMapper cartMapper,
         IUnitOfWork unitOfWork)
     {
         _cartRepository = cartRepository;

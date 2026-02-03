@@ -57,7 +57,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("tenants/register")]
-    public async Task<ActionResult<AuthTenantResponse>> RegisterTenant([FromBody] CreateTenantCommand tenantCommand)
+    public async Task<ActionResult<string>> RegisterTenant([FromBody] CreateTenantCommand tenantCommand)
     {
         var result = await _mediator.Send(tenantCommand);
 

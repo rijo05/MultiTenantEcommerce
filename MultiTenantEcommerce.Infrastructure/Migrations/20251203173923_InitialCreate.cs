@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -105,18 +104,54 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "SubscriptionPlans",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    StripePriceId = table.Column<string>(type: "text", nullable: false),
+                    Price = table.Column<decimal>(type: "numeric", nullable: false),
+                    TransactionFee = table.Column<decimal>(type: "numeric", nullable: false),
+                    PlanLimits_MaxProducts = table.Column<int>(type: "integer", nullable: false),
+                    PlanLimits_MaxCategories = table.Column<int>(type: "integer", nullable: false),
+                    PlanLimits_MaxImagesPerProduct = table.Column<int>(type: "integer", nullable: false),
+                    PlanLimits_MaxEmployees = table.Column<int>(type: "integer", nullable: false),
+                    PlanLimits_MaxStorageBytes = table.Column<int>(type: "integer", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SubscriptionPlans", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Tenants",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Name = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
+                    StripeAccountId = table.Column<string>(type: "text", nullable: true),
+                    StripeCustomerId = table.Column<string>(type: "text", nullable: true),
+                    SubscriptionPlanId = table.Column<Guid>(type: "uuid", nullable: false),
+                    StripeSubscriptionId = table.Column<string>(type: "text", nullable: true),
+                    SubscriptionStatus = table.Column<string>(type: "text", nullable: false),
+                    SubscriptionCurrentPeriodStart = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    SubscriptionCurrentPeriodEnd = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    SubscriptionCancelAtPeriodEnd = table.Column<bool>(type: "boolean", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tenants", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tenants_SubscriptionPlans_SubscriptionPlanId",
+                        column: x => x.SubscriptionPlanId,
+                        principalTable: "SubscriptionPlans",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -220,6 +255,35 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "OrderPayments",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
+                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
+                    PaymentMethod = table.Column<string>(type: "text", nullable: false),
+                    TransactionId = table.Column<string>(type: "text", nullable: true),
+                    CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    CancelledAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Metadata = table.Column<string>(type: "text", nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_OrderPayments", x => new { x.TenantId, x.Id });
+                    table.ForeignKey(
+                        name: "FK_OrderPayments_Tenants_TenantId",
+                        column: x => x.TenantId,
+                        principalTable: "Tenants",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Roles",
                 columns: table => new
                 {
@@ -243,7 +307,7 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ShippingProviderConfig",
+                name: "ShippingProviderConfigs",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -255,12 +319,35 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_ShippingProviderConfig", x => x.Id);
+                    table.PrimaryKey("PK_ShippingProviderConfigs", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ShippingProviderConfig_Tenants_TenantId",
+                        name: "FK_ShippingProviderConfigs_Tenants_TenantId",
                         column: x => x.TenantId,
                         principalTable: "Tenants",
                         principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CartItems",
+                columns: table => new
+                {
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CartId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CartItems", x => new { x.TenantId, x.CartId, x.ProductId });
+                    table.ForeignKey(
+                        name: "FK_CartItems_Carts_TenantId_CartId",
+                        columns: x => new { x.TenantId, x.CartId },
+                        principalTable: "Carts",
+                        principalColumns: new[] { "TenantId", "Id" },
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -309,7 +396,7 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                     Country = table.Column<string>(type: "text", nullable: false),
                     HouseNumber = table.Column<string>(type: "text", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
-                    ShipmentCarrier = table.Column<int>(type: "integer", nullable: false),
+                    ShipmentCarrier = table.Column<string>(type: "text", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -350,64 +437,26 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                         principalTable: "Employees",
                         principalColumns: new[] { "TenantId", "Id" },
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_EmployeeRoles_Roles_TenantId_RoleId",
-                        columns: x => new { x.TenantId, x.RoleId },
-                        principalTable: "Roles",
-                        principalColumns: new[] { "TenantId", "Id" },
-                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
-                name: "PermissionRole",
+                name: "RolePermission",
                 columns: table => new
                 {
-                    PermissionsId = table.Column<Guid>(type: "uuid", nullable: false),
-                    RoleTenantId = table.Column<Guid>(type: "uuid", nullable: false),
-                    RoleId = table.Column<Guid>(type: "uuid", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PermissionRole", x => new { x.PermissionsId, x.RoleTenantId, x.RoleId });
-                    table.ForeignKey(
-                        name: "FK_PermissionRole_Permissions_PermissionsId",
-                        column: x => x.PermissionsId,
-                        principalTable: "Permissions",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_PermissionRole_Roles_RoleTenantId_RoleId",
-                        columns: x => new { x.RoleTenantId, x.RoleId },
-                        principalTable: "Roles",
-                        principalColumns: new[] { "TenantId", "Id" },
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "CartItems",
-                columns: table => new
-                {
-                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CartId = table.Column<Guid>(type: "uuid", nullable: false),
-                    ProductId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Quantity = table.Column<int>(type: "integer", nullable: false),
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    PermissionId = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_CartItems", x => new { x.TenantId, x.CartId, x.ProductId });
+                    table.PrimaryKey("PK_RolePermission", x => new { x.TenantId, x.Id });
                     table.ForeignKey(
-                        name: "FK_CartItems_Carts_TenantId_CartId",
-                        columns: x => new { x.TenantId, x.CartId },
-                        principalTable: "Carts",
-                        principalColumns: new[] { "TenantId", "Id" },
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_CartItems_Products_TenantId_ProductId",
-                        columns: x => new { x.TenantId, x.ProductId },
-                        principalTable: "Products",
+                        name: "FK_RolePermission_Roles_TenantId_RoleId",
+                        columns: x => new { x.TenantId, x.RoleId },
+                        principalTable: "Roles",
                         principalColumns: new[] { "TenantId", "Id" },
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -478,8 +527,7 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                     ProductId = table.Column<Guid>(type: "uuid", nullable: false),
                     Quantity = table.Column<int>(type: "integer", nullable: false),
                     MinimumQuantity = table.Column<int>(type: "integer", nullable: false),
-                    ReservedStock = table.Column<int>(type: "integer", nullable: false),
-                    RowVersion = table.Column<byte[]>(type: "bytea", nullable: false),
+                    Reserved = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
@@ -526,41 +574,6 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "OrderPayments",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    TenantId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CustomerId = table.Column<Guid>(type: "uuid", nullable: false),
-                    OrderId = table.Column<Guid>(type: "uuid", nullable: false),
-                    Amount = table.Column<decimal>(type: "numeric", nullable: false),
-                    Status = table.Column<string>(type: "text", nullable: false),
-                    PaymentMethod = table.Column<string>(type: "text", nullable: false),
-                    TransactionId = table.Column<string>(type: "text", nullable: true),
-                    CompletedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    CancelledAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    Metadata = table.Column<string>(type: "text", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_OrderPayments", x => new { x.TenantId, x.Id });
-                    table.ForeignKey(
-                        name: "FK_OrderPayments_Orders_TenantId_OrderId",
-                        columns: x => new { x.TenantId, x.OrderId },
-                        principalTable: "Orders",
-                        principalColumns: new[] { "TenantId", "Id" },
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_OrderPayments_Tenants_TenantId",
-                        column: x => x.TenantId,
-                        principalTable: "Tenants",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Shipments",
                 columns: table => new
                 {
@@ -573,8 +586,8 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                     PostalCode = table.Column<string>(type: "text", nullable: false),
                     Country = table.Column<string>(type: "text", nullable: false),
                     HouseNumber = table.Column<string>(type: "text", nullable: false),
-                    Carrier = table.Column<int>(type: "integer", nullable: false),
-                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Carrier = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<string>(type: "text", nullable: false),
                     LabelKey = table.Column<string>(type: "text", nullable: false),
                     Price = table.Column<decimal>(type: "numeric", nullable: false),
                     DeliveredAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
@@ -603,16 +616,6 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_CartItems_TenantId_ProductId",
-                table: "CartItems",
-                columns: new[] { "TenantId", "ProductId" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EmployeeRoles_TenantId_RoleId",
-                table: "EmployeeRoles",
-                columns: new[] { "TenantId", "RoleId" });
-
-            migrationBuilder.CreateIndex(
                 name: "IX_OrderItems_TenantId_OrderId_ProductId",
                 table: "OrderItems",
                 columns: new[] { "TenantId", "OrderId", "ProductId" },
@@ -624,20 +627,9 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 columns: new[] { "TenantId", "ProductId" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_OrderPayments_TenantId_OrderId",
-                table: "OrderPayments",
-                columns: new[] { "TenantId", "OrderId" },
-                unique: true);
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Orders_TenantId_CustomerId",
                 table: "Orders",
                 columns: new[] { "TenantId", "CustomerId" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PermissionRole_RoleTenantId_RoleId",
-                table: "PermissionRole",
-                columns: new[] { "RoleTenantId", "RoleId" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductImages_TenantId_ProductId",
@@ -650,14 +642,18 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 columns: new[] { "TenantId", "CategoryId" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Shipments_TenantId_OrderId",
-                table: "Shipments",
-                columns: new[] { "TenantId", "OrderId" },
-                unique: true);
+                name: "IX_RolePermission_TenantId_RoleId",
+                table: "RolePermission",
+                columns: new[] { "TenantId", "RoleId" });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ShippingProviderConfig_TenantId",
-                table: "ShippingProviderConfig",
+                name: "IX_Shipments_TenantId_OrderId",
+                table: "Shipments",
+                columns: new[] { "TenantId", "OrderId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ShippingProviderConfigs_TenantId",
+                table: "ShippingProviderConfigs",
                 column: "TenantId");
 
             migrationBuilder.CreateIndex(
@@ -670,6 +666,11 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 table: "Stocks",
                 columns: new[] { "TenantId", "ProductId" },
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tenants_SubscriptionPlanId",
+                table: "Tenants",
+                column: "SubscriptionPlanId");
         }
 
         /// <inheritdoc />
@@ -697,7 +698,7 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 name: "OutboxEvents");
 
             migrationBuilder.DropTable(
-                name: "PermissionRole");
+                name: "Permissions");
 
             migrationBuilder.DropTable(
                 name: "ProcessedEvents");
@@ -706,10 +707,13 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 name: "ProductImages");
 
             migrationBuilder.DropTable(
+                name: "RolePermission");
+
+            migrationBuilder.DropTable(
                 name: "Shipments");
 
             migrationBuilder.DropTable(
-                name: "ShippingProviderConfig");
+                name: "ShippingProviderConfigs");
 
             migrationBuilder.DropTable(
                 name: "StockMovements");
@@ -722,9 +726,6 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Employees");
-
-            migrationBuilder.DropTable(
-                name: "Permissions");
 
             migrationBuilder.DropTable(
                 name: "Roles");
@@ -743,6 +744,9 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
 
             migrationBuilder.DropTable(
                 name: "Tenants");
+
+            migrationBuilder.DropTable(
+                name: "SubscriptionPlans");
         }
     }
 }

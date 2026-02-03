@@ -142,14 +142,17 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int>("MinimumQuantity")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("ProductId")
                         .HasColumnType("uuid");
 
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bytea");
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Reserved")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -238,9 +241,6 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
 
                     b.HasKey("TenantId", "Id");
 
-                    b.HasIndex("TenantId", "OrderId")
-                        .IsUnique();
-
                     b.ToTable("OrderPayments");
                 });
 
@@ -262,8 +262,9 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("ShipmentCarrier")
-                        .HasColumnType("integer");
+                    b.Property<string>("ShipmentCarrier")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -356,8 +357,6 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
 
                     b.HasKey("TenantId", "CartId", "ProductId");
 
-                    b.HasIndex("TenantId", "ProductId");
-
                     b.ToTable("CartItems");
                 });
 
@@ -369,8 +368,9 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
-                    b.Property<int>("Carrier")
-                        .HasColumnType("integer");
+                    b.Property<string>("Carrier")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
@@ -397,8 +397,9 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                     b.Property<DateTime?>("ShippedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("TrackingNumber")
                         .IsRequired()
@@ -409,8 +410,7 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
 
                     b.HasKey("TenantId", "Id");
 
-                    b.HasIndex("TenantId", "OrderId")
-                        .IsUnique();
+                    b.HasIndex("TenantId", "OrderId");
 
                     b.ToTable("Shipments");
                 });
@@ -475,7 +475,35 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
 
                     b.HasIndex("TenantId");
 
-                    b.ToTable("ShippingProviderConfig");
+                    b.ToTable("ShippingProviderConfigs");
+                });
+
+            modelBuilder.Entity("MultiTenantEcommerce.Domain.Tenants.Entities.SubscriptionPlan", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("StripePriceId")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<decimal>("TransactionFee")
+                        .HasColumnType("numeric");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SubscriptionPlans");
                 });
 
             modelBuilder.Entity("MultiTenantEcommerce.Domain.Tenants.Entities.Tenant", b =>
@@ -489,6 +517,12 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("StripeAccountId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("StripeCustomerId")
                         .HasColumnType("text");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -573,8 +607,6 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
 
                     b.HasKey("TenantId", "EmployeeId", "RoleId");
 
-                    b.HasIndex("TenantId", "RoleId");
-
                     b.ToTable("EmployeeRoles");
                 });
 
@@ -639,6 +671,33 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                     b.HasKey("TenantId", "Id");
 
                     b.ToTable("Roles");
+                });
+
+            modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.Permissions.RolePermission", b =>
+                {
+                    b.Property<Guid>("TenantId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("PermissionId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("TenantId", "Id");
+
+                    b.HasIndex("TenantId", "RoleId");
+
+                    b.ToTable("RolePermissions");
                 });
 
             modelBuilder.Entity("MultiTenantEcommerce.Infrastructure.EmailService.EmailQueue", b =>
@@ -756,24 +815,6 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                     b.ToTable("OutboxEvents");
                 });
 
-            modelBuilder.Entity("PermissionRole", b =>
-                {
-                    b.Property<Guid>("PermissionsId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("RoleTenantId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("PermissionsId", "RoleTenantId", "RoleId");
-
-                    b.HasIndex("RoleTenantId", "RoleId");
-
-                    b.ToTable("PermissionRole");
-                });
-
             modelBuilder.Entity("MultiTenantEcommerce.Domain.Catalog.Entities.Category", b =>
                 {
                     b.HasOne("MultiTenantEcommerce.Domain.Tenants.Entities.Tenant", null)
@@ -791,7 +832,7 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("MultiTenantEcommerce.Domain.Catalog.Entities.Category", "Category")
+                    b.HasOne("MultiTenantEcommerce.Domain.Catalog.Entities.Category", null)
                         .WithMany()
                         .HasForeignKey("TenantId", "CategoryId")
                         .OnDelete(DeleteBehavior.Restrict)
@@ -816,8 +857,6 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("ProductTenantId", "ProductId");
                         });
-
-                    b.Navigation("Category");
 
                     b.Navigation("Price")
                         .IsRequired();
@@ -845,75 +884,6 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                         .HasForeignKey("MultiTenantEcommerce.Domain.Inventory.Entities.Stock", "TenantId", "ProductId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
-
-                    b.OwnsOne("MultiTenantEcommerce.Domain.ValueObjects.NonNegativeQuantity", "MinimumQuantity", b1 =>
-                        {
-                            b1.Property<Guid>("StockTenantId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<Guid>("StockId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<int>("Value")
-                                .HasColumnType("integer")
-                                .HasColumnName("MinimumQuantity");
-
-                            b1.HasKey("StockTenantId", "StockId");
-
-                            b1.ToTable("Stocks");
-
-                            b1.WithOwner()
-                                .HasForeignKey("StockTenantId", "StockId");
-                        });
-
-                    b.OwnsOne("MultiTenantEcommerce.Domain.ValueObjects.NonNegativeQuantity", "Quantity", b1 =>
-                        {
-                            b1.Property<Guid>("StockTenantId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<Guid>("StockId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<int>("Value")
-                                .HasColumnType("integer")
-                                .HasColumnName("Quantity");
-
-                            b1.HasKey("StockTenantId", "StockId");
-
-                            b1.ToTable("Stocks");
-
-                            b1.WithOwner()
-                                .HasForeignKey("StockTenantId", "StockId");
-                        });
-
-                    b.OwnsOne("MultiTenantEcommerce.Domain.ValueObjects.NonNegativeQuantity", "Reserved", b1 =>
-                        {
-                            b1.Property<Guid>("StockTenantId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<Guid>("StockId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<int>("Value")
-                                .HasColumnType("integer")
-                                .HasColumnName("ReservedStock");
-
-                            b1.HasKey("StockTenantId", "StockId");
-
-                            b1.ToTable("Stocks");
-
-                            b1.WithOwner()
-                                .HasForeignKey("StockTenantId", "StockId");
-                        });
-
-                    b.Navigation("MinimumQuantity")
-                        .IsRequired();
-
-                    b.Navigation("Quantity")
-                        .IsRequired();
-
-                    b.Navigation("Reserved")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("MultiTenantEcommerce.Domain.Inventory.Entities.StockMovement", b =>
@@ -930,12 +900,6 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                     b.HasOne("MultiTenantEcommerce.Domain.Tenants.Entities.Tenant", null)
                         .WithMany()
                         .HasForeignKey("TenantId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MultiTenantEcommerce.Domain.Sales.Orders.Entities.Order", null)
-                        .WithOne("OrderPayment")
-                        .HasForeignKey("MultiTenantEcommerce.Domain.Payment.Entities.OrderPayment", "TenantId", "OrderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1129,12 +1093,6 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("MultiTenantEcommerce.Domain.Catalog.Entities.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("TenantId", "ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.OwnsOne("MultiTenantEcommerce.Domain.ValueObjects.PositiveQuantity", "Quantity", b1 =>
                         {
                             b1.Property<Guid>("CartItemTenantId")
@@ -1158,8 +1116,6 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                                 .HasForeignKey("CartItemTenantId", "CartItemCartId", "CartItemProductId");
                         });
 
-                    b.Navigation("Product");
-
                     b.Navigation("Quantity")
                         .IsRequired();
                 });
@@ -1173,8 +1129,8 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("MultiTenantEcommerce.Domain.Sales.Orders.Entities.Order", null)
-                        .WithOne("Shipment")
-                        .HasForeignKey("MultiTenantEcommerce.Domain.Shipping.Entities.Shipment", "TenantId", "OrderId")
+                        .WithMany()
+                        .HasForeignKey("TenantId", "OrderId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1255,6 +1211,60 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("MultiTenantEcommerce.Domain.Tenants.Entities.SubscriptionPlan", b =>
+                {
+                    b.OwnsOne("MultiTenantEcommerce.Domain.Tenants.Entities.PlanLimits", "PlanLimits", b1 =>
+                        {
+                            b1.Property<Guid>("SubscriptionPlanId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("MaxCategories")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("MaxEmployees")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("MaxImagesPerProduct")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("MaxProducts")
+                                .HasColumnType("integer");
+
+                            b1.Property<int>("MaxStorageBytes")
+                                .HasColumnType("integer");
+
+                            b1.HasKey("SubscriptionPlanId");
+
+                            b1.ToTable("SubscriptionPlans");
+
+                            b1.WithOwner()
+                                .HasForeignKey("SubscriptionPlanId");
+                        });
+
+                    b.OwnsOne("MultiTenantEcommerce.Domain.ValueObjects.Money", "Price", b1 =>
+                        {
+                            b1.Property<Guid>("SubscriptionPlanId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<decimal>("Value")
+                                .HasColumnType("numeric")
+                                .HasColumnName("Price");
+
+                            b1.HasKey("SubscriptionPlanId");
+
+                            b1.ToTable("SubscriptionPlans");
+
+                            b1.WithOwner()
+                                .HasForeignKey("SubscriptionPlanId");
+                        });
+
+                    b.Navigation("PlanLimits")
+                        .IsRequired();
+
+                    b.Navigation("Price")
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("MultiTenantEcommerce.Domain.Tenants.Entities.Tenant", b =>
                 {
                     b.OwnsOne("MultiTenantEcommerce.Domain.ValueObjects.Email", "Email", b1 =>
@@ -1275,7 +1285,58 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                                 .HasForeignKey("TenantId");
                         });
 
+                    b.OwnsOne("MultiTenantEcommerce.Domain.Tenants.Entities.TenantSubscription", "Subscription", b1 =>
+                        {
+                            b1.Property<Guid>("TenantId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<bool>("CancelAtPeriodEnd")
+                                .HasColumnType("boolean")
+                                .HasColumnName("SubscriptionCancelAtPeriodEnd");
+
+                            b1.Property<DateTime>("CurrentPeriodEnd")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("SubscriptionCurrentPeriodEnd");
+
+                            b1.Property<DateTime>("CurrentPeriodStart")
+                                .HasColumnType("timestamp with time zone")
+                                .HasColumnName("SubscriptionCurrentPeriodStart");
+
+                            b1.Property<Guid>("PlanId")
+                                .HasColumnType("uuid")
+                                .HasColumnName("SubscriptionPlanId");
+
+                            b1.Property<string>("Status")
+                                .IsRequired()
+                                .HasColumnType("text")
+                                .HasColumnName("SubscriptionStatus");
+
+                            b1.Property<string>("StripeSubscriptionId")
+                                .HasColumnType("text")
+                                .HasColumnName("StripeSubscriptionId");
+
+                            b1.HasKey("TenantId");
+
+                            b1.HasIndex("PlanId");
+
+                            b1.ToTable("Tenants");
+
+                            b1.HasOne("MultiTenantEcommerce.Domain.Tenants.Entities.SubscriptionPlan", "Plan")
+                                .WithMany()
+                                .HasForeignKey("PlanId")
+                                .OnDelete(DeleteBehavior.Restrict)
+                                .IsRequired();
+
+                            b1.WithOwner()
+                                .HasForeignKey("TenantId");
+
+                            b1.Navigation("Plan");
+                        });
+
                     b.Navigation("Email")
+                        .IsRequired();
+
+                    b.Navigation("Subscription")
                         .IsRequired();
                 });
 
@@ -1468,21 +1529,11 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
 
             modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.Permissions.EmployeeRole", b =>
                 {
-                    b.HasOne("MultiTenantEcommerce.Domain.Users.Entities.Employee", "Employee")
+                    b.HasOne("MultiTenantEcommerce.Domain.Users.Entities.Employee", null)
                         .WithMany("EmployeeRoles")
                         .HasForeignKey("TenantId", "EmployeeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("MultiTenantEcommerce.Domain.Users.Entities.Permissions.Role", "Role")
-                        .WithMany()
-                        .HasForeignKey("TenantId", "RoleId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Employee");
-
-                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.Permissions.Role", b =>
@@ -1494,17 +1545,11 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PermissionRole", b =>
+            modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.Permissions.RolePermission", b =>
                 {
-                    b.HasOne("MultiTenantEcommerce.Domain.Users.Entities.Permissions.Permission", null)
-                        .WithMany()
-                        .HasForeignKey("PermissionsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("MultiTenantEcommerce.Domain.Users.Entities.Permissions.Role", null)
-                        .WithMany()
-                        .HasForeignKey("RoleTenantId", "RoleId")
+                        .WithMany("Permissions")
+                        .HasForeignKey("TenantId", "RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1517,10 +1562,6 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
             modelBuilder.Entity("MultiTenantEcommerce.Domain.Sales.Orders.Entities.Order", b =>
                 {
                     b.Navigation("Items");
-
-                    b.Navigation("OrderPayment");
-
-                    b.Navigation("Shipment");
                 });
 
             modelBuilder.Entity("MultiTenantEcommerce.Domain.Sales.ShoppingCart.Entities.Cart", b =>
@@ -1536,6 +1577,11 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
             modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.Employee", b =>
                 {
                     b.Navigation("EmployeeRoles");
+                });
+
+            modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.Permissions.Role", b =>
+                {
+                    b.Navigation("Permissions");
                 });
 #pragma warning restore 612, 618
         }

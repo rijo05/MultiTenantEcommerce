@@ -10,7 +10,7 @@ public class GetRoleByIdQueryHandler : IQueryHandler<GetRoleByIdQuery, RoleDetai
     private readonly RolesMapper _rolesMapper;
     private readonly IPermissionRepository _permissionRepository;
 
-    public GetRoleByIdQueryHandler(IRoleRepository roleRepository, 
+    public GetRoleByIdQueryHandler(IRoleRepository roleRepository,
         IPermissionRepository permissionRepository,
         RolesMapper rolesMapper)
     {

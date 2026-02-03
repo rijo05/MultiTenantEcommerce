@@ -21,13 +21,13 @@ public class AddCartItemCommandHandler : ICommandHandler<AddCartItemCommand, Car
     private readonly IFileStorageService _fileStorageService;
     private readonly IStockRepository _stockRepository;
 
-    public AddCartItemCommandHandler(ICartRepository cartRepository, 
-        CartMapper cartMapper, 
-        IProductRepository productRepository, 
-        IUnitOfWork unitOfWork, 
-        IStockService stockService, 
-        ITenantContext tenantContext, 
-        IFileStorageService fileStorageService, 
+    public AddCartItemCommandHandler(ICartRepository cartRepository,
+        CartMapper cartMapper,
+        IProductRepository productRepository,
+        IUnitOfWork unitOfWork,
+        IStockService stockService,
+        ITenantContext tenantContext,
+        IFileStorageService fileStorageService,
         IStockRepository stockRepository)
     {
         _cartRepository = cartRepository;

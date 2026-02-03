@@ -1,11 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Domain.Common.Entities;
 using MultiTenantEcommerce.Domain.Common.Interfaces;
 using MultiTenantEcommerce.Domain.Enums;
-using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
-using System.Linq.Expressions;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 
@@ -18,7 +15,7 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         _appDbContext = appDbContext;
     }
 
-    public async Task<List<T>> GetAllAsync()
+    public virtual async Task<List<T>> GetAllAsync()
     {
         return await _appDbContext.Set<T>().ToListAsync();
     }

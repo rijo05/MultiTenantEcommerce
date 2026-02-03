@@ -16,11 +16,11 @@ public class RemoveCartItemCommandHandler : ICommandHandler<RemoveCartItemComman
     private readonly CartMapper _cartMapper;
     private readonly IUnitOfWork _unitOfWork;
 
-    public RemoveCartItemCommandHandler(ICartRepository cartRepository, 
-        IProductRepository productRepository, 
-        IStockRepository stockRepository, 
-        IFileStorageService fileStorageService, 
-        CartMapper cartMapper, 
+    public RemoveCartItemCommandHandler(ICartRepository cartRepository,
+        IProductRepository productRepository,
+        IStockRepository stockRepository,
+        IFileStorageService fileStorageService,
+        CartMapper cartMapper,
         IUnitOfWork unitOfWork)
     {
         _cartRepository = cartRepository;

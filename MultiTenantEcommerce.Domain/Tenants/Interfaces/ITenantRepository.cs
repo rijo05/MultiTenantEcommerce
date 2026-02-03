@@ -12,4 +12,6 @@ public interface ITenantRepository : IRepository<Tenant>
         int page = 1,
         int pageSize = 20,
         SortOptions sort = SortOptions.TimeDesc);
+
+    public Task<Tenant?> GetByStripeCustomerId (string stripeCustomerId);
 }

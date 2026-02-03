@@ -1,8 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Domain.Payment.Entities;
 using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
-using MultiTenantEcommerce.Domain.Shipping.Entities;
 using MultiTenantEcommerce.Domain.Tenants.Entities;
 using MultiTenantEcommerce.Domain.Users.Entities;
 
@@ -40,6 +38,10 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
         });
 
         builder.Property(o => o.OrderStatus)
+            .HasConversion<string>()
+            .IsRequired();
+
+        builder.Property(o => o.ShipmentCarrier)
             .HasConversion<string>()
             .IsRequired();
 

@@ -5,13 +5,13 @@ using MultiTenantEcommerce.Domain.Payment.Interfaces;
 using MultiTenantEcommerce.Domain.Sales.Orders.Interfaces;
 
 namespace MultiTenantEcommerce.Application.Payment.OrderPayment.Commands.Completed;
-public class MarkOrderPaymentAsCompletedCommandHandler : ICommandHandler<MarkOrderPaymentAsCompletedCommand, Unit>
+public class MarkOrderAsPaidCommandHandler : ICommandHandler<MarkOrderAsPaidCommand, Unit>
 {
     private readonly IOrderPaymentRepository _orderPaymentRepository;
     private readonly IOrderRepository _orderRepository;
     private readonly IUnitOfWork _unitOfWork;
 
-    public MarkOrderPaymentAsCompletedCommandHandler(IOrderPaymentRepository orderPaymentRepository,
+    public MarkOrderAsPaidCommandHandler(IOrderPaymentRepository orderPaymentRepository,
         IOrderRepository orderRepository,
         IUnitOfWork unitOfWork)
     {
@@ -20,18 +20,18 @@ public class MarkOrderPaymentAsCompletedCommandHandler : ICommandHandler<MarkOrd
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<Unit> Handle(MarkOrderPaymentAsCompletedCommand request, CancellationToken cancellationToken)
+    public async Task<Unit> Handle(MarkOrderAsPaidCommand request, CancellationToken cancellationToken)
     {
-        var payment = await _orderPaymentRepository.GetByIdAsync(request.PaymentId)
-            ?? throw new Exception("Payment not found");
+        //var payment = await _orderPaymentRepository.GetByIdAsync(request.PaymentId)
+        //    ?? throw new Exception("Payment not found");
 
-        var order = await _orderRepository.GetByIdAsync(payment.OrderId)
-            ?? throw new Exception("Order couldnt be foound, this shouldnt happen");
+        //var order = await _orderRepository.GetByIdAsync(payment.OrderId)
+        //    ?? throw new Exception("Order couldnt be foound, this shouldnt happen");
 
-        payment.MarkAsCompleted(request.TransactionId);
-        order.MarkAsPaid();
+        //payment.MarkAsCompleted(request.TransactionId);
+        //order.MarkAsPaid();
 
-        await _unitOfWork.CommitAsync();
+        //await _unitOfWork.CommitAsync();
 
         return Unit.Value;
     }

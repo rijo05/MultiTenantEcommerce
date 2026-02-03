@@ -25,7 +25,7 @@ public class StockConfiguration : IEntityTypeConfiguration<Stock>
 
         builder.Property(x => x.MinimumQuantity)
             .HasConversion(
-            vo => vo.Value, 
+            vo => vo.Value,
             db => new NonNegativeQuantity(db));
 
         builder.Property(x => x.Reserved)

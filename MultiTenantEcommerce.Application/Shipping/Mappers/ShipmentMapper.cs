@@ -1,11 +1,6 @@
 ﻿using MultiTenantEcommerce.Application.Common.Helpers.Mappers;
 using MultiTenantEcommerce.Application.Shipping.DTOs;
 using MultiTenantEcommerce.Domain.Shipping.Entities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace MultiTenantEcommerce.Application.Shipping.Mappers;
 public class ShipmentMapper
@@ -32,7 +27,7 @@ public class ShipmentMapper
             EstimatedDeliveryDate = shipment.EstimatedDeliveryDate,
             DeliveredAt = shipment.DeliveredAt,
             MinTransit = shipment.MinTransit,
-            MaxTransit = shipment.MaxTransit    
+            MaxTransit = shipment.MaxTransit
         };
     }
 }
