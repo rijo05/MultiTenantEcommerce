@@ -2,12 +2,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Authorization;
-using MultiTenantEcommerce.Application.Auth.Commands.CreateCustomer;
-using MultiTenantEcommerce.Application.Auth.Commands.CreateEmployee;
-using MultiTenantEcommerce.Application.Auth.Commands.CreateTenant;
-using MultiTenantEcommerce.Application.Auth.DTOs;
-using MultiTenantEcommerce.Application.Auth.Queries.LoginCustomer;
-using MultiTenantEcommerce.Application.Auth.Queries.LoginEmployee;
+using MultiTenantEcommerce.Application.Commerce.Customers.Commands.Auth.CreateCustomer;
+using MultiTenantEcommerce.Application.Commerce.Customers.Commands.Auth.LoginCustomer;
+using MultiTenantEcommerce.Application.Platform.Identity.Commands.LoginTenant;
+using MultiTenantEcommerce.Application.Platform.Tenancy.TenantMembers.Commands.CreateMember;
+using MultiTenantEcommerce.Application.Platform.Tenancy.Tenants.Commands.CreateTenant;
 
 namespace MultiTenantEcommerce.API.Controllers;
 
@@ -23,7 +22,8 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("customer/register")]
-    public async Task<ActionResult<AuthCustomerResponseDTO>> RegisterCustomer([FromBody] CreateCustomerCommand customerCommand)
+    public async Task<ActionResult<AuthCustomerResponseDTO>> RegisterCustomer(
+        [FromBody] CreateCustomerCommand customerCommand)
     {
         var result = await _mediator.Send(customerCommand);
 
@@ -41,7 +41,8 @@ public class AuthController : ControllerBase
     [HasPermission("create.employee")]
     [Authorize(Policy = "Permission")] //############
     [HttpPost("employees/register")]
-    public async Task<ActionResult<AuthEmployeeResponseDTO>> RegisterEmployee([FromBody] CreateEmployeeCommand employeeCommand)
+    public async Task<ActionResult<AuthTenantMemberResponseDTO>> RegisterTenantMember(
+        [FromBody] CreateTenantMemberCommand employeeCommand)
     {
         var result = await _mediator.Send(employeeCommand);
 
@@ -49,9 +50,10 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("employees/login")]
-    public async Task<ActionResult<AuthEmployeeResponseDTO>> LoginEmployee([FromBody] LoginEmployeeQuery loginEmployee)
+    public async Task<ActionResult<AuthTenantMemberResponseDTO>> LoginTenantMember(
+        [FromBody] LoginTenantMemberQuery loginTenantMember)
     {
-        var result = await _mediator.Send(loginEmployee);
+        var result = await _mediator.Send(loginTenantMember);
 
         return Ok(result);
     }

@@ -1,45 +1,45 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System.Text.RegularExpressions;
 using Microsoft.Extensions.DependencyInjection;
-using MultiTenantEcommerce.Domain.Templates.Entities;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
-using System.Text.RegularExpressions;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Seed;
-public static class EmailTemplateSeeder
-{
-    public static async Task SeedAsync(IServiceProvider serviceProvider, string templatePath)
-    {
-        var scope = serviceProvider.CreateScope();
-        var _appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        var files = Directory.GetFiles(templatePath, "*.html");
+//public static class EmailTemplateSeeder
+//{
+//    public static async Task SeedAsync(IServiceProvider serviceProvider, string templatePath)
+//    {
+//        var scope = serviceProvider.CreateScope();
+//        var _appDbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-        foreach (var item in files)
-        {
-            var templateName = Path.GetFileNameWithoutExtension(item);
-            var html = await File.ReadAllTextAsync(item);
+//        var files = Directory.GetFiles(templatePath, "*.html");
 
-            var titleMatch = Regex.Match(html, @"<title>(.*?)</title>", RegexOptions.IgnoreCase);
-            var subject = titleMatch.Success ? titleMatch.Groups[1].Value.Trim() : templateName;
+//        foreach (var item in files)
+//        {
+//            var templateName = Path.GetFileNameWithoutExtension(item);
+//            var html = await File.ReadAllTextAsync(item);
 
-            var existingTemplate = await _appDbContext.EmailTemplates.FirstOrDefaultAsync(x => x.TemplateName == templateName);
+//            var titleMatch = Regex.Match(html, @"<title>(.*?)</title>", RegexOptions.IgnoreCase);
+//            var subject = titleMatch.Success ? titleMatch.Groups[1].Value.Trim() : templateName;
 
-            if (existingTemplate is not null)
-            {
-                existingTemplate.HtmlContent = html;
-                existingTemplate.Subject = subject;
-                existingTemplate.SetUpdatedAt();
+//            var existingTemplate =
+//                await _appDbContext.EmailTemplates.FirstOrDefaultAsync(x => x.TemplateName == templateName);
 
-                _appDbContext.EmailTemplates.Update(existingTemplate);
-            }
-            else
-            {
-                var emailTemplate = new EmailTemplate(templateName, true, subject, html);
+//            if (existingTemplate is not null)
+//            {
+//                existingTemplate.HtmlContent = html;
+//                existingTemplate.Subject = subject;
+//                existingTemplate.SetUpdatedAt();
 
-                await _appDbContext.EmailTemplates.AddAsync(emailTemplate);
-            }
-        }
+//                _appDbContext.EmailTemplates.Update(existingTemplate);
+//            }
+//            else
+//            {
+//                var emailTemplate = new EmailTemplate(templateName, true, subject, html);
 
-        await _appDbContext.SaveChangesAsync();
-    }
-}
+//                await _appDbContext.EmailTemplates.AddAsync(emailTemplate);
+//            }
+//        }
+
+//        await _appDbContext.SaveChangesAsync();
+//    }
+//}

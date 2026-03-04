@@ -1,7 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MultiTenantEcommerce.Application.Inventory.DTOs;
-using MultiTenantEcommerce.Application.Inventory.Queries.GetByProductId;
+using MultiTenantEcommerce.Application.Commerce.Inventory.Common.DTOs;
 
 namespace MultiTenantEcommerce.API.Controllers.Customer;
 

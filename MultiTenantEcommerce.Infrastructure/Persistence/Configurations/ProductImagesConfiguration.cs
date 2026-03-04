@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Domain.Catalog.Entities;
-using MultiTenantEcommerce.Domain.Tenants.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Catalog.Entities;
+using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
+
 public class ProductImagesConfiguration : IEntityTypeConfiguration<ProductImages>
 {
     public void Configure(EntityTypeBuilder<ProductImages> builder)

@@ -1,14 +1,15 @@
-﻿using MultiTenantEcommerce.Application.Common.Helpers;
-using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
+﻿using System.Text;
+using MultiTenantEcommerce.Shared.Infrastructure.Messaging;
+using MultiTenantEcommerce.Shared.Utilities.Constants;
 using RabbitMQ.Client;
-using System.Text;
+
 namespace MultiTenantEcommerce.Infrastructure.Messaging;
+
 public class RabbitMqEventBus : IEventBus
 {
-    private readonly RabbitMqConnectionManager _connectionManager;
-    private IConnection _connection = null;
-    private IChannel _channel = null;
     private const string EXCHANGE = "domain-events-exchange";
+    private readonly RabbitMqConnectionManager _connectionManager;
+    private IChannel? _channel;
 
     public RabbitMqEventBus(RabbitMqConnectionManager connectionManager)
     {
@@ -23,45 +24,37 @@ public class RabbitMqEventBus : IEventBus
         _channel = await connection.CreateChannelAsync();
 
         await _channel.ExchangeDeclareAsync(
-            exchange: EXCHANGE,
-            type: ExchangeType.Topic,
-            durable: true,
-            autoDelete: false
+            EXCHANGE,
+            ExchangeType.Topic,
+            true,
+            false
         );
     }
 
-    public async Task PublishAsync(string routingKey, string message)
+    public async Task PublishAsync(string content, string eventType, int priority)
     {
-        if (message == null)
-            throw new Exception("message cant be null");
-
         await EnsureConnectionAsync();
 
-        var body = Encoding.UTF8.GetBytes(message);
+        var body = Encoding.UTF8.GetBytes(content);
 
-        var props = new BasicProperties()
+        var props = new BasicProperties
         {
+            Persistent = true,
+            Type = eventType,
+            Priority = (byte)priority,
             DeliveryMode = DeliveryModes.Persistent,
             ContentType = MimeTypes.JSON,
             MessageId = Guid.NewGuid().ToString(),
-            Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds()),
+            Timestamp = new AmqpTimestamp(DateTimeOffset.UtcNow.ToUnixTimeSeconds())
         };
 
+        var routingKey = eventType.Split(',')[0].Split('.').Last().ToLower();
 
-        await _channel.BasicPublishAsync(exchange: EXCHANGE,
-            routingKey: routingKey,
-            mandatory: true,
-            basicProperties: props,
-            body: body);
-
-        return;
-    }
-
-    public async Task Dispose()
-    {
-        await _channel.CloseAsync();
-        await _connection.CloseAsync();
-        await _channel.DisposeAsync();
-        await _connection.DisposeAsync();
+        await _channel!.BasicPublishAsync(
+            EXCHANGE,
+            routingKey,
+            true,
+            props,
+            body);
     }
 }

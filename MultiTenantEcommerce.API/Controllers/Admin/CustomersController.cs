@@ -2,18 +2,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Authorization;
-using MultiTenantEcommerce.Application.Users.Customers.Commands.Delete;
-using MultiTenantEcommerce.Application.Users.Customers.Commands.Update;
-using MultiTenantEcommerce.Application.Users.Customers.DTOs;
-using MultiTenantEcommerce.Application.Users.Customers.Queries.GetByEmail;
-using MultiTenantEcommerce.Application.Users.Customers.Queries.GetById;
-using MultiTenantEcommerce.Application.Users.Customers.Queries.GetByPhoneNumber;
-using MultiTenantEcommerce.Application.Users.Customers.Queries.GetFiltered;
+using MultiTenantEcommerce.Application.Commerce.Customers.Common.DTOs;
+using MultiTenantEcommerce.Application.Commerce.Customers.Queries.GetFiltered;
 
 namespace MultiTenantEcommerce.API.Controllers.Admin;
 
 [ApiController]
-[Authorize(Policy = "EmployeeOnly")]
+[Authorize(Policy = "TenantMemberOnly")]
 [Area("Admin")]
 [Route("api/[area]/[controller]")]
 public class CustomersController : ControllerBase
@@ -27,7 +22,8 @@ public class CustomersController : ControllerBase
 
     [HasPermission("read.customer")]
     [HttpGet]
-    public async Task<ActionResult<List<CustomerResponseDTO>>> GetCustomers([FromQuery] GetFilteredCustomerQuery customerQuery)
+    public async Task<ActionResult<List<CustomerResponseDTO>>> GetCustomers(
+        [FromQuery] GetFilteredCustomerQuery customerQuery)
     {
         var customers = await _mediator.Send(customerQuery);
 

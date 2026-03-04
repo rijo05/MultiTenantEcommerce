@@ -1,9 +1,10 @@
 ﻿using MediatR;
-using MultiTenantEcommerce.Application.Tenants.Commands.Tenant.Onboarding;
+using MultiTenantEcommerce.Application.Tenancy.Tenants.Commands.CompleteOnBoarding;
 using MultiTenantEcommerce.Infrastructure.Webhooks.Interface;
 using Stripe;
 
 namespace MultiTenantEcommerce.Infrastructure.Webhooks.Handlers;
+
 public class AccountUpdatedWebhookHandler : IWebhookHandler
 {
     private readonly IMediator _mediator;
@@ -19,10 +20,8 @@ public class AccountUpdatedWebhookHandler : IWebhookHandler
 
         //onboard para receber dinheiro
         if (account.ChargesEnabled && account.DetailsSubmitted)
-        {
             await _mediator.Send(new CompleteTenantOnboardingCommand(
                 StripeAccountId: account.Id
             ));
-        }
     }
 }

@@ -21,6 +21,7 @@ public class PermissionHandler : AuthorizationHandler<PermissionRequirement>
             if (permissions.Contains(permissionAttribute.Permission))
                 context.Succeed(requirement);
         }
+
         return Task.CompletedTask;
     }
 }

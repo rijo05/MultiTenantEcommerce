@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
-using MultiTenantEcommerce.Domain.Tenants.Entities;
-using MultiTenantEcommerce.Domain.Users.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Customers.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Sales.Orders.Entities;
+using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
+
 public class OrderConfiguration : IEntityTypeConfiguration<Order>
 {
     public void Configure(EntityTypeBuilder<Order> builder)
@@ -13,19 +14,19 @@ public class OrderConfiguration : IEntityTypeConfiguration<Order>
 
 
         builder.HasOne<Tenant>()
-                .WithMany()
-                .HasForeignKey(x => x.TenantId)
-                .OnDelete(DeleteBehavior.Restrict);
+            .WithMany()
+            .HasForeignKey(x => x.TenantId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne<Customer>()
-                .WithMany()
-                .HasForeignKey(x => new { x.TenantId, x.CustomerId })
-                .OnDelete(DeleteBehavior.Restrict);
+            .WithMany()
+            .HasForeignKey(x => new { x.TenantId, x.CustomerId })
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(o => o.Items)
-               .WithOne()
-               .HasForeignKey(oi => new { oi.TenantId, oi.OrderId })
-               .OnDelete(DeleteBehavior.Cascade);
+            .WithOne()
+            .HasForeignKey(oi => new { oi.TenantId, oi.OrderId })
+            .OnDelete(DeleteBehavior.Cascade);
 
 
         builder.OwnsOne(o => o.Address, address =>

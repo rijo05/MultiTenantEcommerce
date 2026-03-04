@@ -2,13 +2,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Authorization;
-using MultiTenantEcommerce.Application.Sales.ShoppingCart.DTOs;
-using MultiTenantEcommerce.Application.Sales.ShoppingCart.Queries.GetByCustomerId;
+using MultiTenantEcommerce.Application.Commerce.Sales.ShoppingCart.Common.DTOs;
 
 namespace MultiTenantEcommerce.API.Controllers.Admin;
 
 [ApiController]
-[Authorize(Policy = "EmployeeOnly")]
+[Authorize(Policy = "TenantMemberOnly")]
 [Area("Admin")]
 [Route("api/[area]/[controller]")]
 public class CartsController : ControllerBase

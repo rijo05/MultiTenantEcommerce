@@ -3,15 +3,12 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Authorization;
 using MultiTenantEcommerce.API.Extensions;
-using MultiTenantEcommerce.Application.Tenants.Commands.Tenant.Delete;
-using MultiTenantEcommerce.Application.Tenants.Commands.Tenant.Update;
-using MultiTenantEcommerce.Application.Tenants.DTOs.Tenant;
-using MultiTenantEcommerce.Application.Tenants.Queries.Tenant.GetById;
+using MultiTenantEcommerce.Application.Platform.Tenancy.Tenants.Common.DTOs;
 
 namespace MultiTenantEcommerce.API.Controllers.Admin;
 
 [ApiController]
-[Authorize(Policy = "EmployeeOnly")]
+[Authorize(Policy = "TenantMemberOnly")]
 [Area("Admin")]
 [Route("api/[area]/[controller]")]
 public class TenantsController : ControllerBase

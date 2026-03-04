@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
-using MultiTenantEcommerce.Domain.Shipping.Entities;
-using MultiTenantEcommerce.Domain.Tenants.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Sales.Orders.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Shipping.Entities;
+using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
+
 public class ShipmentConfiguration : IEntityTypeConfiguration<Shipment>
 {
     public void Configure(EntityTypeBuilder<Shipment> builder)

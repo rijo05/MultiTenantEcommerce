@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Domain.Tenants.Entities;
-using MultiTenantEcommerce.Domain.Users.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Customers.Entities;
+using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
+
 public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 {
     public void Configure(EntityTypeBuilder<Customer> builder)
@@ -12,9 +13,9 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
 
 
         builder.HasOne<Tenant>()
-                .WithMany()
-                .HasForeignKey(x => x.TenantId)
-                .OnDelete(DeleteBehavior.Restrict);
+            .WithMany()
+            .HasForeignKey(x => x.TenantId)
+            .OnDelete(DeleteBehavior.Restrict);
 
 
         builder.OwnsOne(u => u.Email, email =>
@@ -25,8 +26,11 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         });
 
 
-        builder.OwnsOne(o => o.Address, address =>
+        builder.OwnsMany(x => x.Addresses, address =>
         {
+            address.WithOwner().HasForeignKey("CustomerId");
+            address.HasKey("Id"); // Shadow Key
+
             address.Property(a => a.Street).HasColumnName("Street").IsRequired();
             address.Property(a => a.HouseNumber).HasColumnName("HouseNumber").IsRequired();
             address.Property(a => a.City).HasColumnName("City").IsRequired();
@@ -38,17 +42,6 @@ public class CustomerConfiguration : IEntityTypeConfiguration<Customer>
         {
             password.Property<string>("Value")
                 .HasColumnName("Password")
-                .IsRequired();
-        });
-
-        builder.OwnsOne(u => u.PhoneNumber, phoneNumber =>
-        {
-            phoneNumber.Property(e => e.CountryCode)
-                .HasColumnName("PhoneNumber_CountryCode")
-                .IsRequired();
-
-            phoneNumber.Property(e => e.Number)
-                .HasColumnName("PhoneNumber_Number")
                 .IsRequired();
         });
 

@@ -1,5 +1,6 @@
 ﻿using FluentValidation;
 using MultiTenantEcommerce.Application.Common.DTOs.Address;
+using MultiTenantEcommerce.Shared.Application.Validators;
 
 namespace MultiTenantEcommerce.Application.Common.Helpers.Validators.AddressValidator;
 

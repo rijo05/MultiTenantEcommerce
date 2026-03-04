@@ -2,15 +2,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Authorization;
-using MultiTenantEcommerce.Application.Payment.OrderPayment.DTOs;
-using MultiTenantEcommerce.Application.Payment.OrderPayment.Queries.GetByCustomerId;
-using MultiTenantEcommerce.Application.Payment.OrderPayment.Queries.GetById;
-using MultiTenantEcommerce.Application.Payment.OrderPayment.Queries.GetFiltered;
+using MultiTenantEcommerce.Application.Commerce.Sales.Payments.Common.DTOs;
 
 namespace MultiTenantEcommerce.API.Controllers.Admin;
 
 [ApiController]
-[Authorize(Policy = "EmployeeOnly")]
+[Authorize(Policy = "TenantMemberOnly")]
 [Area("Admin")]
 [Route("api/[area]/[controller]")]
 public class PaymentsController : ControllerBase
@@ -24,7 +21,8 @@ public class PaymentsController : ControllerBase
 
     [HasPermission("read.payment")]
     [HttpGet]
-    public async Task<ActionResult<List<OrderPaymentResponseDTO>>> GetOrderPayments([FromQuery] GetFilteredOrderPaymentsQuery orderPaymentsQuery)
+    public async Task<ActionResult<List<OrderPaymentResponseDTO>>> GetOrderPayments(
+        [FromQuery] GetFilteredOrderPaymentsQuery orderPaymentsQuery)
     {
         var orders = await _mediator.Send(orderPaymentsQuery);
 

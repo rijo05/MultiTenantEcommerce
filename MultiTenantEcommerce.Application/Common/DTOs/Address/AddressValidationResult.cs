@@ -1,6 +1,5 @@
-﻿using MultiTenantEcommerce.Domain.ValueObjects;
+﻿namespace MultiTenantEcommerce.Application.Common.DTOs.Address;
 
-namespace MultiTenantEcommerce.Application.Common.DTOs.Address;
 public record AddressValidationResult(
     bool IsValid,
     double Confidence,

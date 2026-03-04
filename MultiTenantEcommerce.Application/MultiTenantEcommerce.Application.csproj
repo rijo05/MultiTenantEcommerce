@@ -15,17 +15,34 @@
     <PackageReference Include="Microsoft.AspNetCore.Routing" Version="2.3.0" />
     <PackageReference Include="Microsoft.AspNetCore.Routing.Abstractions" Version="2.3.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.8" />
+    <PackageReference Include="Polly" Version="8.6.3" />
     <PackageReference Include="System.Collections" Version="4.3.0" />
     <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\MultiTenantEcommerce.Domain\MultiTenantEcommerce.Domain.csproj" />
+    <ProjectReference Include="..\MultiTenantEcommerce.Shared\MultiTenantEcommerce.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Sales\ShoppingCart\Validators\" />
-    <Folder Include="Shipping\Queries\GetQuotes\" />
+    <Folder Include="Commerce\Catalog\Categories\Queries\GetBySlug\" />
+    <Folder Include="Common\Helpers\Mappers\" />
+    <Folder Include="Platform\Billing\Accounts\Commands\GeneratePortalSession\" />
+    <Folder Include="Platform\Billing\Accounts\Common\DTOs\" />
+    <Folder Include="Platform\Billing\Accounts\Common\Mappers\" />
+    <Folder Include="Platform\Billing\Accounts\Queries\GetCurrentAccount\" />
+    <Folder Include="Platform\Billing\Accounts\Queries\GetAccountById\" />
+    <Folder Include="Platform\Identity\Commands\ForgotPassword\" />
+    <Folder Include="Platform\Identity\Commands\RevokeToken\" />
+    <Folder Include="Platform\Identity\Commands\RefreshToken\" />
+    <Folder Include="Platform\Identity\Users\Commands\CreatePlatformAdmin\" />
+    <Folder Include="Platform\Identity\Users\Common\" />
+    <Folder Include="Commerce\Shipping\Commands\CreateShipment\" />
+    <Folder Include="Commerce\Shipping\Queries\GetQuotes\" />
+    <Folder Include="Notifications\Common\" />
+    <Folder Include="Platform\Tenancy\Tenants\Commands\ConfigureShipping\" />
+    <Folder Include="Platform\Tenancy\Tenants\Queries\GetTenantByDomain\" />
   </ItemGroup>
 
 </Project>

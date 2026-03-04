@@ -1,27 +1,29 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
-using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
-using MultiTenantEcommerce.Domain.Catalog.Entities;
-using MultiTenantEcommerce.Domain.Common.Entities;
-using MultiTenantEcommerce.Domain.Common.Events;
-using MultiTenantEcommerce.Domain.Inventory.Entities;
-using MultiTenantEcommerce.Domain.Payment.Entities;
-using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
-using MultiTenantEcommerce.Domain.Sales.ShoppingCart.Entities;
-using MultiTenantEcommerce.Domain.Shipping.Entities;
-using MultiTenantEcommerce.Domain.Templates.Entities;
-using MultiTenantEcommerce.Domain.Tenants.Entities;
-using MultiTenantEcommerce.Domain.Users.Entities;
-using MultiTenantEcommerce.Domain.Users.Entities.Permissions;
-using MultiTenantEcommerce.Infrastructure.EmailService;
+using MultiTenantEcommerce.Domain.Commerce.Catalog.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Customers.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Inventory.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Sales.Orders.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Sales.ShoppingCart.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Shipping.Entities;
+using MultiTenantEcommerce.Domain.Notifications.Entities;
+using MultiTenantEcommerce.Domain.Platform.Billing.Entities;
+using MultiTenantEcommerce.Domain.Platform.Identity.Entities;
+using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities;
+using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities.Auth;
 using MultiTenantEcommerce.Infrastructure.Events;
 using MultiTenantEcommerce.Infrastructure.Outbox;
+using MultiTenantEcommerce.Shared.Domain.Abstractions;
+using MultiTenantEcommerce.Shared.Domain.Events;
+using MultiTenantEcommerce.Shared.Infrastructure.Persistence;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Context;
+
 public class AppDbContext : DbContext
 {
     private readonly ITenantContext _tenantContext;
+
     public AppDbContext(DbContextOptions<AppDbContext> options,
         ITenantContext tenantContext)
         : base(options)
@@ -33,7 +35,8 @@ public class AppDbContext : DbContext
     public virtual DbSet<Product> Products { get; set; }
     public virtual DbSet<ProductImages> ProductImages { get; set; }
     public virtual DbSet<Customer> Customers { get; set; }
-    public virtual DbSet<Employee> Employees { get; set; }
+    public virtual DbSet<TenantMember> TenantMembers { get; set; }
+    public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<Stock> Stocks { get; set; }
     public virtual DbSet<StockMovement> StockMovements { get; set; }
     public virtual DbSet<Shipment> Shipments { get; set; }
@@ -44,15 +47,17 @@ public class AppDbContext : DbContext
     public virtual DbSet<CartItem> CartItems { get; set; }
     public virtual DbSet<OrderPayment> OrderPayments { get; set; }
     public virtual DbSet<Tenant> Tenants { get; set; }
+    public virtual DbSet<TenantSubscription> TenantSubscriptions { get; set; }
     public virtual DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
+    public virtual DbSet<SubscriptionPlanPrice> SubscriptionPlanPrices { get; set; }
     public virtual DbSet<Role> Roles { get; set; }
     public virtual DbSet<RolePermission> RolePermissions { get; set; }
     public virtual DbSet<Permission> Permissions { get; set; }
-    public virtual DbSet<EmployeeRole> EmployeeRoles { get; set; }
+    public virtual DbSet<TenantMemberRole> TenantMemberRoles { get; set; }
+    public virtual DbSet<TenantInvitation> TenantInvitations { get; set; }
     public virtual DbSet<OutboxEvent> OutboxEvents { get; set; }
     public virtual DbSet<ProcessedEvent> ProcessedEvents { get; set; }
-    public virtual DbSet<EmailQueue> EmailQueue { get; set; }
-    public virtual DbSet<EmailTemplate> EmailTemplates { get; set; }
+    public virtual DbSet<TenantNotificationProfile> NotificationProfiles { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -66,7 +71,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<ProductImages>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
 
         modelBuilder.Entity<Customer>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
-        modelBuilder.Entity<Employee>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
+        modelBuilder.Entity<TenantMember>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
 
         modelBuilder.Entity<Shipment>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
         modelBuilder.Entity<ShippingProviderConfig>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
@@ -82,7 +87,8 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<OrderPayment>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
 
         modelBuilder.Entity<Role>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
-        modelBuilder.Entity<EmployeeRole>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
+        modelBuilder.Entity<TenantMemberRole>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
+        modelBuilder.Entity<TenantInvitation>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
         modelBuilder.Entity<RolePermission>().HasQueryFilter(x => x.TenantId == _tenantContext.TenantId);
     }
 
@@ -90,13 +96,9 @@ public class AppDbContext : DbContext
     {
         var tenantId = _tenantContext.TenantId;
 
-        if (tenantId == Guid.Empty)
-        {
-            throw new InvalidOperationException("TenantId is not set in the TenantContext.");
-        }
+        if (tenantId == Guid.Empty) throw new InvalidOperationException("TenantId is not set in the TenantContext.");
 
         foreach (var entry in ChangeTracker.Entries<TenantBase>())
-        {
             if (entry.State == EntityState.Added)
             {
                 entry.Entity.SetTenantId(tenantId);
@@ -104,13 +106,15 @@ public class AppDbContext : DbContext
                 entry.Entity.SetUpdatedAt();
             }
             else if (entry.State == EntityState.Modified)
+            {
                 entry.Entity.SetUpdatedAt();
-        }
+            }
 
         return base.SaveChanges();
     }
 
     #region EVENTS
+
     public List<IDomainEvent> GetAllDomainEvents()
     {
         return ChangeTracker
@@ -141,7 +145,8 @@ public class AppDbContextFactory : IDesignTimeDbContextFactory<AppDbContext>
 
         var builder = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile(@"C:\MultiTenantEcommerce\MultiTenantEcommerce\MultiTenantEcommerce.API\appsettings.json", optional: false, reloadOnChange: true);
+            .AddJsonFile(@"C:\MultiTenantEcommerce\MultiTenantEcommerce\MultiTenantEcommerce.API\appsettings.json",
+                false, true);
 
         var configuration = builder.Build();
 
@@ -162,4 +167,3 @@ public class DesignTimeTenantProvider : ITenantContext
         throw new NotImplementedException();
     }
 }
-

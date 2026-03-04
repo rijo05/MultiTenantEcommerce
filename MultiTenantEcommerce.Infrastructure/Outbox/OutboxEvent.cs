@@ -1,35 +1,48 @@
-﻿using MultiTenantEcommerce.Domain.Common.Events;
-using MultiTenantEcommerce.Domain.Enums;
+﻿using System.Reflection;
 using System.Text.Json;
+using MultiTenantEcommerce.Shared.Domain.Events;
+using MultiTenantEcommerce.Shared.Infrastructure.Messaging;
+using MultiTenantEcommerce.Shared.Integration.Events;
 
 namespace MultiTenantEcommerce.Infrastructure.Outbox;
+
 public class OutboxEvent
 {
+    private OutboxEvent()
+    {
+    }
+
+    public OutboxEvent(IIntegrationEvent integrationEvent)
+    {
+        Id = integrationEvent.EventId;
+        TenantId = integrationEvent.TenantId;
+        OccurredOn = integrationEvent.OccurredOn;
+
+        Type = integrationEvent.GetType().AssemblyQualifiedName!;
+        Content = JsonSerializer.Serialize(integrationEvent, integrationEvent.GetType());
+
+        Retries = 0;
+
+        var isHighPriority = integrationEvent.GetType().IsDefined(typeof(HighPriorityAttribute), false);
+        Priority = isHighPriority ? 9 : 1;
+    }
+
     public Guid Id { get; private set; }
+    public Guid TenantId { get; private set; }
     public string Type { get; private set; }
     public string Content { get; private set; }
-    public string RoutingKey { get; private set; }
-    public EventPriority Priority { get; private set; }
+
+    public int Priority { get; private set; }
+
     public DateTime OccurredOn { get; private set; }
     public DateTime? ProcessedOn { get; private set; }
     public string? Error { get; private set; }
     public int Retries { get; private set; }
 
-    private OutboxEvent() { }
-    public OutboxEvent(IDomainEvent domainEvent)
+    public void MarkAsProcessed()
     {
-        Id = Guid.NewGuid();
-        Type = domainEvent.GetType().AssemblyQualifiedName!;
-        Content = JsonSerializer.Serialize(domainEvent, domainEvent.GetType());
-        OccurredOn = DateTime.UtcNow;
-        Retries = 0;
-
-        RoutingKey = $"{domainEvent.EventPriority.ToString().ToLower()}.{domainEvent.GetType().Name.Replace("Events", "").ToLower()}";
-
-        Priority = domainEvent.EventPriority;
+        ProcessedOn = DateTime.UtcNow;
     }
-
-    public void SetProcessedOn() => ProcessedOn = DateTime.UtcNow;
 
     public void SetErrors(string errors)
     {
@@ -39,11 +52,8 @@ public class OutboxEvent
         Error = string.IsNullOrEmpty(Error) ? errors : $"{Error}\n{errors}";
     }
 
-    public void IncrementRetries() => Retries++;
-}
-
-public class EventWrapper
-{
-    public string EventType { get; set; } = null!;
-    public string Data { get; set; } = null!;
+    public void IncrementRetries()
+    {
+        Retries++;
+    }
 }

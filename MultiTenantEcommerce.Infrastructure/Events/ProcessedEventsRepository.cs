@@ -2,9 +2,11 @@
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Events;
+
 public class ProcessedEventsRepository : IProcessedEventsRepository
 {
     private readonly AppDbContext _appDbContext;
+
     public ProcessedEventsRepository(AppDbContext appDbContext)
     {
         _appDbContext = appDbContext;

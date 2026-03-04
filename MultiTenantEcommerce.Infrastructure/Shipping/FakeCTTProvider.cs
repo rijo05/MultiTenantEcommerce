@@ -1,15 +1,16 @@
-﻿using MultiTenantEcommerce.Application.Shipping.DTOs;
-using MultiTenantEcommerce.Application.Shipping.Interfaces;
-using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
-using MultiTenantEcommerce.Domain.Shipping.Enums;
-using MultiTenantEcommerce.Domain.ValueObjects;
+﻿using MultiTenantEcommerce.Application.Commerce.Shipping.Common.DTOs;
+using MultiTenantEcommerce.Application.Commerce.Shipping.Interfaces;
+using MultiTenantEcommerce.Domain.Commerce.Sales.Orders.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Shipping.Enums;
+using MultiTenantEcommerce.Shared.Domain.ValueObjects;
 using QuestPDF.Fluent;
 
 namespace MultiTenantEcommerce.Infrastructure.Shipping;
+
 public class FakeCTTProvider : IShippingProvider
 {
-    private readonly TimeSpan MIN_TRANSIT = TimeSpan.FromDays(3);
     private readonly TimeSpan MAX_TRANSIT = TimeSpan.FromDays(5);
+    private readonly TimeSpan MIN_TRANSIT = TimeSpan.FromDays(3);
     private readonly decimal PRICE = 3.99M;
 
     public async Task<ShipmentResultDTO> CreateShipment(Order order, string customerName)

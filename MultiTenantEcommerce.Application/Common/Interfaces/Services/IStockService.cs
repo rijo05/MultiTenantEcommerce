@@ -1,7 +1,7 @@
-﻿using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
-using MultiTenantEcommerce.Domain.ValueObjects;
+﻿using MultiTenantEcommerce.Domain.Commerce.Sales.Orders.Entities;
 
 namespace MultiTenantEcommerce.Application.Common.Interfaces.Services;
+
 public interface IStockService
 {
     public Task<bool> CheckAvailability(Guid productId, PositiveQuantity quantity);

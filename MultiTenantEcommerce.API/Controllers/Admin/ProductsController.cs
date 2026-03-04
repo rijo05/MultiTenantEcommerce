@@ -2,23 +2,17 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Authorization;
-using MultiTenantEcommerce.Application.Catalog.Products.Commands.AddImages;
-using MultiTenantEcommerce.Application.Catalog.Products.Commands.Create;
-using MultiTenantEcommerce.Application.Catalog.Products.Commands.Delete;
-using MultiTenantEcommerce.Application.Catalog.Products.Commands.DeleteImage;
-using MultiTenantEcommerce.Application.Catalog.Products.Commands.Update;
-using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
-using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
-using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetById;
-using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetFiltered;
-using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetImage;
-using MultiTenantEcommerce.Application.Common.DTOs;
+using MultiTenantEcommerce.Application.Commerce.Catalog.Products.Commands.Create;
+using MultiTenantEcommerce.Application.Commerce.Catalog.Products.Commands.ManageImages;
+using MultiTenantEcommerce.Application.Commerce.Catalog.Products.Commands.Update;
+using MultiTenantEcommerce.Application.Commerce.Catalog.Products.Common.DTOs.Images;
+using MultiTenantEcommerce.Application.Commerce.Catalog.Products.Common.DTOs.Products;
+using MultiTenantEcommerce.Application.Commerce.Catalog.Products.Queries.GetFilteredAdmin;
 
 namespace MultiTenantEcommerce.API.Controllers.Admin;
 
-
 [ApiController]
-[Authorize(Policy = "EmployeeOnly")]
+[Authorize(Policy = "TenantMemberOnly")]
 [Area("Admin")]
 [Route("api/[area]/[controller]")]
 public class ProductsController : ControllerBase
@@ -79,7 +73,7 @@ public class ProductsController : ControllerBase
             nameof(GetById),
             new { id = product.Id },
             product
-            );
+        );
     }
 
     [HasPermission("update.product")]
@@ -116,7 +110,8 @@ public class ProductsController : ControllerBase
 
     [HasPermission("create.product")]
     [HttpPost("add-image/{productId:guid}")]
-    public async Task<ActionResult<List<PresignedUpload>>> AddImage(Guid productId, [FromBody] List<ProductImageMetadataDTO> metadataDTO)
+    public async Task<ActionResult<List<PresignedUpload>>> AddImage(Guid productId,
+        [FromBody] List<ProductImageMetadataDTO> metadataDTO)
     {
         var command = new AddProductImagesCommand(productId, metadataDTO);
         var uploads = await _mediator.Send(command);

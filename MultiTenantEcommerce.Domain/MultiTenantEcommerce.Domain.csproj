@@ -10,4 +10,12 @@
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Platform\Billing\Events\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MultiTenantEcommerce.Shared\MultiTenantEcommerce.Shared.csproj" />
+  </ItemGroup>
+
 </Project>

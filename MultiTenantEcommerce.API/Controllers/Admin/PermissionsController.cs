@@ -2,15 +2,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Authorization;
-using MultiTenantEcommerce.Application.Users.Permissions.DTOs;
-using MultiTenantEcommerce.Application.Users.Permissions.Queries.Permissions.GetAll;
-using MultiTenantEcommerce.Application.Users.Permissions.Queries.Permissions.GetByAction;
-using MultiTenantEcommerce.Application.Users.Permissions.Queries.Permissions.GetByArea;
+using MultiTenantEcommerce.Application.Platform.Tenancy.Roles.Common.DTOs;
 
 namespace MultiTenantEcommerce.API.Controllers.Admin;
 
 [ApiController]
-[Authorize(Policy = "EmployeeOnly")]
+[Authorize(Policy = "TenantMemberOnly")]
 [Area("Admin")]
 [Route("api/[area]/[controller]")]
 public class PermissionsController : ControllerBase
@@ -23,7 +20,7 @@ public class PermissionsController : ControllerBase
     }
 
     [HasPermission("read.permission")]
-    [HttpGet()]
+    [HttpGet]
     public async Task<ActionResult<List<PermissionResponseDTO>>> GetAll()
     {
         var query = new GetAllPermissionsQuery();

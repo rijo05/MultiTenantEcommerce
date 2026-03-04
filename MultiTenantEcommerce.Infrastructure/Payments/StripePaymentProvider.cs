@@ -1,12 +1,13 @@
 ﻿using Microsoft.Extensions.Configuration;
-using MultiTenantEcommerce.Application.Payment.OrderPayment.DTOs;
-using MultiTenantEcommerce.Application.Payment.OrderPayment.Interfaces;
-using MultiTenantEcommerce.Application.Shipping.DTOs;
-using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
+using MultiTenantEcommerce.Application.Commerce.Sales.Orders.Interfaces;
+using MultiTenantEcommerce.Application.Commerce.Shipping.Common.DTOs;
+using MultiTenantEcommerce.Domain.Commerce.Sales.Orders.Entities;
+using MultiTenantEcommerce.Shared.Integration.DTOs;
 using Stripe;
 using Stripe.Checkout;
 
 namespace MultiTenantEcommerce.Infrastructure.Payments;
+
 public class StripePaymentProvider : IPaymentProvider
 {
     private readonly string _apiKey = "";
@@ -17,6 +18,7 @@ public class StripePaymentProvider : IPaymentProvider
         StripeConfiguration.ApiKey = _apiKey;
     }
 
+    #region CUSTOMER PAGA ORDER
     public async Task<PaymentResultDTO> CreatePaymentAsync(Guid PaymentId,
         Order order,
         ShippingQuoteDTO shipping,
@@ -29,7 +31,7 @@ public class StripePaymentProvider : IPaymentProvider
         {
             PriceData = new SessionLineItemPriceDataOptions
             {
-                UnitAmount = (long)(item.UnitPrice.Value * 100),
+                UnitAmount = item.UnitPrice.ToLong() * 100,
                 Currency = "eur",
                 ProductData = new SessionLineItemPriceDataProductDataOptions
                 {
@@ -42,13 +44,14 @@ public class StripePaymentProvider : IPaymentProvider
         var options = new SessionCreateOptions
         {
             ClientReferenceId = order.CustomerId.ToString(),
+            ExpiresAt = DateTime.UtcNow + TimeSpan.FromMinutes(10),
             LineItems = lineItems,
             Mode = "payment",
             Currency = "eur",
 
             ShippingOptions = new List<SessionShippingOptionOptions>
             {
-                new SessionShippingOptionOptions
+                new()
                 {
                     ShippingRateData = new SessionShippingOptionShippingRateDataOptions
                     {
@@ -61,9 +64,9 @@ public class StripePaymentProvider : IPaymentProvider
                         DeliveryEstimate = new SessionShippingOptionShippingRateDataDeliveryEstimateOptions
                         {
                             Minimum = new SessionShippingOptionShippingRateDataDeliveryEstimateMinimumOptions
-                            { Unit = "day", Value = (long)shipping.MinTransit.TotalDays },
+                                { Unit = "day", Value = (long)shipping.MinTransit.TotalDays },
                             Maximum = new SessionShippingOptionShippingRateDataDeliveryEstimateMaximumOptions
-                            { Unit = "day", Value = (long)shipping.MaxTransit.TotalDays }
+                                { Unit = "day", Value = (long)shipping.MaxTransit.TotalDays }
                         }
                     }
                 }
@@ -72,7 +75,6 @@ public class StripePaymentProvider : IPaymentProvider
             SuccessUrl = $"{domain}/checkout/success?session_id={{CHECKOUT_SESSION_ID}}",
             CancelUrl = $"{domain}/checkout/cancel",
 
-            // Metadados para reconciliação no Webhook
             Metadata = new Dictionary<string, string>
             {
                 { "PaymentId", PaymentId.ToString() },
@@ -84,23 +86,86 @@ public class StripePaymentProvider : IPaymentProvider
             PaymentIntentData = new SessionPaymentIntentDataOptions
             {
                 ApplicationFeeAmount = applicationFeeAmount > 0 ? (long)(applicationFeeAmount * 100) : null,
+                CaptureMethod = "manual",
+                Metadata = new Dictionary<string, string>
+                {
+                    { "OrderId", order.Id.ToString() }
+                }
             }
         };
 
         var requestOptions = new RequestOptions
         {
             ApiKey = _apiKey,
-            StripeAccount = connectedAccountId
+            StripeAccount = connectedAccountId,
+            IdempotencyKey = PaymentId.ToString(),
         };
 
         var service = new SessionService();
         var session = await service.CreateAsync(options, requestOptions);
 
-        return new PaymentResultDTO
+        return new PaymentResultDTO(session.Url, session.Id);
+    }
+
+    #endregion
+
+    #region USER PAGA SUBSCRICAO
+    //Pagar a primeira subscricao / Depois do trial
+    public async Task<string> CreateCheckoutSessionAsync(
+        Guid tenantId,
+        string stripeCustomerId,
+        string stripePriceId,
+        string successUrl,
+        string cancelUrl,
+        DateTime trialEndsAt)
+    {
+        var subscriptionData = new SessionSubscriptionDataOptions
         {
-            PaymentURL = session.Url,
-            PaymentId = session.Id
+            Metadata = new Dictionary<string, string>
+        {
+            { "Type", "SaaS_Subscription" },
+            { "TenantId", tenantId.ToString() },
+        }
         };
+
+        if ((trialEndsAt - DateTime.UtcNow).TotalHours > 48)
+        {
+            subscriptionData.TrialEnd = trialEndsAt;
+        }
+
+        var options = new SessionCreateOptions
+        {
+            Customer = stripeCustomerId,
+            Mode = "subscription",
+            LineItems = new List<SessionLineItemOptions>
+        {
+            new()
+            {
+                Price = stripePriceId,
+                Quantity = 1
+            }
+        },
+            SuccessUrl = successUrl,
+            CancelUrl = cancelUrl,
+            SubscriptionData = subscriptionData
+        };
+
+        var service = new SessionService();
+        var session = await service.CreateAsync(options);
+
+        return session.Url;
+    }
+
+    public async Task<string> CreatePortalSessionAsync(string stripeCustomerId, string returnUrl)
+    {
+        var options = new Stripe.BillingPortal.SessionCreateOptions
+        {
+            Customer = stripeCustomerId,
+            ReturnUrl = returnUrl
+        };
+        var service = new Stripe.BillingPortal.SessionService();
+        var session = await service.CreateAsync(options);
+        return session.Url;
     }
 
     public async Task<string> CreateCustomerAsync(string name, string email, Guid tenantId)
@@ -120,47 +185,45 @@ public class StripePaymentProvider : IPaymentProvider
         return customer.Id; // "cus_123..."
     }
 
-    public async Task<string> CreateCheckoutSessionAsync(
-        string stripeCustomerId,
-        string stripePriceId,
-        string successUrl,
-        string cancelUrl)
+    #endregion
+
+    #region USER RECEBE DINHEIRO
+    public async Task<string> CreateConnectedAccountAsync(string email, string companyName)
     {
-        var options = new SessionCreateOptions
+        var options = new AccountCreateOptions
         {
-            Customer = stripeCustomerId,
-            Mode = "subscription",
-            LineItems = new List<SessionLineItemOptions>
+            Type = "express", // O modelo "Express" é o melhor para SaaS. A Stripe trata do UI.
+            Email = email,
+            Company = new AccountCompanyOptions { Name = companyName },
+            Capabilities = new AccountCapabilitiesOptions
             {
-                new SessionLineItemOptions
-                {
-                    Price = stripePriceId,
-                    Quantity = 1
-                }
+                CardPayments = new AccountCapabilitiesCardPaymentsOptions { Requested = true },
+                Transfers = new AccountCapabilitiesTransfersOptions { Requested = true },
             },
-            SuccessUrl = successUrl,
-            CancelUrl = cancelUrl,
-            SubscriptionData = new SessionSubscriptionDataOptions
-            {
-                Metadata = new Dictionary<string, string>() { { "Type", "SaaS_Subscription" } }
-            }
         };
 
-        var service = new SessionService();
-        var session = await service.CreateAsync(options);
+        var service = new AccountService();
+        var account = await service.CreateAsync(options);
 
-        return session.Url;
+        // Devolve o "acct_1234..." para tu guardares no teu Tenant.StripeAccountId
+        return account.Id;
     }
 
-    public async Task<string> CreatePortalSessionAsync(string stripeCustomerId, string returnUrl)
+    // 2. Gera o Link para ele preencher o IBAN e dados fiscais
+    public async Task<string> CreateConnectOnboardingLinkAsync(string stripeAccountId, string refreshUrl, string returnUrl)
     {
-        var options = new Stripe.BillingPortal.SessionCreateOptions
+        var options = new AccountLinkCreateOptions
         {
-            Customer = stripeCustomerId,
-            ReturnUrl = returnUrl,
+            Account = stripeAccountId,
+            RefreshUrl = refreshUrl, // Se o link expirar, a Stripe manda-o para aqui para pedir um novo
+            ReturnUrl = returnUrl,   // Se ele preencher tudo com sucesso, volta para o teu Dashboard
+            Type = "account_onboarding",
         };
-        var service = new Stripe.BillingPortal.SessionService();
-        var session = await service.CreateAsync(options);
-        return session.Url;
+
+        var service = new AccountLinkService();
+        var link = await service.CreateAsync(options);
+
+        return link.Url; // O Frontend redireciona o utilizador para este URL!
     }
+    #endregion
 }

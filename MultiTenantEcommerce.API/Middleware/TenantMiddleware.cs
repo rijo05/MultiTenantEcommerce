@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Options;
-using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
 using MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
 
 namespace MultiTenantEcommerce.API.Middleware;

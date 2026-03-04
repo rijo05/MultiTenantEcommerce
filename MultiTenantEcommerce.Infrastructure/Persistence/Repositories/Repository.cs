@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MultiTenantEcommerce.Domain.Common.Entities;
-using MultiTenantEcommerce.Domain.Common.Interfaces;
-using MultiTenantEcommerce.Domain.Enums;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using MultiTenantEcommerce.Shared.Application;
+using MultiTenantEcommerce.Shared.Application.CQRS;
+using MultiTenantEcommerce.Shared.Domain.Abstractions;
+using MultiTenantEcommerce.Shared.Infrastructure.Persistence;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 
@@ -29,10 +30,12 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
     {
         await _appDbContext.Set<T>().AddAsync(entity);
     }
+
     public async Task DeleteAsync(T entity)
     {
         _appDbContext.Set<T>().Remove(entity);
     }
+
     public async Task UpdateAsync(T entity)
     {
         _appDbContext.Set<T>().Update(entity);
@@ -60,7 +63,7 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         await _appDbContext.SaveChangesAsync();
     }
 
-    protected async Task<List<T>> SortAndPageAsync(IQueryable<T> query, SortOptions sort, int page, int pageSize)
+    protected async Task<PaginatedList<T>> SortAndPageAsync(IQueryable<T> query, SortOptions sort, int page, int pageSize)
     {
         var sortProperty = sort switch
         {
@@ -71,7 +74,6 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
         };
 
         if (HasProperty<T>(sortProperty))
-        {
             query = sort switch
             {
                 SortOptions.NameAsc => query.OrderBy(p => EF.Property<object>(p, sortProperty)),
@@ -82,21 +84,25 @@ public class Repository<T> : IRepository<T> where T : BaseEntity
                 SortOptions.TimeDesc => query.OrderByDescending(p => EF.Property<object>(p, sortProperty)),
                 _ => query.OrderBy(p => p.CreatedAt)
             };
-        }
         else
-        {
-            query = query.OrderBy(p => p.CreatedAt);
-        }
+            query = query.OrderByDescending(p => EF.Property<object>(p, "CreatedAt"));
 
+        var totalCount = await query.CountAsync();
 
         var pageNumber = Math.Max(page, 1);
         var pageSizeClamped = Math.Clamp(pageSize, 1, 100);
 
-        return await query
+        if (totalCount == 0)
+            return new PaginatedList<T>(new List<T>(), 0, pageNumber, pageSizeClamped);
+
+        var items = await query
             .Skip((pageNumber - 1) * pageSizeClamped)
             .Take(pageSizeClamped)
             .ToListAsync();
+
+        return new PaginatedList<T>(items, totalCount, pageNumber, pageSizeClamped);
     }
+
     private bool HasProperty<T>(string propertyName)
     {
         return typeof(T).GetProperty(propertyName) != null;

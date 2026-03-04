@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MultiTenantEcommerce.Domain.Users.Entities.Permissions;
-using MultiTenantEcommerce.Domain.Users.Interfaces.Permissions;
+using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities.Auth;
+using MultiTenantEcommerce.Domain.Platform.Tenancy.Interfaces.Repositories;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
+
 public class PermissionRepository : Repository<Permission>, IPermissionRepository
 {
     public PermissionRepository(AppDbContext appDbContext) : base(appDbContext)

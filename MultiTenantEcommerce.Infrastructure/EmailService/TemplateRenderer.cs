@@ -1,11 +1,20 @@
-﻿using Scriban;
+﻿using MultiTenantEcommerce.Shared.Infrastructure.Services;
+using Scriban;
 
 namespace MultiTenantEcommerce.Infrastructure.EmailService;
-public class TemplateRenderer
+
+public class TemplateRenderer : ITemplateRender
 {
-    public string Render(string templateText, Dictionary<string, string> metadata)
+    public string Render(string templateText, object model)
     {
         var template = Template.Parse(templateText);
-        return template.Render(metadata, memberRenamer: member => member.Name);
+
+        if (template.HasErrors)
+        {
+            var errors = string.Join(", ", template.Messages.Select(x => x.Message));
+            throw new InvalidOperationException($"Erro de sintaxe no template HTML estático: {errors}");
+        }
+
+        return template.Render(model, member => member.Name);
     }
 }

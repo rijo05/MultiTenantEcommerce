@@ -1,7 +1,8 @@
-﻿using HtmlAgilityPack;
-using System.Text.RegularExpressions;
+﻿using System.Text.RegularExpressions;
+using HtmlAgilityPack;
 
 namespace MultiTenantEcommerce.Infrastructure.EmailService;
+
 public static class HtmlToText
 {
     public static string Convert(string html)

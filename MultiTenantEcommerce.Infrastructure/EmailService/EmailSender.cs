@@ -1,14 +1,15 @@
 ﻿using MailKit.Net.Smtp;
+using MailKit.Security;
 using Microsoft.Extensions.Configuration;
 using MimeKit;
-using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
+using MultiTenantEcommerce.Shared.Infrastructure.Services;
 
 namespace MultiTenantEcommerce.Infrastructure.EmailService;
+
 public class EmailSender : IEmailSender
 {
-    private readonly string _fromEmail;
-    private readonly string _fromName;
     private readonly string _appPassword;
+    private readonly string _fromEmail;
 
     public EmailSender(IConfiguration config)
     {
@@ -16,7 +17,8 @@ public class EmailSender : IEmailSender
         _appPassword = config["Email:Gmail:AppPassword"];
     }
 
-    public async Task SendAsync(string toEmail, string fromName, string subject, string htmlBody, string textBody, string? replyToEmail = null)
+    public async Task SendAsync(string toEmail, string fromName, string subject, string htmlBody,
+        string? replyToEmail = null)
     {
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(fromName, _fromEmail));
@@ -25,6 +27,8 @@ public class EmailSender : IEmailSender
 
         if (!string.IsNullOrEmpty(replyToEmail))
             message.ReplyTo.Add(MailboxAddress.Parse(replyToEmail));
+
+        var textBody = HtmlToText.Convert(htmlBody);
 
         var builder = new BodyBuilder
         {
@@ -35,7 +39,7 @@ public class EmailSender : IEmailSender
         message.Body = builder.ToMessageBody();
 
         using var client = new SmtpClient();
-        await client.ConnectAsync("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+        await client.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
         await client.AuthenticateAsync(_fromEmail, _appPassword);
         await client.SendAsync(message);
         await client.DisconnectAsync(true);

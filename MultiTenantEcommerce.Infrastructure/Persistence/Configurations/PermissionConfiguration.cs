@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Domain.Users.Entities.Permissions;
+using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities.Auth;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
+
 internal class PermissionConfiguration : IEntityTypeConfiguration<Permission>
 {
     public void Configure(EntityTypeBuilder<Permission> builder)
@@ -70,6 +71,5 @@ internal class PermissionConfiguration : IEntityTypeConfiguration<Permission>
         //    new Permission("update.role", "Atualizar role", "role", "update"),
         //    new Permission("delete.role", "Apagar role", "role", "delete")
         //);
-
     }
 }

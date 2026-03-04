@@ -1,16 +1,17 @@
-﻿using MultiTenantEcommerce.Domain.ValueObjects;
+﻿using MultiTenantEcommerce.Shared.Domain.ValueObjects;
 using QuestPDF.Fluent;
 using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 
 namespace MultiTenantEcommerce.Infrastructure.Shipping;
+
 public class GenerateLabel : IDocument
 {
-    private readonly string _logoImage;
-    private readonly string _trackingNumber;
-    private readonly string _barcodeImage;
-    private readonly string _recipientName;
     private readonly Address _address;
+    private readonly string _barcodeImage;
+    private readonly string _logoImage;
+    private readonly string _recipientName;
+    private readonly string _trackingNumber;
 
     public GenerateLabel(string logoImage,
         string trackingNumber,
@@ -25,7 +26,10 @@ public class GenerateLabel : IDocument
         _address = address;
     }
 
-    public DocumentMetadata GetMetadata() => DocumentMetadata.Default;
+    public DocumentMetadata GetMetadata()
+    {
+        return DocumentMetadata.Default;
+    }
 
     public void Compose(IDocumentContainer container)
     {
@@ -42,8 +46,8 @@ public class GenerateLabel : IDocument
 
                 // Tracking number destacado
                 col.Item().PaddingVertical(10).AlignCenter()
-                   .Text($"Tracking: {_trackingNumber}")
-                   .FontSize(18).Bold();
+                    .Text($"Tracking: {_trackingNumber}")
+                    .FontSize(18).Bold();
 
                 // Barcode
                 col.Item().AlignCenter().Image(_barcodeImage).FitWidth();

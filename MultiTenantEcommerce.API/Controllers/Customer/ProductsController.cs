@@ -1,10 +1,8 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Images;
-using MultiTenantEcommerce.Application.Catalog.Products.DTOs.Products;
-using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetById;
-using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetFiltered;
-using MultiTenantEcommerce.Application.Catalog.Products.Queries.GetImage;
+using MultiTenantEcommerce.Application.Commerce.Catalog.Products.Common.DTOs.Images;
+using MultiTenantEcommerce.Application.Commerce.Catalog.Products.Common.DTOs.Products;
+using MultiTenantEcommerce.Application.Commerce.Catalog.Products.Queries.GetFiltered;
 
 namespace MultiTenantEcommerce.API.Controllers.Customer;
 
@@ -29,7 +27,7 @@ public class ProductsController : ControllerBase
             productFilter.Name,
             productFilter.MinPrice,
             productFilter.MaxPrice,
-            true,  //isActive
+            true, //isActive
             false, //isAdmin
             productFilter.Page,
             productFilter.PageSize,

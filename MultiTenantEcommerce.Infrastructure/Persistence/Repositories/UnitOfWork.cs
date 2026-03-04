@@ -1,19 +1,25 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MultiTenantEcommerce.Application.Common.Exceptions;
-using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
+using MultiTenantEcommerce.Infrastructure.Messaging;
 using MultiTenantEcommerce.Infrastructure.Outbox;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 using MultiTenantEcommerce.Infrastructure.Persistence.Transaction;
+using MultiTenantEcommerce.Shared.Application.Events;
+using MultiTenantEcommerce.Shared.Domain.Exceptions;
+using MultiTenantEcommerce.Shared.Infrastructure.Persistence;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 
 public class UnitOfWork : IUnitOfWork
 {
     private readonly AppDbContext _context;
+    private readonly EventDispatcher _eventDispatcher;
+    private readonly IIntegrationEventPublisher _integrationEventPublisher;
 
-    public UnitOfWork(AppDbContext context)
+    public UnitOfWork(AppDbContext context, EventDispatcher eventDispatcher, IIntegrationEventPublisher integrationEventPublisher)
     {
         _context = context;
+        _eventDispatcher = eventDispatcher;
+        _integrationEventPublisher = integrationEventPublisher;
     }
 
     public async Task<ITransaction> BeginTransactionAsync()
@@ -33,14 +39,28 @@ public class UnitOfWork : IUnitOfWork
 
         try
         {
-            var events = _context.GetAllDomainEvents();
-            _context.ClearAllDomainEvents();
-
-            foreach (var domainEvent in events)
+            while (true)
             {
-                var outboxMessage = new OutboxEvent(domainEvent);
+                var domainEvents = _context.GetAllDomainEvents();
+                if (!domainEvents.Any()) break;
 
-                await _context.OutboxEvents.AddAsync(outboxMessage);
+                _context.ClearAllDomainEvents();
+
+                foreach (var domainEvent in domainEvents)
+                {
+                    await _eventDispatcher.DispatchSync(domainEvent);
+                }
+            }
+
+            var integrationEvents = _integrationEventPublisher.GetAllEvents();
+
+            if (integrationEvents.Any())
+            {
+                var outboxMessages = integrationEvents.Select(evt => new OutboxEvent(evt)).ToList();
+
+                await _context.OutboxEvents.AddRangeAsync(outboxMessages);
+
+                _integrationEventPublisher.ClearEvents();
             }
 
             result = await _context.SaveChangesAsync();

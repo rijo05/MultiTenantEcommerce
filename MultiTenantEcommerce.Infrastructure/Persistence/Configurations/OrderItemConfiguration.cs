@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Domain.Catalog.Entities;
-using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Catalog.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Sales.Orders.Entities;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
+
 public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 {
     public void Configure(EntityTypeBuilder<OrderItem> builder)
@@ -12,20 +13,20 @@ public class OrderItemConfiguration : IEntityTypeConfiguration<OrderItem>
 
 
         builder.HasOne<Order>()
-                .WithMany(x => x.Items)
-                .HasForeignKey(x => new { x.TenantId, x.OrderId })
-                .OnDelete(DeleteBehavior.Restrict);
+            .WithMany(x => x.Items)
+            .HasForeignKey(x => new { x.TenantId, x.OrderId })
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasOne<Product>()
-                .WithMany()
-                .HasForeignKey(x => new { x.TenantId, x.ProductId })
-                .OnDelete(DeleteBehavior.Restrict);
+            .WithMany()
+            .HasForeignKey(x => new { x.TenantId, x.ProductId })
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.OwnsOne(x => x.Quantity, qty =>
         {
             qty.Property(q => q.Value)
-               .HasColumnName("Quantity")
-               .IsRequired();
+                .HasColumnName("Quantity")
+                .IsRequired();
         });
 
 

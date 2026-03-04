@@ -5,6 +5,7 @@ using MultiTenantEcommerce.Infrastructure.Webhooks.Interface;
 using Stripe;
 
 namespace MultiTenantEcommerce.Infrastructure.Webhooks.Dispatcher;
+
 public class WebhookDispatcher : IWebhookDispatcher
 {
     private readonly IServiceProvider _serviceProvider;
@@ -29,6 +30,10 @@ public class WebhookDispatcher : IWebhookDispatcher
                 handler = scope.ServiceProvider.GetRequiredService<StripeCheckoutExpiredHandler>();
                 break;
 
+            case StripeEvents.PaymentIntentPaymentFailed:
+                handler = scope.ServiceProvider.GetRequiredService<StripePaymentFailedHandler>();
+                break;
+
             case StripeEvents.InvoicePaid:
                 handler = scope.ServiceProvider.GetRequiredService<SubscriptionPaidWebhookHandler>();
                 break;
@@ -50,9 +55,6 @@ public class WebhookDispatcher : IWebhookDispatcher
                 break;
         }
 
-        if (handler != null)
-        {
-            await handler.HandleAsync(stripeEvent);
-        }
+        if (handler != null) await handler.HandleAsync(stripeEvent);
     }
 }

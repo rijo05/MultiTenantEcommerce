@@ -1,0 +1,77 @@
+﻿using MultiTenantEcommerce.Shared.Domain.Abstractions;
+using MultiTenantEcommerce.Shared.Utilities.Guards;
+
+namespace MultiTenantEcommerce.Domain.Commerce.Catalog.Entities;
+
+public class Category : TenantBase
+{
+    private Category()
+    {
+    }
+
+    public Category(Guid tenantId, string name, string? description, bool isActive = true)
+        : base(tenantId)
+    {
+        GuardCommon.AgainstNullOrEmpty(name, nameof(name));
+        GuardCommon.AgainstMaxLength(description, 255, nameof(description));
+
+        Name = name;
+        Description = description;
+        IsActive = isActive;
+    }
+
+    public string Name { get; private set; }
+    public string? Description { get; private set; }
+    public bool IsActive { get; private set; }
+
+    #region UPDATE DATA
+
+    public void UpdateCategory(
+        string? Name,
+        string? Description,
+        bool? IsActive)
+    {
+        if (IsActive.HasValue)
+            SetActive(IsActive.Value);
+
+        if (Description is not null)
+        {
+            if (Description == "")
+                ClearDescription();
+            else
+                UpdateDescription(Description);
+        }
+
+        if (!string.IsNullOrWhiteSpace(Name))
+            UpdateName(Name);
+    }
+
+    public void UpdateName(string newName)
+    {
+        GuardCommon.AgainstNullOrEmpty(newName, nameof(newName));
+        GuardCommon.AgainstMaxLength(newName, 100, nameof(newName));
+        Name = newName;
+        SetUpdatedAt();
+    }
+
+    public void UpdateDescription(string description)
+    {
+        GuardCommon.AgainstMaxLength(description, 255, nameof(description));
+        Description = description;
+        SetUpdatedAt();
+    }
+
+    public void ClearDescription()
+    {
+        Description = null;
+        SetUpdatedAt();
+    }
+
+    public void SetActive(bool isActive)
+    {
+        IsActive = isActive;
+        SetUpdatedAt();
+    }
+
+    #endregion
+}

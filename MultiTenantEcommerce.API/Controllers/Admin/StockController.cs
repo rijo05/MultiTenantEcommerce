@@ -2,18 +2,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Authorization;
-using MultiTenantEcommerce.Application.Inventory.Commands.DecrementStock;
-using MultiTenantEcommerce.Application.Inventory.Commands.IncrementStock;
-using MultiTenantEcommerce.Application.Inventory.Commands.SetMinimumStockLevel;
-using MultiTenantEcommerce.Application.Inventory.Commands.SetStock;
-using MultiTenantEcommerce.Application.Inventory.DTOs;
-using MultiTenantEcommerce.Application.Inventory.Queries.GetByProductId;
-using MultiTenantEcommerce.Application.Inventory.Queries.GetStockMovements;
+using MultiTenantEcommerce.Application.Commerce.Inventory.Common.DTOs;
+using MultiTenantEcommerce.Application.Commerce.Inventory.Queries.GetStockMovements;
 
 namespace MultiTenantEcommerce.API.Controllers.Admin;
 
 [ApiController]
-[Authorize(Policy = "EmployeeOnly")]
+[Authorize(Policy = "TenantMemberOnly")]
 [Area("Admin")]
 [Route("api/[area]/[controller]")]
 public class StockController : ControllerBase
@@ -80,7 +75,8 @@ public class StockController : ControllerBase
 
     [HasPermission("read.stock")]
     [HttpGet("movements")]
-    public async Task<ActionResult<List<StockMovementResponseDTO>>> GetStockMovements([FromQuery] GetFilteredStockMovementsQuery query)
+    public async Task<ActionResult<List<StockMovementResponseDTO>>> GetStockMovements(
+        [FromQuery] GetFilteredStockMovementsQuery query)
     {
         var movements = await _mediator.Send(query);
 

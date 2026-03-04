@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Extensions;
-using MultiTenantEcommerce.Application.Sales.Orders.DTOs;
-using MultiTenantEcommerce.Application.Sales.Orders.Queries.GetByCustomerId;
-using MultiTenantEcommerce.Application.Sales.Orders.Queries.GetById;
+using MultiTenantEcommerce.Application.Commerce.Sales.Orders.Common.DTOs;
 
 namespace MultiTenantEcommerce.API.Controllers.Customer;
 

@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using MultiTenantEcommerce.Application.Payment.OrderPayment.Interfaces;
-using MultiTenantEcommerce.Domain.Enums;
+using MultiTenantEcommerce.Application.Commerce.Sales.Orders.Interfaces;
+using MultiTenantEcommerce.Domain.Commerce.Sales.Orders.Enums;
 
 namespace MultiTenantEcommerce.Infrastructure.Payments;
+
 public class PaymentProviderFactory : IPaymentProviderFactory
 {
     private readonly IServiceProvider _serviceProvider;

@@ -1,10 +1,11 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MultiTenantEcommerce.Domain.Enums;
-using MultiTenantEcommerce.Domain.Users.Entities.Permissions;
-using MultiTenantEcommerce.Domain.Users.Interfaces.Permissions;
+using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities.Auth;
+using MultiTenantEcommerce.Domain.Platform.Tenancy.Interfaces.Repositories;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using MultiTenantEcommerce.Shared.Application.CQRS;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
+
 public class RoleRepository : Repository<Role>, IRoleRepository
 {
     public RoleRepository(AppDbContext appDbContext) : base(appDbContext)
@@ -23,8 +24,9 @@ public class RoleRepository : Repository<Role>, IRoleRepository
     {
         return await _appDbContext.Roles
             .Include(x => x.Permissions)
+            .ThenInclude(rp => rp.Permission)
             .AsSplitQuery()
-            .FirstAsync(x => x.Id == id);
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<List<Role>> GetRolesWithPermissionsByIdsAsync(List<Guid> roleIds)

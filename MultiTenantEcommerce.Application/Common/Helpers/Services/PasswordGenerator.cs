@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 
 namespace MultiTenantEcommerce.Application.Common.Helpers.Services;
+
 public class PasswordGenerator
 {
     public string GenerateRandomPassword(int length = 12)
@@ -23,10 +24,7 @@ public class PasswordGenerator
         builder.Append(GetRandomChar(Digits));
         builder.Append(GetRandomChar(Special));
 
-        for (int i = builder.Length; i < length; i++)
-        {
-            builder.Append(GetRandomChar(AllCharacters));
-        }
+        for (var i = builder.Length; i < length; i++) builder.Append(GetRandomChar(AllCharacters));
 
         var chars = builder.ToString().ToCharArray();
         Shuffle(chars);
@@ -46,6 +44,7 @@ public class PasswordGenerator
         {
             rng.GetBytes(bytes);
         }
+
         return source[bytes[0] % source.Length];
     }
 
@@ -53,11 +52,11 @@ public class PasswordGenerator
     {
         using (var rng = RandomNumberGenerator.Create())
         {
-            for (int i = array.Length - 1; i > 0; i--)
+            for (var i = array.Length - 1; i > 0; i--)
             {
                 var bytes = new byte[1];
                 rng.GetBytes(bytes);
-                int j = bytes[0] % (i + 1);
+                var j = bytes[0] % (i + 1);
 
                 (array[i], array[j]) = (array[j], array[i]);
             }

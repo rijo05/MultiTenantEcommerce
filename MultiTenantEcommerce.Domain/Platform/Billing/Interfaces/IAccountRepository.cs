@@ -1,0 +1,11 @@
+﻿using MultiTenantEcommerce.Domain.Platform.Billing.Entities;
+using MultiTenantEcommerce.Shared.Infrastructure.Persistence;
+
+namespace MultiTenantEcommerce.Domain.Platform.Billing.Interfaces;
+
+public interface IAccountRepository : IRepository<Account>
+{
+    Task<Account?> GetByOwnerIdAsync(Guid userId);
+
+    Task<Account?> GetByStripeCustomerIdAsync(string stripeCustomerId);
+}

@@ -2,17 +2,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Authorization;
-using MultiTenantEcommerce.Application.Catalog.Categories.Commands.Create;
-using MultiTenantEcommerce.Application.Catalog.Categories.Commands.Delete;
-using MultiTenantEcommerce.Application.Catalog.Categories.Commands.Update;
-using MultiTenantEcommerce.Application.Catalog.Categories.DTOs;
-using MultiTenantEcommerce.Application.Catalog.Categories.Queries.GetById;
-using MultiTenantEcommerce.Application.Catalog.Categories.Queries.GetFiltered;
+using MultiTenantEcommerce.Application.Commerce.Catalog.Categories.Commands.Create;
+using MultiTenantEcommerce.Application.Commerce.Catalog.Categories.Commands.Update;
+using MultiTenantEcommerce.Application.Commerce.Catalog.Categories.Common.DTOs;
 
 namespace MultiTenantEcommerce.API.Controllers.Admin;
 
 [ApiController]
-[Authorize(Policy = "EmployeeOnly")]
+[Authorize(Policy = "TenantMemberOnly")]
 [Area("Admin")]
 [Route("api/[area]/[controller]")]
 public class CategoriesController : ControllerBase
@@ -67,7 +64,7 @@ public class CategoriesController : ControllerBase
             nameof(GetById),
             new { id = category.Id },
             category
-            );
+        );
     }
 
     [HasPermission("update.category")]

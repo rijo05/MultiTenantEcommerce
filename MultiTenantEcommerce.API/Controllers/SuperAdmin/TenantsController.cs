@@ -1,10 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MultiTenantEcommerce.Application.Tenants.Commands.Tenant.Delete;
-using MultiTenantEcommerce.Application.Tenants.Commands.Tenant.Update;
-using MultiTenantEcommerce.Application.Tenants.DTOs.Tenant;
-using MultiTenantEcommerce.Application.Tenants.Queries.Tenant.GetById;
-using MultiTenantEcommerce.Application.Tenants.Queries.Tenant.GetFiltered;
+using MultiTenantEcommerce.Application.Platform.Tenancy.Tenants.Common.DTOs;
+using MultiTenantEcommerce.Application.Platform.Tenancy.Tenants.Queries.GetFiltered;
 
 namespace MultiTenantEcommerce.API.Controllers.SuperAdmin;
 
@@ -20,7 +17,8 @@ public class TenantsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<TenantResponseDTO>>> GetTenants([FromQuery] GetFilteredTenantsQuery filteredQuery)
+    public async Task<ActionResult<List<TenantResponseDTO>>> GetTenants(
+        [FromQuery] GetFilteredTenantsQuery filteredQuery)
     {
         var tenants = await _mediator.Send(filteredQuery);
 

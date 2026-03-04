@@ -1,27 +1,31 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MultiTenantEcommerce.Domain.Catalog.Entities;
-using MultiTenantEcommerce.Domain.Catalog.Interfaces;
-using MultiTenantEcommerce.Domain.Enums;
+using MultiTenantEcommerce.Domain.Commerce.Catalog.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Catalog.Interfaces;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using MultiTenantEcommerce.Shared.Application;
+using MultiTenantEcommerce.Shared.Application.CQRS;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 
 public class CategoryRepository : Repository<Category>, ICategoryRepository
 {
-    public CategoryRepository(AppDbContext appDbContext) : base(appDbContext) { }
+    public CategoryRepository(AppDbContext appDbContext) : base(appDbContext)
+    {
+    }
 
     public async Task<Category?> GetByExactNameAsync(string name)
     {
         return await _appDbContext.Categories
             .FirstOrDefaultAsync(c => c.Name == name);
     }
-    public async Task<List<Category>> GetFilteredAsync(
-    string? name = null,
-    string? description = null,
-    bool? isActive = null,
-    int page = 1,
-    int pageSize = 20,
-    SortOptions sort = SortOptions.TimeDesc)
+
+    public async Task<PaginatedList<Category>> GetFilteredAsync(
+        string? name = null,
+        string? description = null,
+        bool? isActive = null,
+        int page = 1,
+        int pageSize = 20,
+        SortOptions sort = SortOptions.TimeDesc)
     {
         var query = _appDbContext.Categories
             .AsNoTracking()

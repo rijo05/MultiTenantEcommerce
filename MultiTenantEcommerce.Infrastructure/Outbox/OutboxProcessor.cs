@@ -1,54 +1,69 @@
-﻿using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
-using MultiTenantEcommerce.Domain.Enums;
-using MultiTenantEcommerce.Infrastructure.Workers;
-using System.Text.Json;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using MultiTenantEcommerce.Shared.Infrastructure.Messaging;
 
 namespace MultiTenantEcommerce.Infrastructure.Outbox;
-public class OutboxProcessor : IPriorityProcessor
+
+public class OutboxProcessor : BackgroundService
 {
-    private readonly IOutboxRepository _outboxRepository;
-    private readonly IEventBus _eventBus;
     private const int BATCH_SIZE = 20;
+    private readonly IServiceProvider _serviceProvider;
 
     public OutboxProcessor(IOutboxRepository outboxRepository,
-        IEventBus eventBus)
+        IEventBus eventBus,
+        IServiceProvider serviceProvider)
     {
-        _outboxRepository = outboxRepository;
-        _eventBus = eventBus;
+        _serviceProvider = serviceProvider;
     }
 
-    public async Task ExecuteAsync(EventPriority priority)
+    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        var events = await _outboxRepository.GetUnprocessedEvents(priority, BATCH_SIZE);
-        Console.WriteLine($"Foram encontrados {events.Count} eventos");
-
-        foreach (var item in events)
+        while (!stoppingToken.IsCancellationRequested)
         {
+            var delayTime = 2000;
+
             try
             {
-                var wrapper = new EventWrapper
+                using var scope = _serviceProvider.CreateScope();
+                var outboxRepository = scope.ServiceProvider.GetRequiredService<IOutboxRepository>();
+                var eventBus = scope.ServiceProvider.GetRequiredService<IEventBus>();
+
+                var events = await outboxRepository.GetUnprocessedEvents(BATCH_SIZE);
+
+                if (events.Any())
                 {
-                    EventType = item.Type,
-                    Data = item.Content
-                };
+                    foreach (var item in events)
+                    {
+                        try
+                        {
+                            await eventBus.PublishAsync(item.Content, item.Type, item.Priority);
 
-                var json = JsonSerializer.Serialize(wrapper);
+                            item.MarkAsProcessed();
+                        }
+                        catch (Exception ex)
+                        {
+                            item.SetErrors(ex.Message);
+                            item.IncrementRetries();
+                        }
+                    }
+                    await outboxRepository.SaveChangesAsync();
 
-                await _eventBus.PublishAsync(item.RoutingKey, json);
-
-                item.SetProcessedOn();
+                    if (events.Count == BATCH_SIZE)
+                    {
+                        delayTime = 0;
+                    }
+                }
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                item.SetErrors(ex.Message);
-                item.IncrementRetries();
+                Console.WriteLine(e);
+                delayTime = 5000;
             }
-            finally
+
+            if (delayTime > 0)
             {
-                await _outboxRepository.UpdateAsync(item);
+                await Task.Delay(delayTime, stoppingToken);
             }
         }
-
-        await _outboxRepository.SaveChangesAsync();
     }
 }

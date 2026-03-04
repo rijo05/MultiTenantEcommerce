@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Domain.Sales.ShoppingCart.Entities;
-using MultiTenantEcommerce.Domain.Tenants.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Sales.ShoppingCart.Entities;
+using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
+
 public class CartConfiguration : IEntityTypeConfiguration<Cart>
 {
     public void Configure(EntityTypeBuilder<Cart> builder)
@@ -16,8 +17,8 @@ public class CartConfiguration : IEntityTypeConfiguration<Cart>
             .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(x => x.Items)
-               .WithOne()
-               .HasForeignKey(x => new { x.TenantId, x.CartId })
-               .OnDelete(DeleteBehavior.Cascade);
+            .WithOne()
+            .HasForeignKey(x => new { x.TenantId, x.CartId })
+            .OnDelete(DeleteBehavior.Cascade);
     }
 }

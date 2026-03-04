@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Domain.Catalog.Entities;
-using MultiTenantEcommerce.Domain.Tenants.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Catalog.Entities;
+using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
+
 public class ProductConfiguration : IEntityTypeConfiguration<Product>
 {
     public void Configure(EntityTypeBuilder<Product> builder)
@@ -11,9 +12,9 @@ public class ProductConfiguration : IEntityTypeConfiguration<Product>
         builder.HasKey(x => new { x.TenantId, x.Id });
 
         builder.HasOne<Tenant>()
-                .WithMany()
-                .HasForeignKey(x => x.TenantId)
-                .OnDelete(DeleteBehavior.Restrict);
+            .WithMany()
+            .HasForeignKey(x => x.TenantId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.OwnsOne(u => u.Price, price =>
         {

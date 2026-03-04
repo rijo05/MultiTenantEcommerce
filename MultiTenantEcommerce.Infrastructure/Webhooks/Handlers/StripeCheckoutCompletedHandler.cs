@@ -1,11 +1,12 @@
 ﻿using MediatR;
-using MultiTenantEcommerce.Application.Payment.OrderPayment.Commands.Completed;
-using MultiTenantEcommerce.Application.Tenants.Commands.Tenant.FirstSubscription;
+using MultiTenantEcommerce.Application.Commerce.Sales.Orders.Commands.HandleWebhook;
+using MultiTenantEcommerce.Application.Tenancy.Tenants.Commands.SubscriptionState.Activate;
 using MultiTenantEcommerce.Infrastructure.Webhooks.Interface;
 using Stripe;
 using Stripe.Checkout;
 
 namespace MultiTenantEcommerce.Infrastructure.Webhooks.Handlers;
+
 public class StripeCheckoutCompletedHandler : IWebhookHandler
 {
     private readonly IMediator _mediator;
@@ -17,13 +18,17 @@ public class StripeCheckoutCompletedHandler : IWebhookHandler
 
     public async Task HandleAsync(Event stripeEvent)
     {
-        var session = stripeEvent.Data.Object as Session;
+        if (stripeEvent.Data.Object is not Session session || session == null)
+            return;
 
-        if (session.Mode == "payment" && session.Metadata.TryGetValue("OrderId", out var orderIdStr))
+        if (session.Mode == "payment" && 
+            session.Metadata.TryGetValue("OrderId", out var orderIdStr) && 
+            session.Metadata.TryGetValue("PaymentId", out var paymentIdStr))
         {
-            var orderId = Guid.Parse(orderIdStr);
-
-            await _mediator.Send(new MarkOrderAsPaidCommand(orderId, session.PaymentIntentId));
+            if (Guid.TryParse(orderIdStr, out var orderId) && Guid.TryParse(paymentIdStr, out var paymentId))
+            {
+                await _mediator.Send(new MarkOrderAsPaidCommand(orderId, paymentId, session.PaymentIntentId));
+            }
         }
         //apenas a primeira subscricao
         else if (session.Mode == "subscription")
@@ -32,11 +37,13 @@ public class StripeCheckoutCompletedHandler : IWebhookHandler
 
             if (session.Metadata.TryGetValue("TenantId", out var tenantIdStr))
             {
-                await _mediator.Send(new ActivateTenantSubscriptionCommand(
-                    TenantId: Guid.Parse(tenantIdStr),
-                    StripeCustomerId: customerId,
-                    StripeSubscriptionId: session.SubscriptionId
-                ));
+                if (Guid.TryParse(tenantIdStr, out var tenantId))
+                {
+                    await _mediator.Send(new ActivateTenantSubscriptionCommand(
+                        TenantId: tenantId,
+                        StripeCustomerId: customerId,
+                        StripeSubscriptionId: session.SubscriptionId));
+                }
             }
         }
     }

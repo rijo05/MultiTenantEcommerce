@@ -1,15 +1,15 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System.Net.Http.Json;
+using System.Text.Json;
+using Microsoft.Extensions.Configuration;
 using MultiTenantEcommerce.Application.Common.DTOs.Address;
 using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
-using MultiTenantEcommerce.Domain.ValueObjects;
-using System.Net.Http.Json;
-using System.Text.Json;
 
 namespace MultiTenantEcommerce.Infrastructure.AddressValidator;
+
 public class AddressValidator : IAddressValidator
 {
-    private readonly HttpClient _httpClient;
     private readonly string _apiKey;
+    private readonly HttpClient _httpClient;
 
     public AddressValidator(HttpClient client, IConfiguration configuration)
     {
@@ -24,12 +24,12 @@ public class AddressValidator : IAddressValidator
 
         var response = await _httpClient.GetFromJsonAsync<JsonDocument>(url);
         if (response is null)
-            return new AddressValidationResult(false, 0, null, "", new());
+            return new AddressValidationResult(false, 0, null, "", new Dictionary<string, string>());
 
         var results = response.RootElement.GetProperty("results");
 
         if (results.GetArrayLength() == 0)
-            return new AddressValidationResult(false, 0, null, "", new());
+            return new AddressValidationResult(false, 0, null, "", new Dictionary<string, string>());
 
         var best = results[0];
         var confidence = best.GetProperty("confidence").GetDouble();
@@ -41,10 +41,8 @@ public class AddressValidator : IAddressValidator
 
         var components = new Dictionary<string, string>();
         if (best.TryGetProperty("components", out var compJson))
-        {
             foreach (var prop in compJson.EnumerateObject())
                 components[prop.Name] = prop.Value.ToString();
-        }
 
         return new AddressValidationResult(
             confidence >= 7,

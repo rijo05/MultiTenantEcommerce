@@ -32,6 +32,7 @@
   <ItemGroup>
     <ProjectReference Include="..\MultiTenantEcommerce.Application\MultiTenantEcommerce.Application.csproj" />
     <ProjectReference Include="..\MultiTenantEcommerce.Domain\MultiTenantEcommerce.Domain.csproj" />
+    <ProjectReference Include="..\MultiTenantEcommerce.Shared\MultiTenantEcommerce.Shared.csproj" />
   </ItemGroup>
 
 </Project>

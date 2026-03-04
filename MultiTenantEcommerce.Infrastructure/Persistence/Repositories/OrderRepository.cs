@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MultiTenantEcommerce.Domain.Enums;
-using MultiTenantEcommerce.Domain.Sales.Orders.Entities;
-using MultiTenantEcommerce.Domain.Sales.Orders.Interfaces;
+using MultiTenantEcommerce.Domain.Commerce.Sales.Orders.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Sales.Orders.Interfaces;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using MultiTenantEcommerce.Shared.Application;
+using MultiTenantEcommerce.Shared.Application.CQRS;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 
@@ -10,7 +11,7 @@ public class OrderRepository : Repository<Order>, IOrderRepository
 {
     public OrderRepository(AppDbContext appDbContext) : base(appDbContext) { }
 
-    public async Task<List<Order>> GetByCustomerId(
+    public async Task<PaginatedList<Order>> GetByCustomerId(
         Guid customerId,
         int page = 1,
         int pageSize = 20,
@@ -23,14 +24,7 @@ public class OrderRepository : Repository<Order>, IOrderRepository
         return await SortAndPageAsync(query, sort, page, pageSize);
     }
 
-    public override async Task<Order?> GetByIdAsync(Guid orderId)
-    {
-        return await _appDbContext.Orders
-            .Include(x => x.Items)
-            .FirstOrDefaultAsync(x => x.Id == orderId);
-    }
-
-    public async Task<List<Order>> GetFilteredAsync(
+    public async Task<PaginatedList<Order>> GetFilteredAsync(
         Guid? customerId = null,
         string? status = null,
         DateTime? minDate = null,
@@ -44,6 +38,7 @@ public class OrderRepository : Repository<Order>, IOrderRepository
         var query = _appDbContext.Orders
             .AsNoTracking()
             .Include(o => o.Items)
+            .Include(x => x.Payment)
             .AsSplitQuery()
             .AsQueryable();
 
@@ -60,11 +55,28 @@ public class OrderRepository : Repository<Order>, IOrderRepository
             query = query.Where(p => p.CreatedAt <= maxDate);
 
         if (minPrice.HasValue)
-            query = query.Where(p => p.Price.Value >= minPrice);
+            query = query.Where(p => p.TotalPrice.Value >= minPrice);
 
         if (maxPrice.HasValue)
-            query = query.Where(p => p.Price.Value <= maxPrice);
+            query = query.Where(p => p.TotalPrice.Value <= maxPrice);
 
         return await SortAndPageAsync(query, sort, page, pageSize);
+    }
+
+    public override async Task<Order?> GetByIdAsync(Guid orderId)
+    {
+        return await _appDbContext.Orders
+            .Include(x => x.Items)
+            .Include(x => x.Payment)
+            .FirstOrDefaultAsync(x => x.Id == orderId);
+    }
+
+    public async Task<Order?> GetOrderByPaymentReference(string transactionId)
+    {
+        return await _appDbContext.Orders
+            .Include(x => x.Payment)
+            .FirstOrDefaultAsync(x => x.Payment != null &&
+                                      (x.Payment.TransactionId == transactionId ||
+                                       x.Payment.StripeSessionId == transactionId));
     }
 }

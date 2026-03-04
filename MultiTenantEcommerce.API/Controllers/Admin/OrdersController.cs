@@ -2,16 +2,13 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Authorization;
-using MultiTenantEcommerce.Application.Sales.Orders.Commands.ChangeStatus;
-using MultiTenantEcommerce.Application.Sales.Orders.DTOs;
-using MultiTenantEcommerce.Application.Sales.Orders.Queries.GetByCustomerId;
-using MultiTenantEcommerce.Application.Sales.Orders.Queries.GetById;
-using MultiTenantEcommerce.Application.Sales.Orders.Queries.GetFiltered;
+using MultiTenantEcommerce.Application.Commerce.Sales.Orders.Common.DTOs;
+using MultiTenantEcommerce.Application.Commerce.Sales.Orders.Queries.GetFilteredAdmin;
 
 namespace MultiTenantEcommerce.API.Controllers.Admin;
 
 [ApiController]
-[Authorize(Policy = "EmployeeOnly")]
+[Authorize(Policy = "TenantMemberOnly")]
 [Area("Admin")]
 [Route("api/[area]/[controller]")]
 public class OrdersController : ControllerBase
@@ -24,8 +21,8 @@ public class OrdersController : ControllerBase
     }
 
     [HasPermission("read.order")]
-    [HttpGet()]
-    public async Task<ActionResult<List<OrderResponseDTO>>> GetOrders([FromQuery] GetFilteredOrdersQuery filter)
+    [HttpGet]
+    public async Task<ActionResult<List<OrderResponseDTO>>> GetOrders([FromQuery] GetFilteredOrdersAdminQuery filter)
     {
         var orders = await _mediator.Send(filter);
 
@@ -56,7 +53,8 @@ public class OrdersController : ControllerBase
 
     [HasPermission("update.order")]
     [HttpPatch("{id:guid}/status")]
-    public async Task<ActionResult<OrderResponseDetailDTO>> ChangeOrderStatus(Guid id, [FromBody] ChangeOrderStatusDTO statusDTO)
+    public async Task<ActionResult<OrderResponseDetailDTO>> ChangeOrderStatus(Guid id,
+        [FromBody] ChangeOrderStatusDTO statusDTO)
     {
         var command = new ChangeOrderStatusCommand(id, statusDTO.Status);
 

@@ -1,10 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MultiTenantEcommerce.Domain.Enums;
-using MultiTenantEcommerce.Domain.Payment.Entities;
-using MultiTenantEcommerce.Domain.Payment.Interfaces;
+using MultiTenantEcommerce.Domain.Commerce.Sales.Orders.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Sales.Orders.Enums;
+using MultiTenantEcommerce.Domain.Commerce.Sales.Payment.Interfaces;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using MultiTenantEcommerce.Shared.Application.CQRS;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
+
 public class OrderPaymentRepository : Repository<OrderPayment>, IOrderPaymentRepository
 {
     public OrderPaymentRepository(AppDbContext appDbContext) : base(appDbContext)
@@ -22,9 +24,13 @@ public class OrderPaymentRepository : Repository<OrderPayment>, IOrderPaymentRep
         return await SortAndPageAsync(query, sort, page, pageSize);
     }
 
-    public async Task<OrderPayment?> GetByOrderId(Guid orderId)
+    public async Task<IEnumerable<OrderPayment>> GetByOrderId(Guid orderId)
     {
-        return await _appDbContext.OrderPayments.FirstOrDefaultAsync(x => x.OrderId == orderId);
+        return await _appDbContext.OrderPayments
+            .AsNoTracking()
+            .Where(x => x.OrderId == orderId)
+            .OrderByDescending(x => x.CreatedAt)
+            .ToListAsync();
     }
 
     public async Task<List<OrderPayment>> GetFilteredAsync(
@@ -59,5 +65,4 @@ public class OrderPaymentRepository : Repository<OrderPayment>, IOrderPaymentRep
 
         return await SortAndPageAsync(query, sort, page, pageSize);
     }
-
 }

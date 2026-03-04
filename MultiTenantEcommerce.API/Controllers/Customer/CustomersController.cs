@@ -2,10 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Extensions;
-using MultiTenantEcommerce.Application.Users.Customers.Commands.Delete;
-using MultiTenantEcommerce.Application.Users.Customers.Commands.Update;
-using MultiTenantEcommerce.Application.Users.Customers.DTOs;
-using MultiTenantEcommerce.Application.Users.Customers.Queries.GetById;
+using MultiTenantEcommerce.Application.Commerce.Customers.Common.DTOs;
 
 namespace MultiTenantEcommerce.API.Controllers.Customer;
 
@@ -14,7 +11,7 @@ namespace MultiTenantEcommerce.API.Controllers.Customer;
 [Route("api/[controller]")]
 public class CustomersController : ControllerBase
 {
-    private IMediator _mediator;
+    private readonly IMediator _mediator;
 
     public CustomersController(IMediator mediator)
     {
@@ -26,10 +23,7 @@ public class CustomersController : ControllerBase
     public async Task<ActionResult<CustomerResponseDTO>> GetMyProfile()
     {
         var claims = HttpContext.User.Claims.ToList();
-        foreach (var claim in claims)
-        {
-            Console.WriteLine($"Claim: {claim.Type} = {claim.Value}");
-        }
+        foreach (var claim in claims) Console.WriteLine($"Claim: {claim.Type} = {claim.Value}");
 
         var userId = User.GetUserId();
 

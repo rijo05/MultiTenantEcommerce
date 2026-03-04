@@ -1,14 +1,14 @@
 ﻿using MediatR;
-using MultiTenantEcommerce.Application.Tenants.Commands.SubscriptionPlans.AddPrice;
-using MultiTenantEcommerce.Application.Tenants.Commands.SubscriptionPlans.DeletePlan;
-using MultiTenantEcommerce.Application.Tenants.Commands.SubscriptionPlans.DeletePrice;
-using MultiTenantEcommerce.Application.Tenants.Commands.SubscriptionPlans.UpdatePlan;
-using MultiTenantEcommerce.Application.Tenants.Commands.SubscriptionPlans.UpdatePrice;
+using MultiTenantEcommerce.Application.Billing.SubscriptionPlans.Commands.StripeSync.Prices.Add;
+using MultiTenantEcommerce.Application.Billing.SubscriptionPlans.Commands.StripeSync.Prices.Update;
+using MultiTenantEcommerce.Application.Billing.SubscriptionPlans.Commands.StripeSync.Products.Deactivate;
+using MultiTenantEcommerce.Application.Billing.SubscriptionPlans.Commands.StripeSync.Products.Upsert;
 using MultiTenantEcommerce.Infrastructure.Payments;
 using MultiTenantEcommerce.Infrastructure.Webhooks.Interface;
 using Stripe;
 
 namespace MultiTenantEcommerce.Infrastructure.Webhooks.Handlers;
+
 public class StripeProductHandler : IWebhookHandler
 {
     private readonly IMediator _mediator;
@@ -23,17 +23,13 @@ public class StripeProductHandler : IWebhookHandler
         if (stripeEvent.Data.Object is Product product)
         {
             if (stripeEvent.Type == StripeEvents.ProductDeleted)
-            {
                 await _mediator.Send(new DeactivateSubscriptionPlanCommand(
                     StripeProductId: product.Id));
-            }
             else // created | updated
-            {
                 await _mediator.Send(new UpsertSubscriptionPlanCommand(
                     StripeProductId: product.Id,
                     Name: product.Name,
                     Metadata: product.Metadata));
-            }
 
             return;
         }
@@ -59,13 +55,11 @@ public class StripeProductHandler : IWebhookHandler
             else if (stripeEvent.Type == StripeEvents.PriceUpdated)
             {
                 await _mediator.Send(new UpdateSubscriptionPlanPriceCommand(
-                   StripeProductId: price.ProductId,
-                   StripePriceId: price.Id,
-                   IsActive: price.Active));
+                    StripeProductId: price.ProductId,
+                    StripePriceId: price.Id,
+                    IsActive: price.Active));
                 //metadata
             }
-
-            return;
         }
     }
 }

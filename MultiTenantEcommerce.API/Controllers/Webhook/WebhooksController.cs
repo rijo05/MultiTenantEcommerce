@@ -8,8 +8,8 @@ namespace MultiTenantEcommerce.API.Controllers.Webhook;
 [Route("api/[controller]")]
 public class WebhooksController : ControllerBase
 {
-    private readonly string _secret;
     private readonly IWebhookDispatcher _dispatcher;
+    private readonly string _secret;
 
     public WebhooksController(IConfiguration config, IWebhookDispatcher dispatcher)
     {

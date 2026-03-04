@@ -1,25 +1,27 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MultiTenantEcommerce.Domain.Enums;
-using MultiTenantEcommerce.Domain.Inventory.Entities;
-using MultiTenantEcommerce.Domain.Inventory.Interfaces;
+using MultiTenantEcommerce.Domain.Commerce.Inventory.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Inventory.Interfaces;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
-using System.Data;
+using MultiTenantEcommerce.Shared.Application.CQRS;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
+
 public class StockMovementRepository : Repository<StockMovement>, IStockMovementRepository
 {
-    public StockMovementRepository(AppDbContext appDbContext) : base(appDbContext) { }
+    public StockMovementRepository(AppDbContext appDbContext) : base(appDbContext)
+    {
+    }
 
     public async Task<List<StockMovement>> GetFilteredAsync(
-    Guid? productId = null,
-    int? minQuantity = null,
-    int? maxQuantity = null,
-    string? reason = null,
-    DateTime? minDate = null,
-    DateTime? maxDate = null,
-    int page = 1,
-    int pageSize = 20,
-    SortOptions sort = SortOptions.TimeDesc)
+        Guid? productId = null,
+        int? minQuantity = null,
+        int? maxQuantity = null,
+        string? reason = null,
+        DateTime? minDate = null,
+        DateTime? maxDate = null,
+        int page = 1,
+        int pageSize = 20,
+        SortOptions sort = SortOptions.TimeDesc)
     {
         var query = _appDbContext.StockMovements
             .AsNoTracking()

@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Domain.Tenants.Entities;
-using MultiTenantEcommerce.Domain.Users.Entities.Permissions;
+using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities;
+using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities.Auth;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
+
 public class RoleConfiguration : IEntityTypeConfiguration<Role>
 {
     public void Configure(EntityTypeBuilder<Role> builder)
@@ -11,12 +12,12 @@ public class RoleConfiguration : IEntityTypeConfiguration<Role>
         builder.HasKey(r => new { r.TenantId, r.Id });
 
         builder.HasOne<Tenant>()
-               .WithMany()
-               .HasForeignKey(r => r.TenantId)
-               .OnDelete(DeleteBehavior.Restrict);
+            .WithMany()
+            .HasForeignKey(r => r.TenantId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         builder.HasMany(r => r.Permissions)
-                .WithOne()
-                .HasForeignKey(rp => new { rp.TenantId, rp.RoleId });
+            .WithOne()
+            .HasForeignKey(rp => new { rp.TenantId, rp.RoleId });
     }
 }

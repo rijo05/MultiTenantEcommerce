@@ -2,13 +2,8 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Extensions;
-using MultiTenantEcommerce.Application.Payment.OrderPayment.DTOs;
-using MultiTenantEcommerce.Application.Sales.ShoppingCart.Commands.AddItem;
-using MultiTenantEcommerce.Application.Sales.ShoppingCart.Commands.Checkout;
-using MultiTenantEcommerce.Application.Sales.ShoppingCart.Commands.Clear;
-using MultiTenantEcommerce.Application.Sales.ShoppingCart.Commands.RemoveItem;
-using MultiTenantEcommerce.Application.Sales.ShoppingCart.DTOs;
-using MultiTenantEcommerce.Application.Sales.ShoppingCart.Queries.GetByCustomerId;
+using MultiTenantEcommerce.Application.Commerce.Sales.ShoppingCart.Common.DTOs;
+using MultiTenantEcommerce.Shared.Integration.DTOs;
 
 namespace MultiTenantEcommerce.API.Controllers.Customer;
 
@@ -79,7 +74,7 @@ public class CartsController : ControllerBase
     }
 
 
-    [HttpDelete()]
+    [HttpDelete]
     public async Task<ActionResult<CartResponseDTO>> ClearCart()
     {
         var userId = User.GetUserId();

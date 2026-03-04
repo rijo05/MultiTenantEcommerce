@@ -1,8 +1,0 @@
-﻿namespace MultiTenantEcommerce.Application.Catalog.Categories.DTOs;
-
-public class CategoryResponseDTO : ICategoryDTO
-{
-    public Guid Id { get; set; }
-    public string Name { get; set; }
-    public string? Description { get; set; }
-}

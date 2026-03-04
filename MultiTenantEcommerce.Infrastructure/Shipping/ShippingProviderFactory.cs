@@ -1,8 +1,9 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using MultiTenantEcommerce.Application.Shipping.Interfaces;
-using MultiTenantEcommerce.Domain.Shipping.Enums;
+using MultiTenantEcommerce.Application.Commerce.Shipping.Interfaces;
+using MultiTenantEcommerce.Domain.Commerce.Shipping.Enums;
 
 namespace MultiTenantEcommerce.Infrastructure.Shipping;
+
 public class ShippingProviderFactory : IShippingProviderFactory
 {
     private readonly IServiceProvider _serviceProvider;

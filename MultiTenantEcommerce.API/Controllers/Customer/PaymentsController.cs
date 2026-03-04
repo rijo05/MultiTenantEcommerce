@@ -2,9 +2,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Extensions;
-using MultiTenantEcommerce.Application.Payment.OrderPayment.DTOs;
-using MultiTenantEcommerce.Application.Payment.OrderPayment.Queries.GetByCustomerId;
-using MultiTenantEcommerce.Application.Payment.OrderPayment.Queries.GetById;
+using MultiTenantEcommerce.Application.Commerce.Sales.Payments.Common.DTOs;
 
 namespace MultiTenantEcommerce.API.Controllers.Customer;
 

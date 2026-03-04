@@ -1,8 +1,6 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
-using MultiTenantEcommerce.Application.Catalog.Categories.DTOs;
-using MultiTenantEcommerce.Application.Catalog.Categories.Queries.GetById;
-using MultiTenantEcommerce.Application.Catalog.Categories.Queries.GetFiltered;
+using MultiTenantEcommerce.Application.Commerce.Catalog.Categories.Common.DTOs;
 
 namespace MultiTenantEcommerce.API.Controllers.Customer;
 
@@ -24,7 +22,7 @@ public class CategoriesController : ControllerBase
         var query = new GetFilteredCategoriesQuery(
             filteredQuery.Name,
             filteredQuery.Description,
-            true,  //isActive
+            true, //isActive
             false, //isAdmin
             filteredQuery.Page,
             filteredQuery.PageSize,

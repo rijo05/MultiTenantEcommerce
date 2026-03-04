@@ -2,19 +2,14 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MultiTenantEcommerce.API.Authorization;
-using MultiTenantEcommerce.Application.Users.Permissions.Commands.AddToRole;
-using MultiTenantEcommerce.Application.Users.Permissions.Commands.CreateRole;
-using MultiTenantEcommerce.Application.Users.Permissions.Commands.DeleteRole;
-using MultiTenantEcommerce.Application.Users.Permissions.Commands.RemoveFromRole;
-using MultiTenantEcommerce.Application.Users.Permissions.DTOs;
-using MultiTenantEcommerce.Application.Users.Permissions.Queries.Roles.GetAll;
-using MultiTenantEcommerce.Application.Users.Permissions.Queries.Roles.GetById;
-using MultiTenantEcommerce.Application.Users.Permissions.Queries.Roles.GetByName;
+using MultiTenantEcommerce.Application.Platform.Tenancy.Roles.Commands.CreateRole;
+using MultiTenantEcommerce.Application.Platform.Tenancy.Roles.Common.DTOs;
+using MultiTenantEcommerce.Application.Platform.Tenancy.Roles.Queries.Roles.GetAll;
 
-namespace MultiTenantEcommerce.API.Controllers;
+namespace MultiTenantEcommerce.API.Controllers.Admin;
 
 [ApiController]
-[Authorize(Policy = "EmployeeOnly")]
+[Authorize(Policy = "TenantMemberOnly")]
 [Area("Admin")]
 [Route("api/[area]/[controller]")]
 public class RolesController : ControllerBase

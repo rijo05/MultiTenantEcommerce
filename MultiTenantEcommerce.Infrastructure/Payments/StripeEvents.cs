@@ -1,9 +1,11 @@
 ﻿namespace MultiTenantEcommerce.Infrastructure.Payments;
+
 public static class StripeEvents
 {
     //CHECKOUT
     public const string CheckoutSessionCompleted = "checkout.session.completed";
     public const string CheckoutSessionExpired = "checkout.session.expired";
+    public const string PaymentIntentPaymentFailed = "payment_intent.payment_failed";
 
     //SUBSCRICOES
     public const string InvoicePaid = "invoice.paid";

@@ -1,9 +1,12 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
-using MultiTenantEcommerce.Domain.Common.Events;
 using MultiTenantEcommerce.Infrastructure.Events;
+using MultiTenantEcommerce.Shared.Domain.Events;
+using MultiTenantEcommerce.Shared.Infrastructure.Messaging;
+using MultiTenantEcommerce.Shared.Infrastructure.Persistence;
+using MultiTenantEcommerce.Shared.Integration.Events;
 
 namespace MultiTenantEcommerce.Infrastructure.Messaging;
+
 public class EventDispatcher
 {
     private readonly IServiceProvider _serviceProvider;
@@ -13,32 +16,41 @@ public class EventDispatcher
         _serviceProvider = serviceProvider;
     }
 
-    public async Task DispatchAsync(IDomainEvent domainEvent)
+    public async Task DispatchSync(IDomainEvent domainEvent, CancellationToken ct = default)
+    {
+        var handlerType = typeof(ISyncHandler<>).MakeGenericType(domainEvent.GetType());
+        var handlers = _serviceProvider.GetServices(handlerType);
+
+        foreach (var handler in handlers) 
+            await ((dynamic)handler).HandleAsync((dynamic)domainEvent);
+    }
+
+    public async Task DispatchAsync(IIntegrationEvent integrationEvent, CancellationToken ct = default)
     {
         using var scope = _serviceProvider.CreateScope();
-        var scopedProvider = scope.ServiceProvider;
+        var sp = scope.ServiceProvider;
 
-        var handlers = scopedProvider.GetServices(typeof(IEventHandler<>)
-            .MakeGenericType(domainEvent.GetType()))
-            ?.ToList() ?? new List<object>();
+        var tenantContext = sp.GetRequiredService<ITenantContext>();
+        tenantContext.SetTenantId(integrationEvent.TenantId);
 
-        var processedRepo = scopedProvider.GetRequiredService<IProcessedEventsRepository>();
-        var unitOfWork = scopedProvider.GetRequiredService<IUnitOfWork>();
-        var tenantContext = scopedProvider.GetRequiredService<ITenantContext>();
-        tenantContext.SetTenantId(domainEvent.TenantId);
+        var handlerType = typeof(IAsyncHandler<>).MakeGenericType(integrationEvent.GetType());
+        var handlers = sp.GetServices(handlerType);
+
+        var processedRepo = sp.GetRequiredService<IProcessedEventsRepository>();
+        var unitOfWork = sp.GetRequiredService<IUnitOfWork>();
 
         foreach (var handler in handlers)
         {
-            var handlerName = handler.GetType().AssemblyQualifiedName!;
+            var handlerName = handler.GetType().Name;
 
-            if (!await processedRepo.WasThisEventProcessedAlready(domainEvent.EventId, handlerName))
-            {
-                dynamic dynamicHandler = handler;
-                await dynamicHandler.HandleAsync((dynamic)domainEvent);
+            if (await processedRepo.WasThisEventProcessedAlready(integrationEvent.EventId, handlerName))
+                continue;
 
-                await processedRepo.AddAsync(new ProcessedEvent(domainEvent.EventId, handlerName));
-                await unitOfWork.CommitAsync();
-            }
+            await ((dynamic)handler).HandleAsync((dynamic)integrationEvent);
+
+            await processedRepo.AddAsync(new ProcessedEvent(integrationEvent.EventId, handlerName));
+
+            await unitOfWork.CommitAsync();
         }
     }
 }

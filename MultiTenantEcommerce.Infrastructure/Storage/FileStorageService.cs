@@ -2,16 +2,18 @@
 using Amazon.S3;
 using Amazon.S3.Model;
 using Microsoft.Extensions.Configuration;
-using MultiTenantEcommerce.Application.Common.DTOs;
-using MultiTenantEcommerce.Application.Common.Interfaces.Persistence;
-using MultiTenantEcommerce.Domain.Catalog.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Catalog.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Catalog.ValueObjects;
+using MultiTenantEcommerce.Shared.Infrastructure.Services;
+using MultiTenantEcommerce.Shared.Integration.DTOs;
 
 namespace MultiTenantEcommerce.Infrastructure.Storage;
+
 public class FileStorageService : IFileStorageService
 {
-    private BasicAWSCredentials _credentials;
-    private string _serviceURL = "";
-    private string _bucketName = "";
+    private readonly string _bucketName = "";
+    private readonly BasicAWSCredentials _credentials;
+    private readonly string _serviceURL = "";
 
     public FileStorageService(IConfiguration configuration)
     {
@@ -37,26 +39,26 @@ public class FileStorageService : IFileStorageService
     }
 
 
-    public List<PresignedUpload> GenerateUploadUrls(Guid tenantId, Guid productId, List<ProductImages> images)
+    public List<PresignedUpload> GenerateUploadUrls(Guid tenantId, Guid productId, List<(string key, string contentType)> values)
     {
         var client = ConnectClient();
 
         var uploads = new List<PresignedUpload>();
 
-        foreach (var img in images)
+        foreach (var img in values)
         {
             var request = new GetPreSignedUrlRequest
             {
                 BucketName = _bucketName,
-                Key = Uri.UnescapeDataString(img.Key),
+                Key = Uri.UnescapeDataString(img.key),
                 Verb = HttpVerb.PUT,
                 Expires = DateTime.UtcNow.AddMinutes(10),
-                ContentType = img.ContentType
+                ContentType = img.contentType
             };
 
             var url = client.GetPreSignedURL(request);
 
-            uploads.Add(new PresignedUpload(img.Key, url, img.ContentType));
+            uploads.Add(new PresignedUpload(img.key, url, img.contentType));
         }
 
         return uploads;

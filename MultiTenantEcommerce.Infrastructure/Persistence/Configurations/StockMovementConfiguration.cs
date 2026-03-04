@@ -1,9 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Domain.Catalog.Entities;
-using MultiTenantEcommerce.Domain.Inventory.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Catalog.Entities;
+using MultiTenantEcommerce.Domain.Commerce.Inventory.Entities;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
+
 public class StockMovementConfiguration : IEntityTypeConfiguration<StockMovement>
 {
     public void Configure(EntityTypeBuilder<StockMovement> builder)
@@ -12,14 +13,14 @@ public class StockMovementConfiguration : IEntityTypeConfiguration<StockMovement
 
 
         builder.HasOne<Product>()
-                .WithMany()
-                .HasForeignKey(x => new { x.TenantId, x.ProductId })
-                .OnDelete(DeleteBehavior.Restrict);
+            .WithMany()
+            .HasForeignKey(x => new { x.TenantId, x.ProductId })
+            .OnDelete(DeleteBehavior.Restrict);
 
 
         builder.Property(o => o.Reason)
-                .HasConversion<string>()
-                .IsRequired();
+            .HasConversion<string>()
+            .IsRequired();
 
 
         //builder.HasIndex(sm => sm.TenantId)
