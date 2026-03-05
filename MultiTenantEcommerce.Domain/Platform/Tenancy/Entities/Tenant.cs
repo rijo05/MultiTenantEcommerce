@@ -1,7 +1,7 @@
 ﻿using MultiTenantEcommerce.Domain.Platform.Tenancy.Events;
 using MultiTenantEcommerce.Shared.Domain.Abstractions;
+using MultiTenantEcommerce.Shared.Domain.Utilities.Guards;
 using MultiTenantEcommerce.Shared.Domain.ValueObjects;
-using MultiTenantEcommerce.Shared.Utilities.Guards;
 
 namespace MultiTenantEcommerce.Domain.Platform.Tenancy.Entities;
 

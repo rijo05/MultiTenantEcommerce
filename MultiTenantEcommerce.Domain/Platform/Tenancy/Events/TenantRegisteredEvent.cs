@@ -1,4 +1,4 @@
-﻿using MultiTenantEcommerce.Shared.Domain;
+﻿using MultiTenantEcommerce.Shared.Domain.Events;
 
 namespace MultiTenantEcommerce.Domain.Platform.Tenancy.Events;
 

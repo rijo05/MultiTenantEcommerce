@@ -1,6 +1,6 @@
 ﻿using MultiTenantEcommerce.Domain.Platform.Identity.Entities;
+using MultiTenantEcommerce.Shared.Application.Interfaces;
 using MultiTenantEcommerce.Shared.Domain.ValueObjects;
-using MultiTenantEcommerce.Shared.Infrastructure.Persistence;
 
 namespace MultiTenantEcommerce.Domain.Platform.Identity.Interfaces;
 

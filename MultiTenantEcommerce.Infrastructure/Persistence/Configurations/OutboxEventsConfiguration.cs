@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Infrastructure.Outbox;
+using MultiTenantEcommerce.Infrastructure.Shared.Outbox;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
 

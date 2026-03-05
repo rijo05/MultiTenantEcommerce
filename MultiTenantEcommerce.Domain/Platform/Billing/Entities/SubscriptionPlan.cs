@@ -29,9 +29,13 @@ public class SubscriptionPlan : BaseEntity
     {
         if (_prices.Any(x => x.StripePriceId == stripePriceId)) return;
 
-        _prices.Add(new SubscriptionPlanPrice(this, price, stripePriceId));
+        var newPrice = new SubscriptionPlanPrice(this, price, stripePriceId);
+        _prices.Add(newPrice);
 
-        foreach (var p in _prices) p.Deactivate();
+        foreach (var p in _prices) 
+            p.Deactivate();
+
+        newPrice.Activate();
     }
 
     public void Deactivate()

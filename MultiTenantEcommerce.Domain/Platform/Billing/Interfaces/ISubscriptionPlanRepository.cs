@@ -1,5 +1,5 @@
 ﻿using MultiTenantEcommerce.Domain.Platform.Billing.Entities;
-using MultiTenantEcommerce.Shared.Infrastructure.Persistence;
+using MultiTenantEcommerce.Shared.Application.Interfaces;
 
 namespace MultiTenantEcommerce.Domain.Platform.Billing.Interfaces;
 

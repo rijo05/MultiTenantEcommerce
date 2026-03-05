@@ -1,5 +1,5 @@
 ﻿using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities.Auth;
-using MultiTenantEcommerce.Shared.Infrastructure.Persistence;
+using MultiTenantEcommerce.Shared.Application.Interfaces;
 
 namespace MultiTenantEcommerce.Domain.Platform.Tenancy.Interfaces.Repositories;
 

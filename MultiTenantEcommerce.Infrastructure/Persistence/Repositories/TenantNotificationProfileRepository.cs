@@ -14,7 +14,7 @@ public class TenantNotificationProfileRepository : Repository<TenantNotification
 
     public async Task<TenantNotificationProfile?> GetByTenantIdAsync(Guid tenantId)
     {
-        return await _appDbContext.NotificationProfiles
+        return await _dbContext.NotificationProfiles
             .Include(profile => profile.Overrides)
             .FirstOrDefaultAsync(profile => profile.TenantId == tenantId);
     }

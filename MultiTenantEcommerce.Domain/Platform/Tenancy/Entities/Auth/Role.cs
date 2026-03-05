@@ -1,6 +1,6 @@
 ﻿using MultiTenantEcommerce.Domain.Platform.Tenancy.Enums;
 using MultiTenantEcommerce.Shared.Domain.Abstractions;
-using MultiTenantEcommerce.Shared.Utilities.Guards;
+using MultiTenantEcommerce.Shared.Domain.Utilities.Guards;
 
 namespace MultiTenantEcommerce.Domain.Platform.Tenancy.Entities.Auth;
 
@@ -39,7 +39,7 @@ public class Role : TenantBase
     {
         CanItBeModifiedOrDeleted();
 
-        if (_permissions.Any(x => x.PermissionId == permissionId)) return;
+        if (!_permissions.Any(x => x.PermissionId == permissionId)) return;
 
         _permissions.Remove(new RolePermission(TenantId, Id, permissionId));
     }

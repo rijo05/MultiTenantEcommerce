@@ -1,6 +1,6 @@
 ﻿using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities;
 using MultiTenantEcommerce.Shared.Application.CQRS;
-using MultiTenantEcommerce.Shared.Infrastructure.Persistence;
+using MultiTenantEcommerce.Shared.Application.Interfaces;
 using System.Runtime.CompilerServices;
 
 namespace MultiTenantEcommerce.Domain.Platform.Tenancy.Interfaces.Repositories;
