@@ -1,4 +1,4 @@
-﻿namespace MultiTenantEcommerce.Shared.Infrastructure.Persistence;
+﻿namespace MultiTenantEcommerce.Shared.Application.Interfaces;
 
 public interface IUnitOfWork
 {
