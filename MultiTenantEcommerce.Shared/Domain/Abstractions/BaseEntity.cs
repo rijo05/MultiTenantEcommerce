@@ -9,13 +9,11 @@ public abstract class BaseEntity : IHasDomainEvents
     protected BaseEntity()
     {
         Id = Guid.NewGuid();
-        SetCreatedAt();
-        SetUpdatedAt();
     }
 
     public Guid Id { get; protected set; }
     public DateTime CreatedAt { get; protected set; }
-    public DateTime UpdatedAt { get; protected set; }
+    public DateTime? UpdatedAt { get; protected set; }
     public IReadOnlyList<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
     public void ClearDomainEvents()
@@ -28,13 +26,14 @@ public abstract class BaseEntity : IHasDomainEvents
         _domainEvents.Add(domainEvent);
     }
 
-    public void SetUpdatedAt()
+    public void SetCreatedAt(DateTime transactionTime)
     {
-        UpdatedAt = DateTime.UtcNow;
+        if (CreatedAt == default)
+            CreatedAt = transactionTime;
     }
 
-    internal void SetCreatedAt()
+    public void SetUpdatedAt(DateTime transactionTime)
     {
-        CreatedAt = DateTime.UtcNow;
+        UpdatedAt = transactionTime;
     }
 }

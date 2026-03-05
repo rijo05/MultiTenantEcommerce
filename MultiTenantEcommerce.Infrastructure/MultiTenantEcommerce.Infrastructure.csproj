@@ -35,4 +35,9 @@
     <ProjectReference Include="..\MultiTenantEcommerce.Shared\MultiTenantEcommerce.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Persistence\Context\" />
+    <Folder Include="Persistence\Transaction\" />
+  </ItemGroup>
+
 </Project>

@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using MultiTenantEcommerce.Infrastructure.Events;
+using MultiTenantEcommerce.Infrastructure.Shared.Events;
 
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Configurations;
 

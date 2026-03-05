@@ -1,7 +1,7 @@
 ﻿using MultiTenantEcommerce.Application.Commerce.Inventory.Interfaces;
 using MultiTenantEcommerce.Infrastructure.Commerce.Inventory.Persistence.Context;
-using MultiTenantEcommerce.Infrastructure.Messaging;
 using MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
+using MultiTenantEcommerce.Infrastructure.Shared.Messaging;
 using MultiTenantEcommerce.Shared.Application.Interfaces;
 
 namespace MultiTenantEcommerce.Infrastructure.Commerce.Inventory.Persistence.Repositories;

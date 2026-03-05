@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome to {{StoreName}}</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e0f7fa;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #b2ebf2;
+        }
+
+        .header {
+            background-color: #009688;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .content {
+            padding: 20px;
+            color: #333333;
+        }
+
+            .content p {
+                margin: 10px 0;
+                line-height: 1.5;
+            }
+
+        .cta-button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #00796b;
+            color: #ffffff;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+
+        .fallback-link {
+            font-size: 12px;
+            color: #666666;
+            margin-top: 20px;
+            word-break: break-all;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #999999;
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">🎉 Welcome to {{StoreName}}!</div>
+        <div class="content">
+            <p>Hi {{CustomerName}},</p>
+            <p>Your account has been successfully created using <strong>{{CustomerEmail}}</strong>.</p>
+            <p>To ensure the security of your account and access all features, please verify your email address by clicking the button below:</p>
+
+            <a href="{{ValidationUrl}}" class="cta-button">Confirm My Email</a>
+
+            <p class="fallback-link">
+                If the button doesn't work, copy and paste this link into your browser:<br>
+                <a href="{{ValidationUrl}}">{{ValidationUrl}}</a>
+            </p>
+        </div>
+        <div class="footer">
+            This link will expire in 24 hours. We're glad you're here.
+        </div>
+    </div>
+</body>
+</html>

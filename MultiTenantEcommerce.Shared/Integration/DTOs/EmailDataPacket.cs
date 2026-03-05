@@ -1,4 +1,4 @@
-﻿using MultiTenantEcommerce.Shared.Utilities.Constants;
+﻿using MultiTenantEcommerce.Shared.Domain.Utilities.Constants;
 
 namespace MultiTenantEcommerce.Shared.Integration.DTOs;
 

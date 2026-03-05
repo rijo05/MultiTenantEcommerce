@@ -1,4 +1,4 @@
-﻿using MultiTenantEcommerce.Shared.Utilities.Guards;
+﻿using MultiTenantEcommerce.Shared.Domain.Utilities.Guards;
 
 namespace MultiTenantEcommerce.Shared.Domain.ValueObjects;
 
