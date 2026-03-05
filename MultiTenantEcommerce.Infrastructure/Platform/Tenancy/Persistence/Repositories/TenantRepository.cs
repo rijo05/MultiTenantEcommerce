@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities;
 using MultiTenantEcommerce.Domain.Platform.Tenancy.Interfaces.Repositories;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
 using MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 using MultiTenantEcommerce.Infrastructure.Platform.Tenancy.Persistence.Context;
 using MultiTenantEcommerce.Shared.Application.CQRS;

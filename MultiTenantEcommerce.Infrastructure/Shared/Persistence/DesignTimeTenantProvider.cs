@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultiTenantEcommerce.Shared.Infrastructure.Persistence;
+namespace MultiTenantEcommerce.Infrastructure.Shared.Persistence;
 public class DesignTimeTenantProvider : ITenantContext
 {
     public Guid TenantId => Guid.Empty;

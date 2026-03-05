@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
 using System.Text.Json;
+using MultiTenantEcommerce.Shared.Application.Events;
 using MultiTenantEcommerce.Shared.Domain.Events;
-using MultiTenantEcommerce.Shared.Infrastructure.Messaging;
 using MultiTenantEcommerce.Shared.Integration.Events;
 
 namespace MultiTenantEcommerce.Infrastructure.Shared.Outbox;

@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using MultiTenantEcommerce.Infrastructure.Shared.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,6 +21,6 @@ public class IdentityDbContextFactory : IDesignTimeDbContextFactory<IdentityDbCo
             .UseNpgsql(config.GetConnectionString("DefaultConnection"))
             .Options;
 
-        return new IdentityDbContext(options);
+        return new IdentityDbContext(options, new DesignTimeTenantProvider());
     }
 }

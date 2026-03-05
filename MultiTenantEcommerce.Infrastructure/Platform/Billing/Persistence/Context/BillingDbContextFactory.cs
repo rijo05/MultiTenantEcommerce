@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
+using MultiTenantEcommerce.Infrastructure.Shared.Persistence;
 
 namespace MultiTenantEcommerce.Infrastructure.Platform.Billing.Persistence.Context;
 
@@ -16,6 +17,6 @@ public class BillingDbContextFactory : IDesignTimeDbContextFactory<BillingDbCont
             .UseNpgsql(config.GetConnectionString("DefaultConnection"))
             .Options;
 
-        return new BillingDbContext(options);
+        return new BillingDbContext(options, new DesignTimeTenantProvider());
     }
 }

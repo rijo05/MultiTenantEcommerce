@@ -1,7 +1,7 @@
 ﻿using MultiTenantEcommerce.Shared.Application.Interfaces;
 using MultiTenantEcommerce.Shared.Integration.Events;
 
-namespace MultiTenantEcommerce.Shared.Infrastructure.Messaging;
+namespace MultiTenantEcommerce.Infrastructure.Shared.Messaging;
 
 public class IntegrationEventPublisher : IIntegrationEventPublisher
 {

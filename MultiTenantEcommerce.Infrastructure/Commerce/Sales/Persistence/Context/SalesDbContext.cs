@@ -2,7 +2,7 @@
 using MultiTenantEcommerce.Domain.Commerce.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Commerce.Sales.Orders.Entities;
 using MultiTenantEcommerce.Domain.Commerce.Sales.ShoppingCart.Entities;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using MultiTenantEcommerce.Infrastructure.Shared.Persistence;
 using MultiTenantEcommerce.Shared.Application.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -13,12 +13,9 @@ using System.Threading.Tasks;
 namespace MultiTenantEcommerce.Infrastructure.Commerce.Sales.Persistence.Context;
 public class SalesDbContext : ModuleDbContext
 {
-    private readonly ITenantContext _tenantContext;
-
     public SalesDbContext(DbContextOptions<SalesDbContext> options,
-        ITenantContext tenantContext) : base(options)
+        ITenantContext tenantContext) : base(options, tenantContext)
     {
-        _tenantContext = tenantContext;
     }
 
     public virtual DbSet<Order> Orders { get; set; }

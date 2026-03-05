@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using MultiTenantEcommerce.Infrastructure.Shared.Persistence;
 
 namespace MultiTenantEcommerce.Infrastructure.Commerce.Sales.Persistence.Context;
 public class SalesDbContextFactory : IDesignTimeDbContextFactory<SalesDbContext>

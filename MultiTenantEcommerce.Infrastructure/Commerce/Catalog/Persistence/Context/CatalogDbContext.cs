@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MultiTenantEcommerce.Domain.Commerce.Catalog.Entities;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using MultiTenantEcommerce.Infrastructure.Shared.Persistence;
 using MultiTenantEcommerce.Shared.Application.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -11,12 +11,9 @@ using System.Threading.Tasks;
 namespace MultiTenantEcommerce.Infrastructure.Persistence.Catalog.Context;
 public class CatalogDbContext : ModuleDbContext
 {
-    private readonly ITenantContext _tenantContext;
-
     public CatalogDbContext(DbContextOptions<CatalogDbContext> options, 
-        ITenantContext tenantContext) : base(options)
+        ITenantContext tenantContext) : base(options, tenantContext)
     {
-        _tenantContext = tenantContext;
     }
 
     public virtual DbSet<Product> Products { get; set; }

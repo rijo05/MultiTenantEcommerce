@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Design;
 using Microsoft.Extensions.Configuration;
 using MultiTenantEcommerce.Infrastructure.Persistence.Catalog.Context;
 using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using MultiTenantEcommerce.Infrastructure.Shared.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;

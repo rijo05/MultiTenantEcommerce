@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using MultiTenantEcommerce.Infrastructure.Outbox;
+using MultiTenantEcommerce.Infrastructure.Shared.Outbox;
 using MultiTenantEcommerce.Shared.Application.Interfaces;
 using MultiTenantEcommerce.Shared.Domain.Abstractions;
 using MultiTenantEcommerce.Shared.Domain.Events;
@@ -10,16 +11,17 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MultiTenantEcommerce.Infrastructure.Persistence.Context;
+namespace MultiTenantEcommerce.Infrastructure.Shared.Persistence;
 public abstract class ModuleDbContext : DbContext
 {
-    private readonly ITenantContext _tenantContext;
+    protected readonly ITenantContext _tenantContext;
     protected ModuleDbContext(DbContextOptions options, ITenantContext tenantContext) : base(options) 
     {
         _tenantContext = tenantContext;
     }
 
-    public DbSet<OutboxEvent> OutboxEvents { get; set; }
+    public virtual DbSet<OutboxEvent> OutboxEvents { get; set; }
+    protected virtual bool RequiresTenant => true;
 
     public IEnumerable<IDomainEvent> GetAllDomainEvents()
     {

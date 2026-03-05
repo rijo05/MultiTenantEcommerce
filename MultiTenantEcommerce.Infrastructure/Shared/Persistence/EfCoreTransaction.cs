@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore.Storage;
 using MultiTenantEcommerce.Shared.Application.Interfaces;
 
-namespace MultiTenantEcommerce.Infrastructure.Persistence.Transaction;
+namespace MultiTenantEcommerce.Infrastructure.Shared.Persistence;
 
 public class EfCoreTransaction : ITransaction
 {

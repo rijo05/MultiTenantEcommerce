@@ -559,7 +559,7 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                     b.ToTable("Customers");
                 });
 
-            modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.Employee", b =>
+            modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.TenantMember", b =>
                 {
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
@@ -582,15 +582,15 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
 
                     b.HasKey("TenantId", "Id");
 
-                    b.ToTable("Employees");
+                    b.ToTable("TenantMembers");
                 });
 
-            modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.Permissions.EmployeeRole", b =>
+            modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.Permissions.TenantMemberRole", b =>
                 {
                     b.Property<Guid>("TenantId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("EmployeeId")
+                    b.Property<Guid>("TenantMemberId")
                         .HasColumnType("uuid");
 
                     b.Property<Guid>("RoleId")
@@ -605,9 +605,9 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.HasKey("TenantId", "EmployeeId", "RoleId");
+                    b.HasKey("TenantId", "TenantMemberId", "RoleId");
 
-                    b.ToTable("EmployeeRoles");
+                    b.ToTable("TenantMemberRoles");
                 });
 
             modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.Permissions.Permission", b =>
@@ -1221,7 +1221,7 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                             b1.Property<int>("MaxCategories")
                                 .HasColumnType("integer");
 
-                            b1.Property<int>("MaxEmployees")
+                            b1.Property<int>("MaxTenantMembers")
                                 .HasColumnType("integer");
 
                             b1.Property<int>("MaxImagesPerProduct")
@@ -1470,7 +1470,7 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.Employee", b =>
+            modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.TenantMember", b =>
                 {
                     b.HasOne("MultiTenantEcommerce.Domain.Tenants.Entities.Tenant", null)
                         .WithMany()
@@ -1480,10 +1480,10 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
 
                     b.OwnsOne("MultiTenantEcommerce.Domain.ValueObjects.Email", "Email", b1 =>
                         {
-                            b1.Property<Guid>("EmployeeTenantId")
+                            b1.Property<Guid>("TenantMemberTenantId")
                                 .HasColumnType("uuid");
 
-                            b1.Property<Guid>("EmployeeId")
+                            b1.Property<Guid>("TenantMemberId")
                                 .HasColumnType("uuid");
 
                             b1.Property<string>("Value")
@@ -1491,20 +1491,20 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                                 .HasColumnType("text")
                                 .HasColumnName("Email");
 
-                            b1.HasKey("EmployeeTenantId", "EmployeeId");
+                            b1.HasKey("TenantMemberTenantId", "TenantMemberId");
 
-                            b1.ToTable("Employees");
+                            b1.ToTable("TenantMembers");
 
                             b1.WithOwner()
-                                .HasForeignKey("EmployeeTenantId", "EmployeeId");
+                                .HasForeignKey("TenantMemberTenantId", "TenantMemberId");
                         });
 
                     b.OwnsOne("MultiTenantEcommerce.Domain.ValueObjects.Password", "Password", b1 =>
                         {
-                            b1.Property<Guid>("EmployeeTenantId")
+                            b1.Property<Guid>("TenantMemberTenantId")
                                 .HasColumnType("uuid");
 
-                            b1.Property<Guid>("EmployeeId")
+                            b1.Property<Guid>("TenantMemberId")
                                 .HasColumnType("uuid");
 
                             b1.Property<string>("Value")
@@ -1512,12 +1512,12 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                                 .HasColumnType("text")
                                 .HasColumnName("Password");
 
-                            b1.HasKey("EmployeeTenantId", "EmployeeId");
+                            b1.HasKey("TenantMemberTenantId", "TenantMemberId");
 
-                            b1.ToTable("Employees");
+                            b1.ToTable("TenantMembers");
 
                             b1.WithOwner()
-                                .HasForeignKey("EmployeeTenantId", "EmployeeId");
+                                .HasForeignKey("TenantMemberTenantId", "TenantMemberId");
                         });
 
                     b.Navigation("Email")
@@ -1527,11 +1527,11 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.Permissions.EmployeeRole", b =>
+            modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.Permissions.TenantMemberRole", b =>
                 {
-                    b.HasOne("MultiTenantEcommerce.Domain.Users.Entities.Employee", null)
-                        .WithMany("EmployeeRoles")
-                        .HasForeignKey("TenantId", "EmployeeId")
+                    b.HasOne("MultiTenantEcommerce.Domain.Users.Entities.TenantMember", null)
+                        .WithMany("TenantMemberRoles")
+                        .HasForeignKey("TenantId", "TenantMemberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -1574,9 +1574,9 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                     b.Navigation("ShippingProviders");
                 });
 
-            modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.Employee", b =>
+            modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.TenantMember", b =>
                 {
-                    b.Navigation("EmployeeRoles");
+                    b.Navigation("TenantMemberRoles");
                 });
 
             modelBuilder.Entity("MultiTenantEcommerce.Domain.Users.Entities.Permissions.Role", b =>

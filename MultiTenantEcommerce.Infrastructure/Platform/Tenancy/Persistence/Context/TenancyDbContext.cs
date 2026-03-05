@@ -2,19 +2,16 @@
 using MultiTenantEcommerce.Domain.Commerce.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities;
 using MultiTenantEcommerce.Domain.Platform.Tenancy.Entities.Auth;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using MultiTenantEcommerce.Infrastructure.Shared.Persistence;
 using MultiTenantEcommerce.Shared.Application.Interfaces;
 
 namespace MultiTenantEcommerce.Infrastructure.Platform.Tenancy.Persistence.Context;
 
 public class TenancyDbContext : ModuleDbContext
 {
-    private readonly ITenantContext _tenantContext;
-
     public TenancyDbContext(DbContextOptions<TenancyDbContext> options,
-        ITenantContext tenantContext) : base(options)
+        ITenantContext tenantContext) : base(options, tenantContext)
     {
-        _tenantContext = tenantContext;
     }
 
     public virtual DbSet<Tenant> Tenants { get; set; }

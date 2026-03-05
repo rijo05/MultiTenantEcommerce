@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MultiTenantEcommerce.Domain.Commerce.Shipping.Entities;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using MultiTenantEcommerce.Infrastructure.Shared.Persistence;
 using MultiTenantEcommerce.Shared.Application.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,10 +12,8 @@ namespace MultiTenantEcommerce.Infrastructure.Commerce.Shipping.Persistence.Cont
 
 public class ShippingDbContext : ModuleDbContext
 {
-    private readonly ITenantContext _tenantContext;
-    public ShippingDbContext(DbContextOptions options, ITenantContext tenantContext) : base(options)
+    public ShippingDbContext(DbContextOptions options, ITenantContext tenantContext) : base(options, tenantContext)
     {
-        _tenantContext = tenantContext;
     }
     public virtual DbSet<Shipment> Shipments { get; set; }
 

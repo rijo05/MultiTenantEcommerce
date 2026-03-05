@@ -2,8 +2,8 @@
 using MultiTenantEcommerce.Application.Commerce.Customers.Interfaces;
 using MultiTenantEcommerce.Infrastructure.Commerce.Customers.Persistence.Context;
 using MultiTenantEcommerce.Infrastructure.Persistence.Catalog.Context;
-using MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
 using MultiTenantEcommerce.Infrastructure.Shared.Messaging;
+using MultiTenantEcommerce.Infrastructure.Shared.Persistence;
 using MultiTenantEcommerce.Shared.Application.Interfaces;
 using System;
 using System.Collections.Generic;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MultiTenantEcommerce.Domain.Commerce.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Commerce.Inventory.Entities;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using MultiTenantEcommerce.Infrastructure.Shared.Persistence;
 using MultiTenantEcommerce.Shared.Application.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -12,12 +12,9 @@ using System.Threading.Tasks;
 namespace MultiTenantEcommerce.Infrastructure.Commerce.Inventory.Persistence.Context;
 public class InventoryDbContext : ModuleDbContext
 {
-    private readonly ITenantContext _tenantContext;
-
     public InventoryDbContext(DbContextOptions<InventoryDbContext> options,
-        ITenantContext tenantContext) : base(options)
+        ITenantContext tenantContext) : base(options, tenantContext)
     {
-        _tenantContext = tenantContext;
     }
 
     public virtual DbSet<Stock> Stocks { get; set; }

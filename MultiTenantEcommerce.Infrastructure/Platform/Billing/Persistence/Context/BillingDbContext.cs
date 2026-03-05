@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using MultiTenantEcommerce.Domain.Commerce.Catalog.Entities;
 using MultiTenantEcommerce.Domain.Platform.Billing.Entities;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
+using MultiTenantEcommerce.Infrastructure.Shared.Persistence;
+using MultiTenantEcommerce.Shared.Application.Interfaces;
 using MultiTenantEcommerce.Shared.Infrastructure.Persistence;
 using System;
 using System.Collections.Generic;
@@ -13,12 +14,14 @@ namespace MultiTenantEcommerce.Infrastructure.Platform.Billing.Persistence.Conte
 
 public class BillingDbContext : ModuleDbContext
 {
-    public BillingDbContext(DbContextOptions<BillingDbContext> options) : base(options)
+    public BillingDbContext(DbContextOptions<BillingDbContext> options, ITenantContext tenantContext) : base(options, tenantContext)
     {
     }
 
     public virtual DbSet<SubscriptionPlan> SubscriptionPlans { get; set; }
     public virtual DbSet<SubscriptionPlanPrice> SubscriptionPlanPrices { get; set; }
+
+    protected override bool RequiresTenant => false;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

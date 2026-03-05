@@ -115,7 +115,7 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                     PlanLimits_MaxProducts = table.Column<int>(type: "integer", nullable: false),
                     PlanLimits_MaxCategories = table.Column<int>(type: "integer", nullable: false),
                     PlanLimits_MaxImagesPerProduct = table.Column<int>(type: "integer", nullable: false),
-                    PlanLimits_MaxEmployees = table.Column<int>(type: "integer", nullable: false),
+                    PlanLimits_MaxTenantMembers = table.Column<int>(type: "integer", nullable: false),
                     PlanLimits_MaxStorageBytes = table.Column<int>(type: "integer", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
@@ -231,7 +231,7 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Employees",
+                name: "TenantMembers",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -245,9 +245,9 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Employees", x => new { x.TenantId, x.Id });
+                    table.PrimaryKey("PK_TenantMembers", x => new { x.TenantId, x.Id });
                     table.ForeignKey(
-                        name: "FK_Employees_Tenants_TenantId",
+                        name: "FK_TenantMembers_Tenants_TenantId",
                         column: x => x.TenantId,
                         principalTable: "Tenants",
                         principalColumn: "Id",
@@ -418,11 +418,11 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "EmployeeRoles",
+                name: "TenantMemberRoles",
                 columns: table => new
                 {
                     TenantId = table.Column<Guid>(type: "uuid", nullable: false),
-                    EmployeeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    TenantMemberId = table.Column<Guid>(type: "uuid", nullable: false),
                     RoleId = table.Column<Guid>(type: "uuid", nullable: false),
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
@@ -430,11 +430,11 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_EmployeeRoles", x => new { x.TenantId, x.EmployeeId, x.RoleId });
+                    table.PrimaryKey("PK_TenantMemberRoles", x => new { x.TenantId, x.TenantMemberId, x.RoleId });
                     table.ForeignKey(
-                        name: "FK_EmployeeRoles_Employees_TenantId_EmployeeId",
-                        columns: x => new { x.TenantId, x.EmployeeId },
-                        principalTable: "Employees",
+                        name: "FK_TenantMemberRoles_TenantMembers_TenantId_TenantMemberId",
+                        columns: x => new { x.TenantId, x.TenantMemberId },
+                        principalTable: "TenantMembers",
                         principalColumns: new[] { "TenantId", "Id" },
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -686,7 +686,7 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 name: "EmailTemplates");
 
             migrationBuilder.DropTable(
-                name: "EmployeeRoles");
+                name: "TenantMemberRoles");
 
             migrationBuilder.DropTable(
                 name: "OrderItems");
@@ -725,7 +725,7 @@ namespace MultiTenantEcommerce.Infrastructure.Migrations
                 name: "Carts");
 
             migrationBuilder.DropTable(
-                name: "Employees");
+                name: "TenantMembers");
 
             migrationBuilder.DropTable(
                 name: "Roles");

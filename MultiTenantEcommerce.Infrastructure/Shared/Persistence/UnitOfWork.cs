@@ -1,10 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using MultiTenantEcommerce.Infrastructure.Persistence.Context;
-using MultiTenantEcommerce.Infrastructure.Persistence.Transaction;
+using MultiTenantEcommerce.Infrastructure.Shared.Outbox;
 using MultiTenantEcommerce.Shared.Application.Interfaces;
 using MultiTenantEcommerce.Shared.Domain.Exceptions;
 
-namespace MultiTenantEcommerce.Infrastructure.Persistence.Repositories;
+namespace MultiTenantEcommerce.Infrastructure.Shared.Persistence;
 
 public class UnitOfWork<TContext> : IUnitOfWork where TContext : ModuleDbContext
 {
